@@ -162,7 +162,7 @@ export const translations: TranslationStore = {
       backToTop: 'トップに戻る',
     },
     dashboard: {
-      welcome: 'おかえりなさい、',
+      welcome: '',
       editBtn: 'プロフィール編集',
       editHint: 'プロフィールを最新の状態に保ち、より多くの機会をつかみましょう。',
       saveBtn: '保存する',

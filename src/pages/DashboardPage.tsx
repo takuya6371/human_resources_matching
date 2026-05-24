@@ -128,7 +128,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-dark">
       <nav className="bg-dark border-b border-white/[0.06] sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center"
                  style={{ background: 'linear-gradient(135deg, #D85A30 0%, #1D9E75 100%)' }}>
@@ -151,16 +151,16 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="flex items-start justify-between mb-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
             <p className="text-white/40 text-sm mb-1">{t(lang, 'dashboard.welcome')}</p>
-            <h1 className="text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+            <h1 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
               {name} {user.flag}
             </h1>
           </div>
           {!editing && (
-            <button onClick={startEdit} className="btn-primary flex items-center gap-2">
+            <button onClick={startEdit} className="btn-primary flex items-center gap-2 whitespace-nowrap self-start">
               ✏️ {t(lang, 'dashboard.editBtn')}
             </button>
           )}
