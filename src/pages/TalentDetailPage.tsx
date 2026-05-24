@@ -54,7 +54,7 @@ export default function TalentDetailPage() {
     <div className="min-h-screen bg-dark">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <Link to="/talents" className="inline-flex items-center text-white/40 text-sm hover:text-white/70 transition-colors no-underline mb-8">
           {t(lang, 'detail.back')}
         </Link>
@@ -67,19 +67,19 @@ export default function TalentDetailPage() {
           <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full pointer-events-none opacity-30"
                style={{ background: 'radial-gradient(circle, rgba(29,158,117,0.15) 0%, transparent 70%)' }} />
 
-          <div className="relative z-10 p-8 flex items-start gap-6">
-            <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-3xl font-semibold flex-shrink-0"
+          <div className="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-5 sm:gap-6">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-semibold flex-shrink-0"
                  style={{ background: talent.avatarColor + '20', border: `1.5px solid ${talent.avatarColor}40`, color: talent.avatarColor }}>
               {talent.initials}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+                <h1 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
                   {name}
                 </h1>
                 <span className="text-2xl">{talent.flag}</span>
               </div>
-              <p className="text-white/50 text-base mb-4">{country} · {field}</p>
+              <p className="text-white/50 text-sm sm:text-base mb-4">{country} · {field}</p>
               <div className="flex items-center gap-3 flex-wrap">
                 <span className="px-3 py-1.5 rounded-lg text-sm font-semibold"
                       style={{ background: level.bg, color: level.text }}>

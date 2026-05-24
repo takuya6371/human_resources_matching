@@ -26,7 +26,7 @@ export default function HomePage() {
       <Navbar />
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-24 px-6"
+      <section className="relative overflow-hidden py-16 sm:py-24 px-4 sm:px-6"
                style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #141414 100%)' }}>
         <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
              style={{ background: 'radial-gradient(circle, rgba(216,90,48,0.12) 0%, transparent 70%)' }} />
@@ -57,7 +57,7 @@ export default function HomePage() {
             </span>
           </div>
 
-          <h1 className="text-5xl font-medium text-white leading-tight mb-4"
+          <h1 className="text-3xl sm:text-5xl font-medium text-white leading-tight mb-4"
               style={{ letterSpacing: '-0.03em', maxWidth: '700px' }}>
             {t(lang, 'hero.title').split('\n').map((line, i) => (
               <span key={i}>
@@ -68,25 +68,25 @@ export default function HomePage() {
               </span>
             ))}
           </h1>
-          <p className="text-white/60 text-lg max-w-xl mb-10 leading-relaxed">
+          <p className="text-white/60 text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
             {t(lang, 'hero.subtitle')}
           </p>
 
           <form onSubmit={handleSearch}
-                className="inline-flex items-center gap-2 bg-white/95 rounded-xl px-2 py-2 max-w-md backdrop-blur-sm">
+                className="flex items-center gap-2 bg-white/95 rounded-xl px-2 py-2 w-full max-w-md backdrop-blur-sm">
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t(lang, 'hero.searchPlaceholder')}
-              className="bg-transparent border-none outline-none text-dark text-sm px-3 flex-1 placeholder-gray-400 w-64"
+              className="bg-transparent border-none outline-none text-dark text-sm px-3 flex-1 placeholder-gray-400 min-w-0"
             />
             <button type="submit" className="btn-primary whitespace-nowrap">
               {t(lang, 'hero.searchBtn')}
             </button>
           </form>
 
-          <div className="flex gap-12 mt-12">
+          <div className="flex gap-8 sm:gap-12 mt-12">
             {([
               ['5', 'hero.stats.talents'],
               ['12+', 'hero.stats.companies'],
@@ -102,15 +102,15 @@ export default function HomePage() {
       </section>
 
       {/* ── Featured talents ── */}
-      <main className="max-w-6xl mx-auto px-6 py-16">
-        <div className="flex items-end justify-between mb-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="flex items-end justify-between gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
               {t(lang, 'home.featuredHeading')}
             </h2>
             <p className="text-white/40 text-sm mt-1">{t(lang, 'home.featuredSub')}</p>
           </div>
-          <Link to="/talents" className="btn-primary no-underline">
+          <Link to="/talents" className="btn-primary no-underline whitespace-nowrap">
             {t(lang, 'home.viewAll')}
           </Link>
         </div>

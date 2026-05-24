@@ -68,13 +68,13 @@ export default function TalentListPage() {
 
       <div className="border-b border-white/[0.06]"
            style={{ background: 'linear-gradient(180deg, #0F0F0F 0%, #141414 100%)' }}>
-        <div className="max-w-6xl mx-auto px-6 py-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <h1 className="text-3xl font-medium text-white mb-2" style={{ letterSpacing: '-0.02em' }}>
             {t(lang, 'list.heading')}
           </h1>
           <p className="text-white/40 text-sm mb-6">{t(lang, 'list.subheading')}</p>
 
-          <div className="inline-flex items-center gap-2 bg-dark-3 rounded-xl px-3 py-2 w-full max-w-sm"
+          <div className="flex items-center gap-2 bg-dark-3 rounded-xl px-3 py-2 w-full sm:max-w-sm"
                style={{ border: '0.5px solid rgba(255,255,255,0.1)' }}>
             <span className="text-white/30 text-sm">🔍</span>
             <input
@@ -94,7 +94,7 @@ export default function TalentListPage() {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-6 py-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="flex items-center gap-2 flex-wrap mb-8">
           <button
             onClick={() => setActiveField(null)}
