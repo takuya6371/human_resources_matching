@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, type Dispatch, type SetStateAction } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { createContext, useContext, useState, useEffect, type Dispatch, type SetStateAction } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import type { Lang } from './types'
 import HomePage from './pages/HomePage'
@@ -16,6 +16,12 @@ interface LangContextType {
 export const LangContext = createContext<LangContextType>({ lang: 'ja', setLang: () => {} })
 export const useLang = () => useContext(LangContext)
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
+
 export default function App() {
   const [lang, setLang] = useState<Lang>('ja')
 
@@ -23,6 +29,7 @@ export default function App() {
     <AuthProvider>
       <LangContext.Provider value={{ lang, setLang }}>
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/talents" element={<TalentListPage />} />
