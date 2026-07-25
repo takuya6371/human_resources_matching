@@ -62,3 +62,39 @@ export interface User extends Talent {
   email?: string
   role: 'talent' | 'company' | 'admin'
 }
+
+export type AccountType = 'talent' | 'company' | 'admin'
+
+export interface Company {
+  id: string
+  email?: string
+  name: string
+  nameJa: string
+  description: string
+  industry: string
+  size: string
+  website: string
+  logoUrl: string
+}
+
+// profiles_teaser ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
+export interface TalentTeaser {
+  id: string
+  field: string
+  fieldJa: string
+  country: string
+  countryJa: string
+  flag: string
+  japaneseLevel: JLPTLevel
+  skills: string[]
+  skillsJa: string[]
+  openToWork: boolean
+  university: string
+  faculty: string
+  degree: string
+  graduationYear: number
+  residenceArea?: string
+  availableFrom: string
+  availableFromJa: string
+  status: ProfileStatus
+}

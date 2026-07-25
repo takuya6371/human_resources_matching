@@ -6,9 +6,12 @@ import { t } from '../i18n'
 
 export default function Navbar() {
   const { lang, setLang } = useLang()
-  const { user, logout } = useAuth()
+  const { user, company, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  const companyInitial = company?.name ? company.name.slice(0, 2).toUpperCase() : '??'
+  const accountLabel = user ? (lang === 'ja' ? user.nameJa : user.nameEn) : company?.name
 
   async function handleLogout() {
     await logout()
@@ -77,6 +80,21 @@ export default function Navbar() {
                   {t(lang, 'dashboard.logout')}
                 </button>
               </>
+            ) : company ? (
+              <>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                     style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                       style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                    {companyInitial}
+                  </div>
+                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                </div>
+                <button onClick={handleLogout}
+                        className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+                  {t(lang, 'dashboard.logout')}
+                </button>
+              </>
             ) : (
               <Link to="/login" className="btn-primary text-sm no-underline">
                 {t(lang, 'nav.signIn')}
@@ -126,6 +144,20 @@ export default function Navbar() {
                   </div>
                   <span className="text-white/70 text-sm">{lang === 'ja' ? user.nameJa : user.nameEn}</span>
                 </Link>
+                <button onClick={handleLogout}
+                        className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
+                  {t(lang, 'dashboard.logout')}
+                </button>
+              </div>
+            ) : company ? (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2 py-2">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                       style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                    {companyInitial}
+                  </div>
+                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                </div>
                 <button onClick={handleLogout}
                         className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
                   {t(lang, 'dashboard.logout')}

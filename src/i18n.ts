@@ -43,6 +43,15 @@ export const translations: TranslationStore = {
     card: {
       viewProfile: 'View profile',
       available: 'Available',
+      locked: 'Sign in to view',
+    },
+    gate: {
+      title: 'Full profiles are for company accounts',
+      subtitle: 'Sign in with a company account to see names, bios, work history and contact options for every talent.',
+      signInBtn: 'Sign in as a company',
+      signUpBtn: 'Create a company account',
+      detailTitle: 'This profile is only visible to company accounts',
+      detailSubtitle: 'Sign in or create a company account to see the full profile.',
     },
     detail: {
       back: '← Back to list',
@@ -77,6 +86,11 @@ export const translations: TranslationStore = {
       signedUpMsg: 'Account created! Please check your email to confirm your address, then sign in.',
       goToLogin: 'Go to sign in',
       backToTop: 'Back to top',
+      accountTypeLabel: 'Account type',
+      accountTypeTalent: 'Talent',
+      accountTypeCompany: 'Company',
+      companyNameLabel: 'Company name',
+      companyNamePlaceholder: 'Acme Inc.',
     },
     dashboard: {
       welcome: 'Welcome back,',
@@ -191,6 +205,15 @@ export const translations: TranslationStore = {
     card: {
       viewProfile: 'プロフィールを見る',
       available: '求職中',
+      locked: 'ログインして見る',
+    },
+    gate: {
+      title: 'プロフィールの全文閲覧は企業アカウント限定です',
+      subtitle: '企業アカウントでログインすると、氏名・自己紹介・職務経歴・連絡先など全ての情報を閲覧できます。',
+      signInBtn: '企業アカウントでログイン',
+      signUpBtn: '企業アカウントを新規登録',
+      detailTitle: 'このプロフィールは企業アカウントのみ閲覧できます',
+      detailSubtitle: 'ログインまたは企業アカウントの新規登録をすると、詳細プロフィールを閲覧できます。',
     },
     detail: {
       back: '← 一覧に戻る',
@@ -225,6 +248,11 @@ export const translations: TranslationStore = {
       signedUpMsg: 'アカウントを作成しました！メールを確認してアドレスを認証してからログインしてください。',
       goToLogin: 'ログインへ',
       backToTop: 'トップに戻る',
+      accountTypeLabel: 'アカウント種別',
+      accountTypeTalent: '人材として登録',
+      accountTypeCompany: '企業として登録',
+      companyNameLabel: '会社名',
+      companyNamePlaceholder: '株式会社サンプル',
     },
     dashboard: {
       welcome: '',
@@ -339,6 +367,15 @@ export const translations: TranslationStore = {
     card: {
       viewProfile: 'Voir le profil',
       available: 'Disponible',
+      locked: 'Connectez-vous pour voir',
+    },
+    gate: {
+      title: 'Les profils complets sont réservés aux comptes entreprise',
+      subtitle: 'Connectez-vous avec un compte entreprise pour voir les noms, bios, expériences et coordonnées de tous les talents.',
+      signInBtn: 'Se connecter en tant qu\'entreprise',
+      signUpBtn: 'Créer un compte entreprise',
+      detailTitle: 'Ce profil est visible uniquement par les comptes entreprise',
+      detailSubtitle: 'Connectez-vous ou créez un compte entreprise pour voir le profil complet.',
     },
     detail: {
       back: '← Retour à la liste',
@@ -373,6 +410,11 @@ export const translations: TranslationStore = {
       signedUpMsg: 'Compte créé ! Vérifiez votre email pour confirmer votre adresse, puis connectez-vous.',
       goToLogin: 'Aller à la connexion',
       backToTop: 'Retour en haut',
+      accountTypeLabel: 'Type de compte',
+      accountTypeTalent: 'Talent',
+      accountTypeCompany: 'Entreprise',
+      companyNameLabel: 'Nom de l\'entreprise',
+      companyNamePlaceholder: 'Acme Inc.',
     },
     dashboard: {
       welcome: 'Bienvenue,',

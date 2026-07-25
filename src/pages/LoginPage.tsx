@@ -5,24 +5,30 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 
 export default function LoginPage() {
-  const { user, login, signUp } = useAuth()
+  const { user, company, accountType, login, signUp } = useAuth()
   const { lang, setLang } = useLang()
   const navigate = useNavigate()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
+  const [signUpType, setSignUpType] = useState<'talent' | 'company'>('talent')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [companyName, setCompanyName] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
 
-  // userがセットされたら（ログイン成功後）ダッシュボードへ遷移
+  // ログイン成功後、企業アカウントは人材一覧へ、それ以外はダッシュボードへ遷移
   useEffect(() => {
-    if (user) navigate('/dashboard', { replace: true })
-  }, [user, navigate])
+    if (user || company) navigate(accountType === 'company' ? '/talents' : '/dashboard', { replace: true })
+  }, [user, company, accountType, navigate])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password.trim()) {
+      setError(t(lang, 'login.errorEmpty'))
+      return
+    }
+    if (mode === 'signup' && signUpType === 'company' && !companyName.trim()) {
       setError(t(lang, 'login.errorEmpty'))
       return
     }
@@ -37,7 +43,10 @@ export default function LoginPage() {
         return
       }
     } else {
-      const { error: authError } = await signUp(email, password)
+      const { error: authError } = await signUp(email, password, {
+        role: signUpType,
+        companyName: signUpType === 'company' ? companyName.trim() : undefined,
+      })
       if (authError) {
         setError(authError)
         setSubmitting(false)
@@ -107,6 +116,39 @@ export default function LoginPage() {
                 <div className="mb-5 px-4 py-3 rounded-xl text-sm"
                      style={{ background: 'rgba(216,90,48,0.1)', color: '#D85A30', border: '0.5px solid rgba(216,90,48,0.2)' }}>
                   {error}
+                </div>
+              )}
+
+              {!isLogin && (
+                <div className="mb-4">
+                  <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
+                    {t(lang, 'login.accountTypeLabel')}
+                  </label>
+                  <div className="flex items-center bg-dark-3 rounded-xl p-1 border border-white/[0.08]">
+                    <button type="button" onClick={() => { setSignUpType('talent'); setError('') }}
+                      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${signUpType === 'talent' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+                      {t(lang, 'login.accountTypeTalent')}
+                    </button>
+                    <button type="button" onClick={() => { setSignUpType('company'); setError('') }}
+                      className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${signUpType === 'company' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+                      {t(lang, 'login.accountTypeCompany')}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!isLogin && signUpType === 'company' && (
+                <div className="mb-4">
+                  <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
+                    {t(lang, 'login.companyNameLabel')}
+                  </label>
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={e => { setCompanyName(e.target.value); setError('') }}
+                    placeholder={t(lang, 'login.companyNamePlaceholder')}
+                    className="w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
+                  />
                 </div>
               )}
 

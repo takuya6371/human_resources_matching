@@ -1,19 +1,29 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
-import type { User, Language, Experience } from '../types'
+import { mapProfileRow, deriveInitials } from '../lib/profileMapper'
+import type { User, Company, AccountType } from '../types'
 
 interface AuthContextType {
   user: User | null
+  company: Company | null
+  accountType: AccountType | null
   loading: boolean
   login: (email: string, password: string) => Promise<{ error: string | null }>
-  signUp: (email: string, password: string) => Promise<{ error: string | null }>
+  signUp: (email: string, password: string, opts?: SignUpOptions) => Promise<{ error: string | null }>
   logout: () => Promise<void>
   updateProfile: (updates: Partial<User>) => Promise<void>
   submitForReview: () => Promise<void>
 }
 
+interface SignUpOptions {
+  role: 'talent' | 'company'
+  companyName?: string
+}
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  company: null,
+  accountType: null,
   loading: true,
   login: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
@@ -21,16 +31,6 @@ const AuthContext = createContext<AuthContextType>({
   updateProfile: async () => {},
   submitForReview: async () => {},
 })
-
-const AVATAR_COLORS = ['#D85A30', '#1D9E75', '#7F77DD', '#BA7517', '#2980B9']
-
-function deriveInitials(nameEn: string): string {
-  return nameEn.split(' ').map(n => n[0] ?? '').join('').slice(0, 2).toUpperCase() || '??'
-}
-
-function deriveAvatarColor(userId: string): string {
-  return AVATAR_COLORS[userId.charCodeAt(0) % AVATAR_COLORS.length]
-}
 
 async function fetchProfile(userId: string, email: string): Promise<User | null> {
   const [{ data: profile }, { data: langs }, { data: exps }] = await Promise.all([
@@ -41,84 +41,63 @@ async function fetchProfile(userId: string, email: string): Promise<User | null>
 
   if (!profile) return null
 
-  const languages: Language[] = (langs ?? []).map(l => ({
-    name: l.language,
-    level: l.level,
-  }))
+  return {
+    ...mapProfileRow(profile, langs ?? [], exps ?? []),
+    email,
+    role: (profile.role as 'talent' | 'company' | 'admin') ?? 'talent',
+  }
+}
 
-  const experience: Experience[] = (exps ?? []).map(e => ({
-    company: e.company_en ?? '',
-    companyJa: e.company_ja ?? '',
-    role: e.role_en ?? '',
-    roleJa: e.role_ja ?? '',
-    period: e.period ?? '',
-    descriptionEn: e.desc_en ?? '',
-    descriptionJa: e.desc_ja ?? '',
-  }))
-
-  const nameEn = profile.name_en ?? ''
+async function fetchCompany(userId: string, email: string): Promise<Company | null> {
+  const { data: company } = await supabase.from('companies').select('*').eq('id', userId).single()
+  if (!company) return null
 
   return {
-    id: profile.id,
+    id: company.id,
     email,
-    nameEn,
-    nameJa: profile.name_ja ?? '',
-    country: profile.country ?? '',
-    countryJa: profile.country_ja ?? '',
-    flag: profile.flag ?? '',
-    avatarColor: deriveAvatarColor(profile.id),
-    initials: deriveInitials(nameEn),
-    field: profile.field ?? '',
-    fieldJa: profile.field_ja ?? '',
-    university: profile.university_en ?? '',
-    universityJa: profile.university_ja ?? '',
-    faculty: profile.faculty_en ?? '',
-    facultyJa: profile.faculty_ja ?? '',
-    degree: profile.degree ?? '',
-    graduationYear: profile.graduation_year ?? new Date().getFullYear(),
-    japaneseLevel: profile.japanese_level ?? 'N3',
-    skills: profile.skills ?? [],
-    skillsJa: profile.skills_ja ?? [],
-    bioEn: profile.bio_en ?? '',
-    bioJa: profile.bio_ja ?? '',
-    availableFrom: profile.available_from ?? '',
-    availableFromJa: profile.available_from_ja ?? '',
-    openToWork: profile.open_to_work ?? true,
-    headlineEn: profile.headline_en ?? '',
-    headlineJa: profile.headline_ja ?? '',
-    languages,
-    experience,
-    status: profile.status ?? 'draft',
-    adminNote: profile.admin_note ?? undefined,
-    residenceArea: profile.residence_area ?? undefined,
-    devExperienceYears: profile.dev_experience_years ?? undefined,
-    pastClients: profile.past_clients ?? [],
-    yearsInJapan: profile.years_in_japan ?? undefined,
-    hobbies: profile.hobbies ?? undefined,
-    videoUrl: profile.video_url ?? undefined,
-    role: (profile.role as 'talent' | 'company' | 'admin') ?? 'talent',
+    name: company.name ?? '',
+    nameJa: company.name_ja ?? '',
+    description: company.description ?? '',
+    industry: company.industry ?? '',
+    size: company.size ?? '',
+    website: company.website ?? '',
+    logoUrl: company.logo_url ?? '',
   }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [company, setCompany] = useState<Company | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const accountType: AccountType | null = user ? user.role : company ? 'company' : null
+
+  async function loadAccount(userId: string, email: string) {
+    const profile = await fetchProfile(userId, email)
+    if (profile) {
+      setUser(profile)
+      setCompany(null)
+      return
+    }
+    const companyAccount = await fetchCompany(userId, email)
+    setUser(null)
+    setCompany(companyAccount)
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        const profile = await fetchProfile(session.user.id, session.user.email ?? '')
-        setUser(profile)
+        await loadAccount(session.user.id, session.user.email ?? '')
       }
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
-        const profile = await fetchProfile(session.user.id, session.user.email ?? '')
-        setUser(profile)
+        await loadAccount(session.user.id, session.user.email ?? '')
       } else {
         setUser(null)
+        setCompany(null)
       }
     })
 
@@ -129,20 +108,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
     if (data.session) {
-      const profile = await fetchProfile(data.session.user.id, data.session.user.email ?? '')
-      setUser(profile)
+      await loadAccount(data.session.user.id, data.session.user.email ?? '')
     }
     return { error: null }
   }
 
-  const signUp = async (email: string, password: string): Promise<{ error: string | null }> => {
-    const { error } = await supabase.auth.signUp({ email, password })
+  const signUp = async (email: string, password: string, opts?: SignUpOptions): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          role: opts?.role ?? 'talent',
+          company_name: opts?.companyName,
+        },
+      },
+    })
     return { error: error?.message ?? null }
   }
 
   const logout = async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setCompany(null)
   }
 
   const updateProfile = async (updates: Partial<User>) => {
@@ -215,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signUp, logout, updateProfile, submitForReview }}>
+    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, updateProfile, submitForReview }}>
       {children}
     </AuthContext.Provider>
   )
