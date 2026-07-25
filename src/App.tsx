@@ -7,6 +7,8 @@ import TalentListPage from './pages/TalentListPage'
 import TalentDetailPage from './pages/TalentDetailPage'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
+import ContactPage from './pages/ContactPage'
+import AdminPage from './pages/AdminPage'
 
 interface LangContextType {
   lang: Lang
@@ -36,6 +38,8 @@ export default function App() {
             <Route path="/talent/:id" element={<TalentDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </BrowserRouter>
       </LangContext.Provider>

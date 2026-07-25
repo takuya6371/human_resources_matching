@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
@@ -43,17 +43,17 @@ const INPUT_CLS = 'w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 p
 const LABEL_CLS = 'block text-white/40 text-xs font-medium mb-1.5 uppercase tracking-wider'
 
 export default function DashboardPage() {
-  const { user, logout, updateProfile } = useAuth()
+  const { user, loading, logout, updateProfile } = useAuth()
   const { lang, setLang } = useLang()
   const navigate = useNavigate()
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
+  useEffect(() => {
+    if (!loading && !user) navigate('/login', { replace: true })
+  }, [loading, user, navigate])
 
-  if (!user) {
-    navigate('/login')
-    return null
-  }
+  if (loading || !user) return null
 
   const level = LEVEL_COLORS[user.japaneseLevel] ?? LEVEL_COLORS['N3']
   const name = lang === 'ja' ? user.nameJa : user.nameEn
@@ -86,7 +86,7 @@ export default function DashboardPage() {
     setSaved(false)
   }
 
-  function handleSave(e: React.FormEvent) {
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
     const updates: Partial<User> = {
@@ -110,7 +110,7 @@ export default function DashboardPage() {
       languages: form.languages,
       experience: form.experience,
     }
-    updateProfile(updates)
+    await updateProfile(updates)
     setEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
@@ -120,8 +120,8 @@ export default function DashboardPage() {
     setForm(f => f ? { ...f, [key]: value } : f)
   }
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/')
   }
 
@@ -142,6 +142,8 @@ export default function DashboardPage() {
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'ja' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>JA</button>
               <button onClick={() => setLang('en')}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'en' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>EN</button>
+              <button onClick={() => setLang('fr')}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'fr' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>FR</button>
             </div>
             <button onClick={handleLogout}
                     className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
@@ -172,6 +174,7 @@ export default function DashboardPage() {
             ✓ {t(lang, 'dashboard.savedMsg')}
           </div>
         )}
+
 
         {editing && form ? (
           <form onSubmit={handleSave}>

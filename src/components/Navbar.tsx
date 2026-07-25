@@ -10,8 +10,8 @@ export default function Navbar() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  function handleLogout() {
-    logout()
+  async function handleLogout() {
+    await logout()
     navigate('/')
     setMenuOpen(false)
   }
@@ -32,12 +32,14 @@ export default function Navbar() {
           <Link to="/talents" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
             {t(lang, 'nav.talents')}
           </Link>
-          <a href="#" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
-            {t(lang, 'nav.companies')}
-          </a>
-          <a href="#" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
-            {t(lang, 'nav.about')}
-          </a>
+          <Link to="/contact" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
+            {t(lang, 'nav.contact')}
+          </Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
+              {t(lang, 'nav.admin')}
+            </Link>
+          )}
         </div>
 
         {/* right side */}
@@ -50,6 +52,10 @@ export default function Navbar() {
             <button onClick={() => setLang('en')}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'en' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
               EN
+            </button>
+            <button onClick={() => setLang('fr')}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'fr' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+              FR
             </button>
           </div>
 
@@ -98,14 +104,16 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.talents')}
           </Link>
-          <a href="#" className="text-white/70 text-sm py-2 no-underline hover:text-white"
-             onClick={() => setMenuOpen(false)}>
-            {t(lang, 'nav.companies')}
-          </a>
-          <a href="#" className="text-white/70 text-sm py-2 no-underline hover:text-white"
-             onClick={() => setMenuOpen(false)}>
-            {t(lang, 'nav.about')}
-          </a>
+          <Link to="/contact" className="text-white/70 text-sm py-2 no-underline hover:text-white"
+                onClick={() => setMenuOpen(false)}>
+            {t(lang, 'nav.contact')}
+          </Link>
+          {user?.role === 'admin' && (
+            <Link to="/admin" className="text-white/70 text-sm py-2 no-underline hover:text-white"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.admin')}
+            </Link>
+          )}
           <div className="pt-2 border-t border-white/[0.06]">
             {user ? (
               <div className="flex flex-col gap-3">

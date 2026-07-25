@@ -1,26 +1,54 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
 
 export default function LoginPage() {
-  const { login } = useAuth()
+  const { user, login, signUp } = useAuth()
   const { lang, setLang } = useLang()
   const navigate = useNavigate()
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [signedUp, setSignedUp] = useState(false)
 
-  function handleSubmit(e: React.FormEvent) {
+  // userがセットされたら（ログイン成功後）ダッシュボードへ遷移
+  useEffect(() => {
+    if (user) navigate('/dashboard', { replace: true })
+  }, [user, navigate])
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password.trim()) {
       setError(t(lang, 'login.errorEmpty'))
       return
     }
-    login()
-    navigate('/dashboard')
+    setSubmitting(true)
+    setError('')
+
+    if (mode === 'login') {
+      const { error: authError } = await login(email, password)
+      if (authError) {
+        setError(t(lang, 'login.errorInvalid'))
+        setSubmitting(false)
+        return
+      }
+    } else {
+      const { error: authError } = await signUp(email, password)
+      if (authError) {
+        setError(authError)
+        setSubmitting(false)
+        return
+      }
+      setSignedUp(true)
+    }
+    setSubmitting(false)
   }
+
+  const isLogin = mode === 'login'
 
   return (
     <div className="min-h-screen bg-dark flex flex-col"
@@ -42,6 +70,10 @@ export default function LoginPage() {
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'en' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
             EN
           </button>
+          <button onClick={() => setLang('fr')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'fr' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+            FR
+          </button>
         </div>
       </div>
 
@@ -54,54 +86,73 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-medium text-white tracking-tight mb-2" style={{ letterSpacing: '-0.02em' }}>
-              {t(lang, 'login.title')}
+              {isLogin ? t(lang, 'login.title') : t(lang, 'login.signUpTitle')}
             </h1>
             <p className="text-white/40 text-sm">{t(lang, 'login.subtitle')}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="bg-dark-2 rounded-2xl p-8"
-                style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
-            {error && (
-              <div className="mb-5 px-4 py-3 rounded-xl text-sm"
-                   style={{ background: 'rgba(216,90,48,0.1)', color: '#D85A30', border: '0.5px solid rgba(216,90,48,0.2)' }}>
-                {error}
+          {signedUp ? (
+            <div className="bg-dark-2 rounded-2xl p-8 text-center" style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+              <p className="text-2xl mb-3">✓</p>
+              <p className="text-white/70 text-sm">{t(lang, 'login.signedUpMsg')}</p>
+              <button onClick={() => { setMode('login'); setSignedUp(false) }}
+                      className="mt-5 text-a-orange text-sm hover:opacity-80 cursor-pointer">
+                {t(lang, 'login.goToLogin')}
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="bg-dark-2 rounded-2xl p-8"
+                  style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+              {error && (
+                <div className="mb-5 px-4 py-3 rounded-xl text-sm"
+                     style={{ background: 'rgba(216,90,48,0.1)', color: '#D85A30', border: '0.5px solid rgba(216,90,48,0.2)' }}>
+                  {error}
+                </div>
+              )}
+
+              <div className="mb-4">
+                <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
+                  {t(lang, 'login.emailLabel')}
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => { setEmail(e.target.value); setError('') }}
+                  placeholder={t(lang, 'login.emailPlaceholder')}
+                  className="w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
+                />
               </div>
-            )}
 
-            <div className="mb-4">
-              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
-                {t(lang, 'login.emailLabel')}
-              </label>
-              <input
-                type="text"
-                value={email}
-                onChange={e => { setEmail(e.target.value); setError('') }}
-                placeholder={t(lang, 'login.emailPlaceholder')}
-                className="w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
-              />
-            </div>
+              <div className="mb-6">
+                <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
+                  {t(lang, 'login.passwordLabel')}
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); setError('') }}
+                  placeholder="••••••••"
+                  className="w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
+                />
+              </div>
 
-            <div className="mb-6">
-              <label className="block text-white/50 text-xs font-medium mb-2 uppercase tracking-wider">
-                {t(lang, 'login.passwordLabel')}
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={e => { setPassword(e.target.value); setError('') }}
-                placeholder="••••••••"
-                className="w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-3 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
-              />
-            </div>
+              <button type="submit" disabled={submitting}
+                      className="w-full py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50"
+                      style={{ background: 'linear-gradient(135deg, #D85A30 0%, #BA7517 100%)' }}>
+                {submitting ? '...' : (isLogin ? t(lang, 'login.submitBtn') : t(lang, 'login.signUpBtn'))}
+              </button>
 
-            <button type="submit"
-                    className="w-full py-3 rounded-xl text-white text-sm font-medium transition-opacity hover:opacity-90 cursor-pointer"
-                    style={{ background: 'linear-gradient(135deg, #D85A30 0%, #BA7517 100%)' }}>
-              {t(lang, 'login.submitBtn')}
-            </button>
-
-            <p className="text-center text-white/20 text-xs mt-5">{t(lang, 'login.hint')}</p>
-          </form>
+              <p className="text-center text-white/30 text-xs mt-5">
+                {isLogin ? t(lang, 'login.noAccount') : t(lang, 'login.hasAccount')}
+                {' '}
+                <button type="button"
+                        onClick={() => { setMode(isLogin ? 'signup' : 'login'); setError('') }}
+                        className="text-a-orange hover:opacity-80 cursor-pointer underline">
+                  {isLogin ? t(lang, 'login.signUpLink') : t(lang, 'login.signInLink')}
+                </button>
+              </p>
+            </form>
+          )}
 
           <p className="text-center mt-5">
             <Link to="/" className="text-white/30 text-sm hover:text-white/50 transition-colors no-underline">

@@ -1,6 +1,7 @@
-export type Lang = 'en' | 'ja'
+export type Lang = 'en' | 'ja' | 'fr'
 export type JLPTLevel = 'N1' | 'N2' | 'N3' | 'N4' | 'N5'
 export type LanguageLevel = 'Native' | 'Fluent' | 'Business' | 'Conversational' | 'Basic'
+export type ProfileStatus = 'draft' | 'pending' | 'approved' | 'rejected'
 
 export interface Language {
   name: string
@@ -46,8 +47,18 @@ export interface Talent {
   openToWork: boolean
   languages: Language[]
   experience: Experience[]
+  // 追加フィールド（議事録 2026-07-10）
+  status: ProfileStatus
+  adminNote?: string
+  residenceArea?: string
+  devExperienceYears?: number
+  pastClients: string[]
+  yearsInJapan?: number
+  hobbies?: string
+  videoUrl?: string
 }
 
 export interface User extends Talent {
   email?: string
+  role: 'talent' | 'company' | 'admin'
 }

@@ -18,6 +18,7 @@ const FIELDS_JA: Record<string, string> = {
   Data: 'データ',
 }
 const LEVELS = ['N1', 'N2', 'N3'] as const
+const AREAS = ['東京都', '大阪府', '京都府', '神奈川県', '愛知県', '福岡県'] as const
 
 export default function TalentListPage() {
   const { lang } = useLang()
@@ -25,6 +26,7 @@ export default function TalentListPage() {
   const [search, setSearch] = useState(searchParams.get('q') ?? '')
   const [activeField, setActiveField] = useState<string | null>(null)
   const [activeLevel, setActiveLevel] = useState<string | null>(null)
+  const [activeArea, setActiveArea] = useState<string | null>(null)
 
   useEffect(() => {
     const q = searchParams.get('q')
@@ -43,6 +45,7 @@ export default function TalentListPage() {
   function clearAll() {
     setActiveField(null)
     setActiveLevel(null)
+    setActiveArea(null)
     handleSearchChange('')
   }
 
@@ -56,11 +59,12 @@ export default function TalentListPage() {
         skillsArr.some(s => s.toLowerCase().includes(query))
       const matchField = !activeField || talent.field === activeField
       const matchLevel = !activeLevel || talent.japaneseLevel === activeLevel
-      return matchSearch && matchField && matchLevel
+      const matchArea = !activeArea || talent.residenceArea === activeArea
+      return matchSearch && matchField && matchLevel && matchArea
     })
   }, [search, activeField, activeLevel, lang])
 
-  const hasFilters = !!(activeField || activeLevel || search)
+  const hasFilters = !!(activeField || activeLevel || activeArea || search)
 
   return (
     <div className="min-h-screen bg-dark">
@@ -127,6 +131,23 @@ export default function TalentListPage() {
               {l}
             </button>
           ))}
+
+          <div className="w-px h-4 bg-white/[0.08]" />
+
+          {AREAS.map(area => {
+            const hasData = talents.some(t => t.residenceArea === area)
+            if (!hasData) return null
+            return (
+              <button key={area}
+                onClick={() => setActiveArea(activeArea === area ? null : area)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  activeArea === area ? 'bg-white/20 text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                }`}
+              >
+                {area}
+              </button>
+            )
+          })}
 
           {hasFilters && (
             <>
