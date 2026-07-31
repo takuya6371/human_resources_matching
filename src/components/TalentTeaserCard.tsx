@@ -8,6 +8,7 @@ const LEVEL_COLORS: Record<string, { bg: string; text: string }> = {
   N2: { bg: 'rgba(29,158,117,0.12)', text: '#1D9E75' },
   N3: { bg: 'rgba(83,74,183,0.12)', text: '#7F77DD' },
   N4: { bg: 'rgba(186,117,23,0.12)', text: '#BA7517' },
+  N5: { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.5)' },
 }
 
 interface Props {

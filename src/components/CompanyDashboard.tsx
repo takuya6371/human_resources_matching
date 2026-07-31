@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
+import { uploadProfileImage } from '../lib/storage'
 import type { Company } from '../types'
 
 interface EditForm {
@@ -25,6 +26,8 @@ export default function CompanyDashboard({ company }: { company: Company }) {
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [logoError, setLogoError] = useState('')
 
   const name = lang === 'ja' && company.nameJa ? company.nameJa : company.name
 
@@ -40,6 +43,25 @@ export default function CompanyDashboard({ company }: { company: Company }) {
     })
     setEditing(true)
     setSaved(false)
+    setLogoError('')
+  }
+
+  async function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setLogoError('')
+    setUploadingLogo(true)
+    try {
+      const url = await uploadProfileImage(file, company.id)
+      setField('logoUrl', url)
+    } catch (err) {
+      setLogoError(err instanceof Error && err.message === 'FILE_TOO_LARGE'
+        ? (lang === 'ja' ? 'ファイルサイズは5MB以下にしてください。' : 'File must be under 5MB.')
+        : (lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.'))
+    } finally {
+      setUploadingLogo(false)
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -147,6 +169,21 @@ export default function CompanyDashboard({ company }: { company: Company }) {
               </div>
               <div>
                 <label className={LABEL_CLS}>{t(lang, 'dashboard.companyLogoUrl')}</label>
+                <div className="flex items-center gap-4 mb-3">
+                  {form.logoUrl ? (
+                    <img src={form.logoUrl} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-semibold flex-shrink-0"
+                         style={{ background: 'rgba(29,158,117,0.15)', border: '1.5px solid rgba(29,158,117,0.3)', color: '#1D9E75' }}>
+                      {initial}
+                    </div>
+                  )}
+                  <label className="btn-primary text-xs px-4 py-2 cursor-pointer">
+                    {uploadingLogo ? '...' : t(lang, 'dashboard.uploadPhoto')}
+                    <input type="file" accept="image/*" className="hidden" onChange={handleLogoChange} disabled={uploadingLogo} />
+                  </label>
+                </div>
+                {logoError && <p className="text-xs mb-2" style={{ color: '#D85A30' }}>{logoError}</p>}
                 <input className={INPUT_CLS} value={form.logoUrl} onChange={e => setField('logoUrl', e.target.value)} placeholder="https://" />
               </div>
             </section>
@@ -165,10 +202,14 @@ export default function CompanyDashboard({ company }: { company: Company }) {
           <div className="space-y-5">
             <div className="relative bg-dark-2 rounded-2xl p-6 card-border overflow-hidden">
               <div className="relative flex items-center gap-4">
-                <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold flex-shrink-0"
-                     style={{ background: 'rgba(29,158,117,0.15)', border: '1.5px solid rgba(29,158,117,0.3)', color: '#1D9E75' }}>
-                  {initial}
-                </div>
+                {company.logoUrl ? (
+                  <img src={company.logoUrl} alt="" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold flex-shrink-0"
+                       style={{ background: 'rgba(29,158,117,0.15)', border: '1.5px solid rgba(29,158,117,0.3)', color: '#1D9E75' }}>
+                    {initial}
+                  </div>
+                )}
                 <div>
                   <h2 className="text-xl font-medium text-white tracking-tight">{name}</h2>
                   {company.email && <p className="text-white/30 text-xs mt-0.5">{company.email}</p>}

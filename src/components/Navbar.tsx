@@ -71,10 +71,14 @@ export default function Navbar() {
                 <Link to={userLink}
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
                       style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
-                    {isAdmin ? '🛡️' : user.initials}
-                  </div>
+                  {!isAdmin && user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                         style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
+                      {isAdmin ? '🛡️' : user.initials}
+                    </div>
+                  )}
                   <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
@@ -87,10 +91,14 @@ export default function Navbar() {
                 <Link to="/dashboard"
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
                       style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
-                    {companyInitial}
-                  </div>
+                  {company?.logoUrl ? (
+                    <img src={company.logoUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                         style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                      {companyInitial}
+                    </div>
+                  )}
                   <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
@@ -141,10 +149,14 @@ export default function Navbar() {
                 <Link to={userLink}
                       className="flex items-center gap-2 py-2 no-underline"
                       onClick={() => setMenuOpen(false)}>
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
-                    {isAdmin ? '🛡️' : user.initials}
-                  </div>
+                  {!isAdmin && user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                         style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
+                      {isAdmin ? '🛡️' : user.initials}
+                    </div>
+                  )}
                   <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
@@ -157,10 +169,14 @@ export default function Navbar() {
                 <Link to="/dashboard"
                       className="flex items-center gap-2 py-2 no-underline"
                       onClick={() => setMenuOpen(false)}>
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
-                    {companyInitial}
-                  </div>
+                  {company?.logoUrl ? (
+                    <img src={company.logoUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
+                         style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                      {companyInitial}
+                    </div>
+                  )}
                   <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}

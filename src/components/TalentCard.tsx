@@ -8,6 +8,7 @@ const LEVEL_COLORS: Record<string, { bg: string; text: string }> = {
   N2: { bg: 'rgba(29,158,117,0.12)', text: '#1D9E75' },
   N3: { bg: 'rgba(83,74,183,0.12)', text: '#7F77DD' },
   N4: { bg: 'rgba(186,117,23,0.12)', text: '#BA7517' },
+  N5: { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.5)' },
 }
 
 const ACCENT_GRADIENTS = [
@@ -40,10 +41,14 @@ export default function TalentCard({ talent, index, disableLink = false }: Props
         <div className="pl-3">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl flex items-center justify-center text-lg font-semibold flex-shrink-0"
-                   style={{ background: talent.avatarColor + '22', border: `1px solid ${talent.avatarColor}33`, color: talent.avatarColor }}>
-                {talent.initials}
-              </div>
+              {talent.avatarUrl ? (
+                <img src={talent.avatarUrl} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center text-lg font-semibold flex-shrink-0"
+                     style={{ background: talent.avatarColor + '22', border: `1px solid ${talent.avatarColor}33`, color: talent.avatarColor }}>
+                  {talent.initials}
+                </div>
+              )}
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-white font-medium text-base tracking-tight">{name}</p>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
+import { uploadProfileImage } from '../lib/storage'
 import type { User, JLPTLevel, LanguageLevel, Language, Experience } from '../types'
 
 const LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5']
@@ -43,6 +44,7 @@ interface EditForm {
   hobbies: string
   videoUrl: string
   pastClients: string
+  avatarUrl: string
 }
 
 const INPUT_CLS = 'w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors'
@@ -63,6 +65,8 @@ export default function TalentDashboard({ user }: { user: User }) {
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const [avatarError, setAvatarError] = useState('')
 
   const level = LEVEL_COLORS[user.japaneseLevel] ?? LEVEL_COLORS['N3']
   const name = lang === 'ja' ? user.nameJa : user.nameEn
@@ -96,9 +100,29 @@ export default function TalentDashboard({ user }: { user: User }) {
       hobbies: user.hobbies ?? '',
       videoUrl: user.videoUrl ?? '',
       pastClients: (user.pastClients ?? []).join(', '),
+      avatarUrl: user.avatarUrl ?? '',
     })
     setEditing(true)
     setSaved(false)
+    setAvatarError('')
+  }
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setAvatarError('')
+    setUploadingAvatar(true)
+    try {
+      const url = await uploadProfileImage(file, user.id)
+      setField('avatarUrl', url)
+    } catch (err) {
+      setAvatarError(err instanceof Error && err.message === 'FILE_TOO_LARGE'
+        ? (lang === 'ja' ? 'ファイルサイズは5MB以下にしてください。' : 'File must be under 5MB.')
+        : (lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.'))
+    } finally {
+      setUploadingAvatar(false)
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -130,6 +154,7 @@ export default function TalentDashboard({ user }: { user: User }) {
       hobbies: form.hobbies || undefined,
       videoUrl: form.videoUrl || undefined,
       pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
+      avatarUrl: form.avatarUrl || undefined,
     }
     await updateProfile(updates)
     setEditing(false)
@@ -214,6 +239,24 @@ export default function TalentDashboard({ user }: { user: User }) {
                     {t(lang, 'dashboard.sectionBasic')}
                   </h2>
                   <div className="space-y-4">
+                    <div>
+                      <label className={LABEL_CLS}>{t(lang, 'dashboard.photo')}</label>
+                      <div className="flex items-center gap-4">
+                        {form.avatarUrl ? (
+                          <img src={form.avatarUrl} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-semibold flex-shrink-0"
+                               style={{ background: user.avatarColor + '22', border: `1.5px solid ${user.avatarColor}40`, color: user.avatarColor }}>
+                            {user.initials}
+                          </div>
+                        )}
+                        <label className="btn-primary text-xs px-4 py-2 cursor-pointer">
+                          {uploadingAvatar ? '...' : t(lang, 'dashboard.uploadPhoto')}
+                          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploadingAvatar} />
+                        </label>
+                      </div>
+                      {avatarError && <p className="text-xs mt-2" style={{ color: '#D85A30' }}>{avatarError}</p>}
+                    </div>
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.email')}</label>
                       <input className={INPUT_CLS} type="email" value={form.email}
@@ -371,7 +414,7 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <input className={`${INPUT_CLS} flex-1`} value={l.name}
                            onChange={e => { const next = [...form.languages]; next[i] = { ...next[i], name: e.target.value }; setField('languages', next) }}
                            placeholder={lang === 'ja' ? '言語名' : 'Language'} />
-                    <select className={`${INPUT_CLS} w-40`} value={l.level}
+                    <select className={`${INPUT_CLS} !w-40 flex-shrink-0`} value={l.level}
                             onChange={e => { const next = [...form.languages]; next[i] = { ...next[i], level: e.target.value as LanguageLevel }; setField('languages', next) }}>
                       {LANG_LEVELS.map(lv => <option key={lv} value={lv}>{lv}</option>)}
                     </select>
@@ -465,10 +508,14 @@ export default function TalentDashboard({ user }: { user: User }) {
                 <div className="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none"
                      style={{ background: `radial-gradient(circle, ${user.avatarColor}15 0%, transparent 70%)` }} />
                 <div className="relative flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold flex-shrink-0"
-                       style={{ background: user.avatarColor + '22', border: `1.5px solid ${user.avatarColor}40`, color: user.avatarColor }}>
-                    {user.initials}
-                  </div>
+                  {user.avatarUrl ? (
+                    <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold flex-shrink-0"
+                         style={{ background: user.avatarColor + '22', border: `1.5px solid ${user.avatarColor}40`, color: user.avatarColor }}>
+                      {user.initials}
+                    </div>
+                  )}
                   <div>
                     <h2 className="text-xl font-medium text-white tracking-tight">{name}</h2>
                     <p className="text-white/40 text-sm mt-0.5">

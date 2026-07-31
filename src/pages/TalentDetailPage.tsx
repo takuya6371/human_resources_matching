@@ -14,6 +14,7 @@ const LEVEL_COLORS: Record<string, { bg: string; text: string }> = {
   N2: { bg: 'rgba(29,158,117,0.12)', text: '#1D9E75' },
   N3: { bg: 'rgba(83,74,183,0.12)', text: '#7F77DD' },
   N4: { bg: 'rgba(186,117,23,0.12)', text: '#BA7517' },
+  N5: { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.5)' },
 }
 
 const LEVEL_LABELS: Record<string, { en: string; ja: string; fr: string }> = {
@@ -118,10 +119,14 @@ export default function TalentDetailPage() {
                  style={{ background: 'radial-gradient(circle, rgba(29,158,117,0.15) 0%, transparent 70%)' }} />
 
             <div className="relative z-10 p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-5 sm:gap-6">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-semibold flex-shrink-0"
-                   style={{ background: talent.avatarColor + '20', border: `1.5px solid ${talent.avatarColor}40`, color: talent.avatarColor }}>
-                {talent.initials}
-              </div>
+              {talent.avatarUrl ? (
+                <img src={talent.avatarUrl} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl font-semibold flex-shrink-0"
+                     style={{ background: talent.avatarColor + '20', border: `1.5px solid ${talent.avatarColor}40`, color: talent.avatarColor }}>
+                  {talent.initials}
+                </div>
+              )}
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
                   <h1 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>

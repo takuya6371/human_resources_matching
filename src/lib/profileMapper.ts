@@ -43,6 +43,7 @@ export function mapProfileRow(
     flag: profile.flag ?? '',
     avatarColor: deriveAvatarColor(profile.id),
     initials: deriveInitials(nameEn),
+    avatarUrl: profile.avatar_url ?? undefined,
     field: profile.field ?? '',
     fieldJa: profile.field_ja ?? '',
     university: profile.university_en ?? '',

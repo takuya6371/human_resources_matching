@@ -138,7 +138,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) return
 
-    await supabase.from('profiles').update({
+    const { data: saved } = await supabase.from('profiles').update({
+      avatar_url: updates.avatarUrl,
       name_en: updates.nameEn,
       name_ja: updates.nameJa,
       headline_en: updates.headlineEn,
@@ -161,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       hobbies: updates.hobbies,
       video_url: updates.videoUrl,
       past_clients: updates.pastClients,
-    }).eq('id', user.id)
+    }).eq('id', user.id).select('status, admin_note, published_at').single()
 
     if (updates.languages !== undefined) {
       await supabase.from('profile_languages').delete().eq('profile_id', user.id)
@@ -201,6 +202,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...prev,
       ...updates,
       initials: deriveInitials(nameEn),
+      // status/admin_note/published_atはDBのトリガー（承認済み編集時の自動差し戻し等）で
+      // クライアントの送信値と変わりうるため、実際にDBへ書き込まれた値を正としてマージする
+      status: saved?.status ?? prev.status,
+      adminNote: saved?.admin_note ?? undefined,
     } : prev)
   }
 

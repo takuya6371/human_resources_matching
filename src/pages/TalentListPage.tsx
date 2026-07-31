@@ -18,7 +18,7 @@ const FIELDS_JA: Record<string, string> = {
   Engineering: '工学',
   Data: 'データ',
 }
-const LEVELS = ['N1', 'N2', 'N3'] as const
+const LEVELS = ['N1', 'N2', 'N3', 'N4', 'N5'] as const
 const AREAS = ['東京都', '大阪府', '京都府', '神奈川県', '愛知県', '福岡県'] as const
 
 export default function TalentListPage() {
@@ -30,6 +30,7 @@ export default function TalentListPage() {
   const [activeField, setActiveField] = useState<string | null>(null)
   const [activeLevel, setActiveLevel] = useState<string | null>(null)
   const [activeArea, setActiveArea] = useState<string | null>(null)
+  const [openToWorkOnly, setOpenToWorkOnly] = useState(false)
   const [talents, setTalents] = useState<Talent[]>([])
   const [teasers, setTeasers] = useState<TalentTeaser[]>([])
   const [loading, setLoading] = useState(true)
@@ -78,6 +79,7 @@ export default function TalentListPage() {
     setActiveField(null)
     setActiveLevel(null)
     setActiveArea(null)
+    setOpenToWorkOnly(false)
     handleSearchChange('')
   }
 
@@ -93,9 +95,10 @@ export default function TalentListPage() {
       const matchField = !activeField || talent.field === activeField
       const matchLevel = !activeLevel || talent.japaneseLevel === activeLevel
       const matchArea = !activeArea || talent.residenceArea === activeArea
-      return matchSearch && matchField && matchLevel && matchArea
+      const matchOpenToWork = !openToWorkOnly || talent.openToWork
+      return matchSearch && matchField && matchLevel && matchArea && matchOpenToWork
     })
-  }, [hasFullAccess, talents, search, activeField, activeLevel, activeArea, lang])
+  }, [hasFullAccess, talents, search, activeField, activeLevel, activeArea, openToWorkOnly, lang])
 
   const filteredTeasers = useMemo(() => {
     if (hasFullAccess) return []
@@ -106,13 +109,14 @@ export default function TalentListPage() {
       const matchField = !activeField || talent.field === activeField
       const matchLevel = !activeLevel || talent.japaneseLevel === activeLevel
       const matchArea = !activeArea || talent.residenceArea === activeArea
-      return matchSearch && matchField && matchLevel && matchArea
+      const matchOpenToWork = !openToWorkOnly || talent.openToWork
+      return matchSearch && matchField && matchLevel && matchArea && matchOpenToWork
     })
-  }, [hasFullAccess, teasers, search, activeField, activeLevel, activeArea, lang])
+  }, [hasFullAccess, teasers, search, activeField, activeLevel, activeArea, openToWorkOnly, lang])
 
   const resultCount = hasFullAccess ? filteredTalents.length : filteredTeasers.length
   const areaSource: { residenceArea?: string }[] = hasFullAccess ? talents : teasers
-  const hasFilters = !!(activeField || activeLevel || activeArea || search)
+  const hasFilters = !!(activeField || activeLevel || activeArea || openToWorkOnly || search)
 
   return (
     <div className="min-h-screen bg-dark">
@@ -162,65 +166,92 @@ export default function TalentListPage() {
           </div>
         )}
 
-        <div className="flex items-center gap-2 flex-wrap mb-8">
-          <button
-            onClick={() => setActiveField(null)}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-              !activeField ? 'bg-white text-dark' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
-            }`}
-          >
-            {t(lang, 'list.filterAll')}
-          </button>
-          {FIELDS.map(f => (
-            <button key={f}
-              onClick={() => setActiveField(activeField === f ? null : f)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                activeField === f ? 'bg-a-orange text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
-              }`}
-            >
-              {lang === 'ja' ? FIELDS_JA[f] : f}
-            </button>
-          ))}
-
-          <div className="w-px h-4 bg-white/[0.08]" />
-
-          {LEVELS.map(l => (
-            <button key={l}
-              onClick={() => setActiveLevel(activeLevel === l ? null : l)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                activeLevel === l ? 'bg-a-green text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
-              }`}
-            >
-              {l}
-            </button>
-          ))}
-
-          <div className="w-px h-4 bg-white/[0.08]" />
-
-          {AREAS.map(area => {
-            const hasData = areaSource.some(t => t.residenceArea === area)
-            if (!hasData) return null
-            return (
-              <button key={area}
-                onClick={() => setActiveArea(activeArea === area ? null : area)}
+        <div className="space-y-3 mb-8">
+          <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
+            <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+              {t(lang, 'list.filterField')}
+            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setActiveField(null)}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                  activeArea === area ? 'bg-white/20 text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                  !activeField ? 'bg-white text-dark' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
                 }`}
               >
-                {area}
+                {t(lang, 'list.filterAll')}
               </button>
-            )
-          })}
+              {FIELDS.map(f => (
+                <button key={f}
+                  onClick={() => setActiveField(activeField === f ? null : f)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    activeField === f ? 'bg-a-orange text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                  }`}
+                >
+                  {lang === 'ja' ? FIELDS_JA[f] : f}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {hasFilters && (
-            <>
-              <div className="w-px h-4 bg-white/[0.08]" />
+          <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
+            <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+              {t(lang, 'list.filterLevel')}
+            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              {LEVELS.map(l => (
+                <button key={l}
+                  onClick={() => setActiveLevel(activeLevel === l ? null : l)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    activeLevel === l ? 'bg-a-green text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {AREAS.some(area => areaSource.some(t => t.residenceArea === area)) && (
+            <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
+              <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+                {t(lang, 'list.filterResidence')}
+              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {AREAS.map(area => {
+                  const hasData = areaSource.some(t => t.residenceArea === area)
+                  if (!hasData) return null
+                  return (
+                    <button key={area}
+                      onClick={() => setActiveArea(activeArea === area ? null : area)}
+                      className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                        activeArea === area ? 'bg-white/20 text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                      }`}
+                    >
+                      {area}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-white/[0.06] mt-1">
+            <button
+              onClick={() => setOpenToWorkOnly(o => !o)}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 mt-2 ${
+                openToWorkOnly ? 'bg-a-green text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+              }`}
+            >
+              ✓ {t(lang, 'list.filterOpenToWork')}
+            </button>
+
+            {hasFilters && (
               <button onClick={clearAll}
-                      className="px-3.5 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer bg-dark-3 border border-white/[0.08]">
+                      className="px-3.5 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer bg-dark-3 border border-white/[0.08] mt-2">
                 {t(lang, 'list.clearAll')}
               </button>
-            </>
-          )}
+            )}
+          </div>
         </div>
 
         <p className="text-white/30 text-xs mb-5">
