@@ -10,8 +10,10 @@ export default function Navbar() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const isAdmin = user?.role === 'admin'
   const companyInitial = company?.name ? company.name.slice(0, 2).toUpperCase() : '??'
-  const accountLabel = user ? (lang === 'ja' ? user.nameJa : user.nameEn) : company?.name
+  const accountLabel = isAdmin ? t(lang, 'nav.admin') : user ? (lang === 'ja' ? user.nameJa : user.nameEn) : company?.name
+  const userLink = isAdmin ? '/admin' : '/dashboard'
 
   async function handleLogout() {
     await logout()
@@ -66,14 +68,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
-                <Link to="/dashboard"
+                <Link to={userLink}
                       className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
                       style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
                   <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={{ background: user.avatarColor + '30', color: user.avatarColor }}>
-                    {user.initials}
+                       style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
+                    {isAdmin ? '🛡️' : user.initials}
                   </div>
-                  <span className="text-white/70 text-sm">{lang === 'ja' ? user.nameJa : user.nameEn}</span>
+                  <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
                         className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
@@ -82,14 +84,15 @@ export default function Navbar() {
               </>
             ) : company ? (
               <>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-                     style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                <Link to="/dashboard"
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
+                      style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
                   <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
                        style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
                     {companyInitial}
                   </div>
                   <span className="text-white/70 text-sm">{accountLabel}</span>
-                </div>
+                </Link>
                 <button onClick={handleLogout}
                         className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
                   {t(lang, 'dashboard.logout')}
@@ -135,14 +138,14 @@ export default function Navbar() {
           <div className="pt-2 border-t border-white/[0.06]">
             {user ? (
               <div className="flex flex-col gap-3">
-                <Link to="/dashboard"
+                <Link to={userLink}
                       className="flex items-center gap-2 py-2 no-underline"
                       onClick={() => setMenuOpen(false)}>
                   <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                       style={{ background: user.avatarColor + '30', color: user.avatarColor }}>
-                    {user.initials}
+                       style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
+                    {isAdmin ? '🛡️' : user.initials}
                   </div>
-                  <span className="text-white/70 text-sm">{lang === 'ja' ? user.nameJa : user.nameEn}</span>
+                  <span className="text-white/70 text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
                         className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
@@ -151,13 +154,15 @@ export default function Navbar() {
               </div>
             ) : company ? (
               <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2 py-2">
+                <Link to="/dashboard"
+                      className="flex items-center gap-2 py-2 no-underline"
+                      onClick={() => setMenuOpen(false)}>
                   <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
                        style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
                     {companyInitial}
                   </div>
                   <span className="text-white/70 text-sm">{accountLabel}</span>
-                </div>
+                </Link>
                 <button onClick={handleLogout}
                         className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
                   {t(lang, 'dashboard.logout')}

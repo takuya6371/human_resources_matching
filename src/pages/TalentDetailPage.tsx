@@ -45,8 +45,13 @@ export default function TalentDetailPage() {
 
     async function load() {
       if (hasFullAccess) {
+        // 企業アカウントは承認済みのみ。管理者は審査目的でどのステータスでも閲覧できる必要がある
+        // （RLS自体はis_admin()で全ステータスの読み取りを許可しているので、ここで絞るとRLSより厳しくなってしまう）。
+        let query = supabase.from('profiles').select('*').eq('id', id)
+        if (accountType === 'company') query = query.eq('status', 'approved')
+
         const [{ data: profile }, { data: langs }, { data: exps }] = await Promise.all([
-          supabase.from('profiles').select('*').eq('id', id).eq('status', 'approved').single(),
+          query.single(),
           supabase.from('profile_languages').select('*').eq('profile_id', id).order('sort_order'),
           supabase.from('profile_experiences').select('*').eq('profile_id', id).order('sort_order'),
         ])
@@ -64,7 +69,7 @@ export default function TalentDetailPage() {
 
     load()
     return () => { cancelled = true }
-  }, [id, hasFullAccess])
+  }, [id, hasFullAccess, accountType])
 
   if (loading) {
     return <div className="min-h-screen bg-dark" />
@@ -134,10 +139,12 @@ export default function TalentDetailPage() {
                         style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: '0.5px solid rgba(255,255,255,0.08)' }}>
                     {talent.degree} · {talent.graduationYear}
                   </span>
-                  <span className="px-3 py-1.5 rounded-lg text-sm"
-                        style={{ background: 'rgba(29,158,117,0.1)', color: '#1D9E75' }}>
-                    ✓ {availableFrom}
-                  </span>
+                  {availableFrom && (
+                    <span className="px-3 py-1.5 rounded-lg text-sm"
+                          style={{ background: 'rgba(29,158,117,0.1)', color: '#1D9E75' }}>
+                      ✓ {availableFrom}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -165,6 +172,37 @@ export default function TalentDetailPage() {
                   ))}
                 </div>
               </section>
+
+              {(talent.residenceArea || talent.devExperienceYears != null || talent.yearsInJapan != null || talent.hobbies || talent.videoUrl || (talent.pastClients && talent.pastClients.length > 0)) && (
+                <section className="bg-dark-2 rounded-2xl p-6 card-border">
+                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-4">
+                    {t(lang, 'dashboard.sectionAdditional')}
+                  </h2>
+                  <div className="space-y-2 text-sm">
+                    {talent.residenceArea && (
+                      <p className="text-white/70"><span className="text-white/40">{t(lang, 'dashboard.residenceArea')}: </span>{talent.residenceArea}</p>
+                    )}
+                    {talent.devExperienceYears != null && (
+                      <p className="text-white/70"><span className="text-white/40">{t(lang, 'dashboard.devExperienceYears')}: </span>{talent.devExperienceYears}</p>
+                    )}
+                    {talent.yearsInJapan != null && (
+                      <p className="text-white/70"><span className="text-white/40">{t(lang, 'dashboard.yearsInJapan')}: </span>{talent.yearsInJapan}</p>
+                    )}
+                    {talent.hobbies && (
+                      <p className="text-white/70"><span className="text-white/40">{t(lang, 'dashboard.hobbies')}: </span>{talent.hobbies}</p>
+                    )}
+                    {talent.videoUrl && (
+                      <p className="text-white/70">
+                        <span className="text-white/40">{t(lang, 'dashboard.videoUrl')}: </span>
+                        <a href={talent.videoUrl} target="_blank" rel="noreferrer" className="text-a-orange hover:opacity-80 break-all">{talent.videoUrl}</a>
+                      </p>
+                    )}
+                    {talent.pastClients && talent.pastClients.length > 0 && (
+                      <p className="text-white/70"><span className="text-white/40">{t(lang, 'dashboard.pastClients')}: </span>{talent.pastClients.join(', ')}</p>
+                    )}
+                  </div>
+                </section>
+              )}
 
               {talent.experience.length > 0 && (
                 <section className="bg-dark-2 rounded-2xl p-6 card-border">
@@ -303,10 +341,12 @@ export default function TalentDetailPage() {
                       style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: '0.5px solid rgba(255,255,255,0.08)' }}>
                   {teaser.degree} · {teaser.graduationYear}
                 </span>
-                <span className="px-3 py-1.5 rounded-lg text-sm"
-                      style={{ background: 'rgba(29,158,117,0.1)', color: '#1D9E75' }}>
-                  ✓ {availableFrom}
-                </span>
+                {availableFrom && (
+                  <span className="px-3 py-1.5 rounded-lg text-sm"
+                        style={{ background: 'rgba(29,158,117,0.1)', color: '#1D9E75' }}>
+                    ✓ {availableFrom}
+                  </span>
+                )}
               </div>
             </div>
           </div>

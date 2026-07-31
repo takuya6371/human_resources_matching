@@ -5,7 +5,7 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 
-type TabType = 'pending' | 'all'
+type TabType = 'pending' | 'all' | 'inquiries'
 
 interface ProfileRow {
   id: string
@@ -20,6 +20,16 @@ interface ProfileRow {
   created_at: string
 }
 
+interface InquiryRow {
+  id: string
+  name: string
+  company: string | null
+  email: string
+  inquiry_type: string | null
+  message: string
+  created_at: string
+}
+
 const STATUS_STYLE: Record<string, { bg: string; color: string; label_en: string; label_ja: string }> = {
   draft:    { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', label_en: 'Draft', label_ja: '下書き' },
   pending:  { bg: 'rgba(186,117,23,0.15)', color: '#BA7517', label_en: 'Pending', label_ja: '審査待ち' },
@@ -28,11 +38,12 @@ const STATUS_STYLE: Record<string, { bg: string; color: string; label_en: string
 }
 
 export default function AdminPage() {
-  const { user, loading } = useAuth()
+  const { user, loading, logout } = useAuth()
   const { lang } = useLang()
   const navigate = useNavigate()
   const [tab, setTab] = useState<TabType>('pending')
   const [profiles, setProfiles] = useState<ProfileRow[]>([])
+  const [inquiries, setInquiries] = useState<InquiryRow[]>([])
   const [fetching, setFetching] = useState(true)
   const [rejectNote, setRejectNote] = useState<Record<string, string>>({})
   const [processing, setProcessing] = useState<string | null>(null)
@@ -43,9 +54,18 @@ export default function AdminPage() {
     if (!loading && (!user || !isAdmin)) navigate('/')
   }, [loading, user, isAdmin, navigate])
 
+  async function handleLogout() {
+    await logout()
+    navigate('/')
+  }
+
   useEffect(() => {
     if (!isAdmin) return
-    fetchProfiles()
+    if (tab === 'inquiries') {
+      fetchInquiries()
+    } else {
+      fetchProfiles()
+    }
   }, [tab, isAdmin])
 
   async function fetchProfiles() {
@@ -59,6 +79,16 @@ export default function AdminPage() {
 
     const { data } = await query
     setProfiles((data as ProfileRow[]) ?? [])
+    setFetching(false)
+  }
+
+  async function fetchInquiries() {
+    setFetching(true)
+    const { data } = await supabase
+      .from('inquiries')
+      .select('id, name, company, email, inquiry_type, message, created_at')
+      .order('created_at', { ascending: false })
+    setInquiries((data as InquiryRow[]) ?? [])
     setFetching(false)
   }
 
@@ -96,7 +126,13 @@ export default function AdminPage() {
             </div>
             <span className="text-white font-medium text-lg tracking-tight">AfriTalent</span>
           </Link>
-          <span className="text-white/40 text-sm">{t(lang, 'admin.title')}</span>
+          <div className="flex items-center gap-4">
+            <span className="text-white/40 text-sm">{t(lang, 'admin.title')}</span>
+            <button onClick={handleLogout}
+                    className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+              {t(lang, 'dashboard.logout')}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -107,18 +143,44 @@ export default function AdminPage() {
 
         {/* タブ */}
         <div className="flex gap-2 mb-6">
-          {(['pending', 'all'] as TabType[]).map(tabKey => (
+          {(['pending', 'all', 'inquiries'] as TabType[]).map(tabKey => (
             <button key={tabKey} onClick={() => setTab(tabKey)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
                       tab === tabKey ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80 bg-dark-3 border border-white/[0.08]'
                     }`}>
-              {t(lang, tabKey === 'pending' ? 'admin.pendingTab' : 'admin.allTab')}
+              {t(lang, tabKey === 'pending' ? 'admin.pendingTab' : tabKey === 'all' ? 'admin.allTab' : 'admin.inquiriesTab')}
             </button>
           ))}
         </div>
 
         {fetching ? (
           <p className="text-white/30 text-sm">Loading...</p>
+        ) : tab === 'inquiries' ? (
+          inquiries.length === 0 ? (
+            <div className="bg-dark-2 rounded-2xl p-10 text-center" style={{ border: '0.5px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-white/30 text-sm">{t(lang, 'admin.noInquiries')}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {inquiries.map(inq => (
+                <div key={inq.id} className="bg-dark-2 rounded-2xl p-5"
+                     style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="text-white font-medium">{inq.name}</span>
+                    {inq.company && <span className="text-white/40 text-sm">{inq.company}</span>}
+                    {inq.inquiry_type && (
+                      <span className="px-2 py-0.5 rounded-md text-xs font-medium"
+                            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
+                        {inq.inquiry_type}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-white/40 text-xs mb-2">{inq.email} · {new Date(inq.created_at).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</p>
+                  <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{inq.message}</p>
+                </div>
+              ))}
+            </div>
+          )
         ) : displayed.length === 0 ? (
           <div className="bg-dark-2 rounded-2xl p-10 text-center" style={{ border: '0.5px solid rgba(255,255,255,0.06)' }}>
             <p className="text-white/30 text-sm">{t(lang, 'admin.noItems')}</p>

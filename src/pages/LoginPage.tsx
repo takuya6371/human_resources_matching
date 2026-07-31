@@ -17,9 +17,11 @@ export default function LoginPage() {
   const [submitting, setSubmitting] = useState(false)
   const [signedUp, setSignedUp] = useState(false)
 
-  // ログイン成功後、企業アカウントは人材一覧へ、それ以外はダッシュボードへ遷移
+  // ログイン成功後、管理者は審査パネルへ、企業アカウントは人材一覧へ、人材は自分のダッシュボードへ遷移
   useEffect(() => {
-    if (user || company) navigate(accountType === 'company' ? '/talents' : '/dashboard', { replace: true })
+    if (!user && !company) return
+    const destination = accountType === 'admin' ? '/admin' : accountType === 'company' ? '/talents' : '/dashboard'
+    navigate(destination, { replace: true })
   }, [user, company, accountType, navigate])
 
   async function handleSubmit(e: React.FormEvent) {

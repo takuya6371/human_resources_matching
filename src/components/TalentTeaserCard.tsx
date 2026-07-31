@@ -57,7 +57,8 @@ export default function TalentTeaserCard({ talent }: Props) {
 
           <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
             <span className="text-xs text-white/40">
-              {t(lang, 'card.available')}: {lang === 'ja' ? talent.availableFromJa : talent.availableFrom}
+              {(lang === 'ja' ? talent.availableFromJa : talent.availableFrom) &&
+                `${t(lang, 'card.available')}: ${lang === 'ja' ? talent.availableFromJa : talent.availableFrom}`}
             </span>
             <span className="text-xs font-medium text-a-orange group-hover:text-a-orange/80 transition-colors flex items-center gap-1">
               🔒 {t(lang, 'card.locked')}

@@ -12,6 +12,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, opts?: SignUpOptions) => Promise<{ error: string | null }>
   logout: () => Promise<void>
   updateProfile: (updates: Partial<User>) => Promise<void>
+  updateCompany: (updates: Partial<Company>) => Promise<void>
   submitForReview: () => Promise<void>
 }
 
@@ -29,6 +30,7 @@ const AuthContext = createContext<AuthContextType>({
   signUp: async () => ({ error: null }),
   logout: async () => {},
   updateProfile: async () => {},
+  updateCompany: async () => {},
   submitForReview: async () => {},
 })
 
@@ -153,6 +155,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       bio_ja: updates.bioJa,
       available_from: updates.availableFrom || null,
       available_from_ja: updates.availableFromJa,
+      residence_area: updates.residenceArea,
+      dev_experience_years: updates.devExperienceYears,
+      years_in_japan: updates.yearsInJapan,
+      hobbies: updates.hobbies,
+      video_url: updates.videoUrl,
+      past_clients: updates.pastClients,
     }).eq('id', user.id)
 
     if (updates.languages !== undefined) {
@@ -196,6 +204,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } : prev)
   }
 
+  const updateCompany = async (updates: Partial<Company>) => {
+    if (!company) return
+
+    await supabase.from('companies').update({
+      name: updates.name,
+      name_ja: updates.nameJa,
+      description: updates.description,
+      industry: updates.industry,
+      size: updates.size,
+      website: updates.website,
+      logo_url: updates.logoUrl,
+    }).eq('id', company.id)
+
+    setCompany(prev => prev ? { ...prev, ...updates } : prev)
+  }
+
   const submitForReview = async () => {
     if (!user) return
     await supabase.rpc('submit_profile_for_review')
@@ -203,7 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, updateProfile, submitForReview }}>
+    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, updateProfile, updateCompany, submitForReview }}>
       {children}
     </AuthContext.Provider>
   )
