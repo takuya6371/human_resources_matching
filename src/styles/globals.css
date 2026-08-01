@@ -55,4 +55,49 @@
   .btn-ghost {
     @apply text-white/60 text-sm font-normal hover:text-white transition-colors;
   }
+
+  /* ------------------------------------------------------------
+     "Line" — quiet-luxury system, used on the pages being
+     re-themed first (Navbar, Home, talent list/detail).
+     Boldness lives in one place — the filled CTA — everything
+     else stays quiet hairlines and plain type, no boxed badges.
+  ------------------------------------------------------------ */
+  .line-page {
+    @apply bg-paper text-ink;
+  }
+
+  .line-card {
+    @apply border border-hairline bg-paper;
+  }
+
+  /* the one filled, confident element on the page */
+  .btn-line {
+    @apply inline-flex items-center gap-2 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-paper bg-ink transition-colors cursor-pointer;
+  }
+  .btn-line:hover {
+    @apply bg-seal;
+  }
+
+  /* quiet secondary action — text + rule, no box */
+  .btn-line-ghost {
+    @apply inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-ink pb-[3px] cursor-pointer transition-colors;
+    border-bottom: 1px solid currentColor;
+  }
+  .btn-line-ghost:hover {
+    @apply text-seal;
+  }
+
+  .badge-line {
+    @apply inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-seal pb-[2px];
+    border-bottom: 1.5px solid #A6332B;
+  }
+
+  .badge-line-ink {
+    @apply inline-flex items-center gap-1 text-[11px] uppercase tracking-wide text-ink-soft pb-[2px];
+    border-bottom: 1px solid #E7E2D6;
+  }
+
+  .avatar-line {
+    @apply rounded-full border border-hairline flex items-center justify-center font-display font-medium text-ink flex-shrink-0 overflow-hidden;
+  }
 }

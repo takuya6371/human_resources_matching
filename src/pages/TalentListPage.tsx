@@ -119,30 +119,27 @@ export default function TalentListPage() {
   const hasFilters = !!(activeField || activeLevel || activeArea || openToWorkOnly || search)
 
   return (
-    <div className="min-h-screen bg-dark">
+    <div className="min-h-screen line-page">
       <Navbar />
 
-      <div className="border-b border-white/[0.06]"
-           style={{ background: 'linear-gradient(180deg, #0F0F0F 0%, #141414 100%)' }}>
+      <div className="border-b border-hairline">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-          <h1 className="text-3xl font-medium text-white mb-2" style={{ letterSpacing: '-0.02em' }}>
+          <h1 className="font-display font-medium text-ink text-3xl tracking-wide mb-2">
             {t(lang, 'list.heading')}
           </h1>
-          <p className="text-white/40 text-sm mb-6">{t(lang, 'list.subheading')}</p>
+          <p className="text-ink-soft text-sm mb-6">{t(lang, 'list.subheading')}</p>
 
-          <div className="flex items-center gap-2 bg-dark-3 rounded-xl px-3 py-2 w-full sm:max-w-sm"
-               style={{ border: '0.5px solid rgba(255,255,255,0.1)' }}>
-            <span className="text-white/30 text-sm">🔍</span>
+          <div className="flex items-center gap-0 border-b border-ink w-full sm:max-w-md">
             <input
               type="text"
               value={search}
               onChange={e => handleSearchChange(e.target.value)}
               placeholder={t(lang, 'hero.searchPlaceholder')}
-              className="bg-transparent border-none outline-none text-white text-sm flex-1 placeholder-white/25"
+              className="bg-transparent border-none outline-none text-ink text-sm py-3 flex-1 placeholder-ink-faint min-w-0"
             />
             {search && (
               <button onClick={() => handleSearchChange('')}
-                      className="text-white/30 hover:text-white/60 transition-colors cursor-pointer text-xs">
+                      className="text-ink-faint hover:text-ink transition-colors cursor-pointer text-xs px-2">
                 ✕
               </button>
             )}
@@ -152,14 +149,13 @@ export default function TalentListPage() {
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {!hasFullAccess && (
-          <div className="rounded-2xl p-6 mb-8 card-border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-               style={{ background: 'linear-gradient(135deg, rgba(216,90,48,0.08) 0%, rgba(29,158,117,0.08) 100%)' }}>
+          <div className="p-6 mb-8 border border-seal flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-white text-sm font-medium mb-1">{t(lang, 'gate.title')}</p>
-              <p className="text-white/50 text-xs leading-relaxed max-w-xl">{t(lang, 'gate.subtitle')}</p>
+              <p className="text-ink text-sm font-medium mb-1">{t(lang, 'gate.title')}</p>
+              <p className="text-ink-soft text-xs leading-relaxed max-w-xl">{t(lang, 'gate.subtitle')}</p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
-              <Link to="/login" className="btn-primary text-sm no-underline whitespace-nowrap">
+              <Link to="/login" className="btn-line no-underline whitespace-nowrap">
                 {t(lang, 'gate.signInBtn')}
               </Link>
             </div>
@@ -168,14 +164,14 @@ export default function TalentListPage() {
 
         <div className="space-y-3 mb-8">
           <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
-            <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+            <span className="text-ink-faint text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
               {t(lang, 'list.filterField')}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setActiveField(null)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                  !activeField ? 'bg-white text-dark' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                  !activeField ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
                 }`}
               >
                 {t(lang, 'list.filterAll')}
@@ -183,8 +179,8 @@ export default function TalentListPage() {
               {FIELDS.map(f => (
                 <button key={f}
                   onClick={() => setActiveField(activeField === f ? null : f)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    activeField === f ? 'bg-a-orange text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                  className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                    activeField === f ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
                   }`}
                 >
                   {lang === 'ja' ? FIELDS_JA[f] : f}
@@ -194,15 +190,15 @@ export default function TalentListPage() {
           </div>
 
           <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
-            <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+            <span className="text-ink-faint text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
               {t(lang, 'list.filterLevel')}
             </span>
             <div className="flex items-center gap-2 flex-wrap">
               {LEVELS.map(l => (
                 <button key={l}
                   onClick={() => setActiveLevel(activeLevel === l ? null : l)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                    activeLevel === l ? 'bg-a-green text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                  className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                    activeLevel === l ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
                   }`}
                 >
                   {l}
@@ -213,7 +209,7 @@ export default function TalentListPage() {
 
           {AREAS.some(area => areaSource.some(t => t.residenceArea === area)) && (
             <div className="flex items-start gap-3 flex-wrap sm:flex-nowrap">
-              <span className="text-white/30 text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
+              <span className="text-ink-faint text-xs font-medium uppercase tracking-wider pt-1.5 w-24 flex-shrink-0">
                 {t(lang, 'list.filterResidence')}
               </span>
               <div className="flex items-center gap-2 flex-wrap">
@@ -223,8 +219,8 @@ export default function TalentListPage() {
                   return (
                     <button key={area}
                       onClick={() => setActiveArea(activeArea === area ? null : area)}
-                      className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                        activeArea === area ? 'bg-white/20 text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+                      className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                        activeArea === area ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
                       }`}
                     >
                       {area}
@@ -235,31 +231,31 @@ export default function TalentListPage() {
             </div>
           )}
 
-          <div className="flex items-center gap-2 flex-wrap pt-1 border-t border-white/[0.06] mt-1">
+          <div className="flex items-center gap-2 flex-wrap pt-3 border-t border-hairline mt-2">
             <button
               onClick={() => setOpenToWorkOnly(o => !o)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer flex items-center gap-1 mt-2 ${
-                openToWorkOnly ? 'bg-a-green text-white' : 'bg-dark-3 text-white/60 hover:text-white border border-white/[0.08]'
+              className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 border ${
+                openToWorkOnly ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
               }`}
             >
-              ✓ {t(lang, 'list.filterOpenToWork')}
+              {t(lang, 'list.filterOpenToWork')}
             </button>
 
             {hasFilters && (
               <button onClick={clearAll}
-                      className="px-3.5 py-1.5 rounded-lg text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer bg-dark-3 border border-white/[0.08] mt-2">
+                      className="px-3.5 py-1.5 text-xs text-ink-faint hover:text-seal transition-colors cursor-pointer">
                 {t(lang, 'list.clearAll')}
               </button>
             )}
           </div>
         </div>
 
-        <p className="text-white/30 text-xs mb-5">
+        <p className="text-ink-faint text-xs mb-5" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {resultCount} {t(lang, 'list.resultCount')}
         </p>
 
         {loading ? (
-          <div className="text-center py-20 text-white/30">…</div>
+          <div className="text-center py-20 text-ink-faint">···</div>
         ) : resultCount > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {hasFullAccess
@@ -271,9 +267,8 @@ export default function TalentListPage() {
                 ))}
           </div>
         ) : (
-          <div className="text-center py-20 text-white/30">
-            <div className="text-5xl mb-4">🔍</div>
-            <p className="text-lg">{t(lang, 'list.noResults')}</p>
+          <div className="text-center py-20 text-ink-faint">
+            <p className="text-lg font-display">{t(lang, 'list.noResults')}</p>
           </div>
         )}
       </main>

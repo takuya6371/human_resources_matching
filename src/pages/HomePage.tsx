@@ -22,95 +22,68 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark">
+    <div className="min-h-screen line-page">
       <Navbar />
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-16 sm:py-24 px-4 sm:px-6"
-               style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #141414 100%)' }}>
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(216,90,48,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full pointer-events-none"
-             style={{ background: 'radial-gradient(circle, rgba(29,158,117,0.12) 0%, transparent 70%)' }} />
-        <div className="absolute top-16 right-24 w-20 h-20 border border-a-orange/20 rounded-full pointer-events-none"
-             style={{ transform: 'rotate(15deg)' }} />
-        <div className="absolute bottom-16 left-24 w-14 h-14 rounded-xl pointer-events-none"
-             style={{ background: 'linear-gradient(135deg, rgba(29,158,117,0.15) 0%, transparent 100%)', transform: 'rotate(-20deg)' }} />
-
-        <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-6"
-               style={{ background: 'rgba(29,158,117,0.08)', border: '0.5px solid rgba(29,158,117,0.3)' }}>
-            <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
-                    style={{ background: '#1D9E75' }} />
-              <span className="relative inline-flex rounded-full h-2 w-2"
-                    style={{ background: '#1D9E75' }} />
-            </span>
-            <span className="text-xs font-medium"
-                  style={{ color: 'rgba(255,255,255,0.75)' }}>
-              {t(lang, 'hero.badge').split('×').map((part, i) => (
-                <span key={i}>
-                  {i > 0 && <span style={{ color: '#1D9E75', margin: '0 0.2em' }}>×</span>}
-                  {part}
-                </span>
-              ))}
+      {/* Hero */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6 border-b border-hairline">
+        <div className="max-w-6xl mx-auto">
+          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 border border-seal mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-seal flex-shrink-0" />
+            <span className="text-xs font-medium text-seal tracking-wide">
+              {t(lang, 'hero.badge')}
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-medium text-white leading-tight mb-4"
-              style={{ letterSpacing: '-0.03em', maxWidth: '700px' }}>
+          <h1 className="font-display font-medium text-ink leading-[1.05] mb-6"
+              style={{ fontSize: 'clamp(36px, 6vw, 68px)', letterSpacing: '0.005em', maxWidth: '18ch' }}>
             {t(lang, 'hero.title').split('\n').map((line, i) => (
-              <span key={i}>
-                {i > 0 && <br />}
-                {i === 1
-                  ? <span style={{ background: 'linear-gradient(135deg, #D85A30 0%, #1D9E75 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{line}</span>
-                  : line}
-              </span>
+              <span key={i} style={{ display: 'block' }}>{line}</span>
             ))}
           </h1>
-          <p className="text-white/60 text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
+          <p className="text-ink-soft text-base sm:text-lg max-w-xl mb-10 leading-relaxed">
             {t(lang, 'hero.subtitle')}
           </p>
 
           <form onSubmit={handleSearch}
-                className="flex items-center gap-2 bg-white/95 rounded-xl px-2 py-2 w-full max-w-md backdrop-blur-sm">
+                className="flex items-center gap-0 border-b border-ink w-full max-w-md">
             <input
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t(lang, 'hero.searchPlaceholder')}
-              className="bg-transparent border-none outline-none text-dark text-sm px-3 flex-1 placeholder-gray-400 min-w-0"
+              className="bg-transparent border-none outline-none text-ink text-sm py-3 flex-1 placeholder-ink-faint min-w-0"
             />
-            <button type="submit" className="btn-primary whitespace-nowrap">
+            <button type="submit" className="btn-line whitespace-nowrap">
               {t(lang, 'hero.searchBtn')}
             </button>
           </form>
 
-          <div className="flex gap-8 sm:gap-12 mt-12">
+          <div className="flex gap-10 sm:gap-14 mt-16 pt-8 border-t border-hairline max-w-xl">
             {([
               ['5', 'hero.stats.talents'],
               ['12+', 'hero.stats.companies'],
               ['4', 'hero.stats.countries'],
             ] as const).map(([val, key]) => (
               <div key={key}>
-                <p className="text-white text-3xl font-medium" style={{ letterSpacing: '-0.02em' }}>{val}</p>
-                <p className="text-white/50 text-sm mt-1">{t(lang, key)}</p>
+                <p className="font-display text-ink text-3xl" style={{ fontVariantNumeric: 'tabular-nums' }}>{val}</p>
+                <p className="text-ink-faint text-xs mt-1.5 uppercase tracking-wide">{t(lang, key)}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Featured talents ── */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        <div className="flex items-end justify-between gap-4 mb-8">
+      {/* Featured talents */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
+        <div className="flex items-end justify-between gap-4 mb-10">
           <div>
-            <h2 className="text-2xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+            <h2 className="font-display font-medium text-ink text-2xl tracking-wide">
               {t(lang, 'home.featuredHeading')}
             </h2>
-            <p className="text-white/40 text-sm mt-1">{t(lang, 'home.featuredSub')}</p>
+            <p className="text-ink-soft text-sm mt-1.5">{t(lang, 'home.featuredSub')}</p>
           </div>
-          <Link to="/talents" className="btn-primary no-underline whitespace-nowrap">
+          <Link to="/talents" className="btn-line no-underline whitespace-nowrap">
             {t(lang, 'home.viewAll')}
           </Link>
         </div>

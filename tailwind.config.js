@@ -4,6 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        // legacy tokens — still referenced by pages not yet re-themed
         'a-orange': '#D85A30',
         'a-orange-dark': '#BA7517',
         'a-green': '#1D9E75',
@@ -14,9 +15,18 @@ export default {
         'dark-3': '#1C1C1C',
         'dark-4': '#242424',
         'border': 'rgba(255,255,255,0.08)',
+
+        // "Line" — quiet-luxury outline system (paper.md)
+        'paper': '#FAF8F4',
+        'ink': '#1C1B18',
+        'ink-soft': '#8A8577',
+        'ink-faint': '#B7B2A1',
+        'hairline': '#E7E2D6',
+        'seal': '#A6332B',
       },
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        display: ['Futura', '"Century Gothic"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       backgroundImage: {
         'hero-gradient': 'linear-gradient(180deg, #0A0A0A 0%, #141414 100%)',

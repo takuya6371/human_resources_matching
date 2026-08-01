@@ -22,26 +22,22 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-dark border-b border-white/[0.06] sticky top-0 z-50 backdrop-blur-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <nav className="line-page border-b border-hairline sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: 'rgba(250,248,244,0.92)' }}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 no-underline" onClick={() => setMenuOpen(false)}>
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-               style={{ background: 'linear-gradient(135deg, #D85A30 0%, #1D9E75 100%)' }}>
-            <span className="text-white font-bold text-xs">AT</span>
-          </div>
-          <span className="text-white font-medium text-lg tracking-tight">AfriTalent</span>
+          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
         </Link>
 
         {/* desktop nav links */}
-        <div className="hidden md:flex items-center gap-7">
-          <Link to="/talents" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
+        <div className="hidden md:flex items-center gap-8">
+          <Link to="/talents" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.talents')}
           </Link>
-          <Link to="/contact" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
+          <Link to="/contact" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.contact')}
           </Link>
           {user?.role === 'admin' && (
-            <Link to="/admin" className="text-white/60 text-sm hover:text-white transition-colors no-underline">
+            <Link to="/admin" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
               {t(lang, 'nav.admin')}
             </Link>
           )}
@@ -49,65 +45,62 @@ export default function Navbar() {
 
         {/* right side */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-dark-3 rounded-lg p-0.5 border border-white/[0.08]">
+          <div className="hidden sm:flex items-center border border-hairline">
             <button onClick={() => setLang('ja')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'ja' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+              className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${lang === 'ja' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
               JA
             </button>
             <button onClick={() => setLang('en')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'en' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+              className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'en' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
               EN
             </button>
             <button onClick={() => setLang('fr')}
-              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'fr' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>
+              className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'fr' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
               FR
             </button>
           </div>
 
           {/* desktop auth */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-4">
             {user ? (
               <>
                 <Link to={userLink}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
-                      style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                      className="flex items-center gap-2 px-3 py-1.5 no-underline transition-colors border border-hairline hover:border-ink">
                   {!isAdmin && user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                    <img src={user.avatarUrl} alt="" className="avatar-line w-6 h-6" />
                   ) : (
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                         style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
-                      {isAdmin ? '🛡️' : user.initials}
+                    <div className="avatar-line w-6 h-6 text-[10px]"
+                         style={isAdmin ? { color: '#A6332B' } : undefined}>
+                      {isAdmin ? '✦' : user.initials}
                     </div>
                   )}
-                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                  <span className="text-ink text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
-                        className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+                        className="text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer">
                   {t(lang, 'dashboard.logout')}
                 </button>
               </>
             ) : company ? (
               <>
                 <Link to="/dashboard"
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg no-underline transition-colors hover:bg-dark-3"
-                      style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                      className="flex items-center gap-2 px-3 py-1.5 no-underline transition-colors border border-hairline hover:border-ink">
                   {company?.logoUrl ? (
-                    <img src={company.logoUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                    <img src={company.logoUrl} alt="" className="avatar-line w-6 h-6" />
                   ) : (
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                         style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                    <div className="avatar-line w-6 h-6 text-[10px]">
                       {companyInitial}
                     </div>
                   )}
-                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                  <span className="text-ink text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
-                        className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+                        className="text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer">
                   {t(lang, 'dashboard.logout')}
                 </button>
               </>
             ) : (
-              <Link to="/login" className="btn-primary text-sm no-underline">
+              <Link to="/login" className="btn-line no-underline">
                 {t(lang, 'nav.signIn')}
               </Link>
             )}
@@ -119,48 +112,56 @@ export default function Navbar() {
             onClick={() => setMenuOpen(o => !o)}
             aria-label="menu"
           >
-            <span className={`block w-5 h-px bg-white/60 transition-all duration-200 origin-center ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
-            <span className={`block w-5 h-px bg-white/60 transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-px bg-white/60 transition-all duration-200 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
+            <span className={`block w-5 h-px bg-ink transition-all duration-200 origin-center ${menuOpen ? 'rotate-45 translate-y-[7px]' : ''}`} />
+            <span className={`block w-5 h-px bg-ink transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block w-5 h-px bg-ink transition-all duration-200 origin-center ${menuOpen ? '-rotate-45 -translate-y-[7px]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-white/[0.06] px-4 py-4 flex flex-col gap-3 bg-dark">
-          <Link to="/talents" className="text-white/70 text-sm py-2 no-underline hover:text-white"
+        <div className="md:hidden border-t border-hairline px-4 py-4 flex flex-col gap-3 line-page">
+          <Link to="/talents" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.talents')}
           </Link>
-          <Link to="/contact" className="text-white/70 text-sm py-2 no-underline hover:text-white"
+          <Link to="/contact" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.contact')}
           </Link>
           {user?.role === 'admin' && (
-            <Link to="/admin" className="text-white/70 text-sm py-2 no-underline hover:text-white"
+            <Link to="/admin" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                   onClick={() => setMenuOpen(false)}>
               {t(lang, 'nav.admin')}
             </Link>
           )}
-          <div className="pt-2 border-t border-white/[0.06]">
+          <div className="flex items-center gap-2 sm:hidden">
+            {(['ja', 'en', 'fr'] as const).map(l => (
+              <button key={l} onClick={() => setLang(l)}
+                className={`px-3 py-1.5 text-xs font-medium border transition-colors cursor-pointer ${lang === l ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft'}`}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-hairline">
             {user ? (
               <div className="flex flex-col gap-3">
                 <Link to={userLink}
                       className="flex items-center gap-2 py-2 no-underline"
                       onClick={() => setMenuOpen(false)}>
                   {!isAdmin && user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                    <img src={user.avatarUrl} alt="" className="avatar-line w-6 h-6" />
                   ) : (
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                         style={isAdmin ? { background: 'rgba(216,90,48,0.2)', color: '#D85A30' } : { background: user.avatarColor + '30', color: user.avatarColor }}>
-                      {isAdmin ? '🛡️' : user.initials}
+                    <div className="avatar-line w-6 h-6 text-[10px]"
+                         style={isAdmin ? { color: '#A6332B' } : undefined}>
+                      {isAdmin ? '✦' : user.initials}
                     </div>
                   )}
-                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                  <span className="text-ink text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
-                        className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
+                        className="text-left text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer py-2">
                   {t(lang, 'dashboard.logout')}
                 </button>
               </div>
@@ -170,22 +171,21 @@ export default function Navbar() {
                       className="flex items-center gap-2 py-2 no-underline"
                       onClick={() => setMenuOpen(false)}>
                   {company?.logoUrl ? (
-                    <img src={company.logoUrl} alt="" className="w-6 h-6 rounded-md object-cover flex-shrink-0" />
+                    <img src={company.logoUrl} alt="" className="avatar-line w-6 h-6" />
                   ) : (
-                    <div className="w-6 h-6 rounded-md flex items-center justify-center text-xs font-semibold"
-                         style={{ background: 'rgba(29,158,117,0.2)', color: '#1D9E75' }}>
+                    <div className="avatar-line w-6 h-6 text-[10px]">
                       {companyInitial}
                     </div>
                   )}
-                  <span className="text-white/70 text-sm">{accountLabel}</span>
+                  <span className="text-ink text-sm">{accountLabel}</span>
                 </Link>
                 <button onClick={handleLogout}
-                        className="text-left text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer py-2">
+                        className="text-left text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer py-2">
                   {t(lang, 'dashboard.logout')}
                 </button>
               </div>
             ) : (
-              <Link to="/login" className="btn-primary text-sm no-underline inline-block"
+              <Link to="/login" className="btn-line no-underline"
                     onClick={() => setMenuOpen(false)}>
                 {t(lang, 'nav.signIn')}
               </Link>
