@@ -30,12 +30,14 @@ interface InquiryRow {
   created_at: string
 }
 
-const STATUS_STYLE: Record<string, { bg: string; color: string; label_en: string; label_ja: string }> = {
-  draft:    { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', label_en: 'Draft', label_ja: '下書き' },
-  pending:  { bg: 'rgba(186,117,23,0.15)', color: '#BA7517', label_en: 'Pending', label_ja: '審査待ち' },
-  approved: { bg: 'rgba(29,158,117,0.15)', color: '#1D9E75', label_en: 'Approved', label_ja: '承認済み' },
-  rejected: { bg: 'rgba(216,90,48,0.15)', color: '#D85A30', label_en: 'Rejected', label_ja: '差し戻し' },
+const STATUS_STYLE: Record<string, { color: string; label_en: string; label_ja: string }> = {
+  draft:    { color: '#B7B2A1', label_en: 'Draft', label_ja: '下書き' },
+  pending:  { color: '#BA7517', label_en: 'Pending', label_ja: '審査待ち' },
+  approved: { color: '#1D7E5C', label_en: 'Approved', label_ja: '承認済み' },
+  rejected: { color: '#A6332B', label_en: 'Rejected', label_ja: '差し戻し' },
 }
+
+const INPUT_CLS = 'bg-paper border border-hairline px-3 py-2 text-ink text-xs placeholder-ink-faint outline-none focus:border-ink transition-colors'
 
 export default function AdminPage() {
   const { user, loading, logout } = useAuth()
@@ -116,37 +118,33 @@ export default function AdminPage() {
   const displayed = profiles
 
   return (
-    <div className="min-h-screen bg-dark">
-      <nav className="bg-dark border-b border-white/[0.06] sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen line-page">
+      <nav className="line-page border-b border-hairline sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #D85A30 0%, #1D9E75 100%)' }}>
-              <span className="text-white font-bold text-xs">AT</span>
-            </div>
-            <span className="text-white font-medium text-lg tracking-tight">AfriTalent</span>
+            <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-white/40 text-sm">{t(lang, 'admin.title')}</span>
+            <span className="text-ink-soft text-sm">{t(lang, 'admin.title')}</span>
             <button onClick={handleLogout}
-                    className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+                    className="text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer">
               {t(lang, 'dashboard.logout')}
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="text-2xl font-medium text-white mb-6" style={{ letterSpacing: '-0.02em' }}>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <h1 className="font-display font-medium text-ink text-3xl tracking-wide mb-6">
           {t(lang, 'admin.title')}
         </h1>
 
         {/* タブ */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-8">
           {(['pending', 'all', 'inquiries'] as TabType[]).map(tabKey => (
             <button key={tabKey} onClick={() => setTab(tabKey)}
-                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer ${
-                      tab === tabKey ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80 bg-dark-3 border border-white/[0.08]'
+                    className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                      tab === tabKey ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
                     }`}>
               {t(lang, tabKey === 'pending' ? 'admin.pendingTab' : tabKey === 'all' ? 'admin.allTab' : 'admin.inquiriesTab')}
             </button>
@@ -154,36 +152,32 @@ export default function AdminPage() {
         </div>
 
         {fetching ? (
-          <p className="text-white/30 text-sm">Loading...</p>
+          <p className="text-ink-faint text-sm">···</p>
         ) : tab === 'inquiries' ? (
           inquiries.length === 0 ? (
-            <div className="bg-dark-2 rounded-2xl p-10 text-center" style={{ border: '0.5px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-white/30 text-sm">{t(lang, 'admin.noInquiries')}</p>
+            <div className="line-card p-10 text-center">
+              <p className="text-ink-faint text-sm">{t(lang, 'admin.noInquiries')}</p>
             </div>
           ) : (
             <div className="space-y-4">
               {inquiries.map(inq => (
-                <div key={inq.id} className="bg-dark-2 rounded-2xl p-5"
-                     style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                <div key={inq.id} className="line-card p-5">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-white font-medium">{inq.name}</span>
-                    {inq.company && <span className="text-white/40 text-sm">{inq.company}</span>}
+                    <span className="text-ink font-medium">{inq.name}</span>
+                    {inq.company && <span className="text-ink-soft text-sm">{inq.company}</span>}
                     {inq.inquiry_type && (
-                      <span className="px-2 py-0.5 rounded-md text-xs font-medium"
-                            style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}>
-                        {inq.inquiry_type}
-                      </span>
+                      <span className="badge-line-ink">{inq.inquiry_type}</span>
                     )}
                   </div>
-                  <p className="text-white/40 text-xs mb-2">{inq.email} · {new Date(inq.created_at).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</p>
-                  <p className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap">{inq.message}</p>
+                  <p className="text-ink-faint text-xs mb-2">{inq.email} · {new Date(inq.created_at).toLocaleString(lang === 'ja' ? 'ja-JP' : 'en-US')}</p>
+                  <p className="text-ink-soft text-sm leading-relaxed whitespace-pre-wrap">{inq.message}</p>
                 </div>
               ))}
             </div>
           )
         ) : displayed.length === 0 ? (
-          <div className="bg-dark-2 rounded-2xl p-10 text-center" style={{ border: '0.5px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-white/30 text-sm">{t(lang, 'admin.noItems')}</p>
+          <div className="line-card p-10 text-center">
+            <p className="text-ink-faint text-sm">{t(lang, 'admin.noItems')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -191,38 +185,36 @@ export default function AdminPage() {
               const st = STATUS_STYLE[p.status] ?? STATUS_STYLE.draft
               const isPending = p.status === 'pending'
               return (
-                <div key={p.id} className="bg-dark-2 rounded-2xl p-5"
-                     style={{ border: '0.5px solid rgba(255,255,255,0.08)' }}>
+                <div key={p.id} className="line-card p-5">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-white font-medium">{p.name_en}</span>
-                        <span className="text-white/40 text-sm">{p.name_ja}</span>
-                        <span className="px-2 py-0.5 rounded-md text-xs font-medium"
-                              style={{ background: st.bg, color: st.color }}>
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-ink font-medium">{p.name_en}</span>
+                        <span className="text-ink-soft text-sm">{p.name_ja}</span>
+                        <span className="text-xs font-medium uppercase tracking-wide pb-[2px]"
+                              style={{ color: st.color, borderBottom: `1.5px solid ${st.color}` }}>
                           {lang === 'ja' ? st.label_ja : st.label_en}
                         </span>
                       </div>
-                      <p className="text-white/40 text-xs">
+                      <p className="text-ink-faint text-xs">
                         {p.email} · {p.country} · {p.field} · {p.japanese_level}
                       </p>
                       {p.admin_note && (
-                        <p className="text-white/30 text-xs mt-1 italic">"{p.admin_note}"</p>
+                        <p className="text-ink-faint text-xs mt-1 italic">"{p.admin_note}"</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <Link to={`/talent/${p.id}`} target="_blank"
-                            className="px-3 py-1.5 rounded-lg text-xs text-white/50 hover:text-white/80 no-underline transition-colors"
-                            style={{ background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)' }}>
+                            className="btn-line-ghost no-underline">
                         {t(lang, 'card.viewProfile')}
                       </Link>
                     </div>
                   </div>
 
                   {isPending && (
-                    <div className="mt-4 pt-4 border-t border-white/[0.06] flex flex-col sm:flex-row gap-2 items-start">
+                    <div className="mt-4 pt-4 border-t border-hairline flex flex-col sm:flex-row gap-2 items-start">
                       <input
-                        className="flex-1 bg-dark-3 border border-white/[0.08] rounded-xl px-3 py-2 text-white text-xs placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors"
+                        className={`flex-1 ${INPUT_CLS}`}
                         placeholder={t(lang, 'admin.notePlaceholder')}
                         value={rejectNote[p.id] ?? ''}
                         onChange={e => setRejectNote(prev => ({ ...prev, [p.id]: e.target.value }))}
@@ -230,15 +222,14 @@ export default function AdminPage() {
                       <div className="flex gap-2">
                         <button onClick={() => handleApprove(p.id)}
                                 disabled={processing === p.id}
-                                className="px-4 py-2 rounded-xl text-xs font-medium text-white transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50"
-                                style={{ background: 'linear-gradient(135deg, #1D9E75, #147a5a)' }}>
-                          {processing === p.id ? '...' : t(lang, 'admin.approve')}
+                                className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-paper transition-colors cursor-pointer disabled:opacity-50"
+                                style={{ backgroundColor: '#1D7E5C' }}>
+                          {processing === p.id ? '···' : t(lang, 'admin.approve')}
                         </button>
                         <button onClick={() => handleReject(p.id)}
                                 disabled={processing === p.id}
-                                className="px-4 py-2 rounded-xl text-xs font-medium text-white transition-opacity hover:opacity-90 cursor-pointer disabled:opacity-50"
-                                style={{ background: 'linear-gradient(135deg, #D85A30, #BA7517)' }}>
-                          {processing === p.id ? '...' : t(lang, 'admin.reject')}
+                                className="btn-line px-4 py-2 text-xs disabled:opacity-50">
+                          {processing === p.id ? '···' : t(lang, 'admin.reject')}
                         </button>
                       </div>
                     </div>

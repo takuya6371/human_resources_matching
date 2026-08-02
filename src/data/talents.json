@@ -6,7 +6,6 @@
     "country": "Ghana",
     "countryJa": "ガーナ",
     "flag": "🇬🇭",
-    "avatarColor": "#D85A30",
     "initials": "KA",
     "field": "IT",
     "fieldJa": "IT・エンジニアリング",
@@ -17,23 +16,49 @@
     "degree": "M.Eng",
     "graduationYear": 2026,
     "japaneseLevel": "N2",
-    "skills": ["Python", "Machine Learning", "Data Analysis", "TensorFlow", "SQL"],
-    "skillsJa": ["Python", "機械学習", "データ分析", "TensorFlow", "SQL"],
+    "skills": [
+      "Python",
+      "Machine Learning",
+      "Data Analysis",
+      "TensorFlow",
+      "SQL"
+    ],
+    "skillsJa": [
+      "Python",
+      "機械学習",
+      "データ分析",
+      "TensorFlow",
+      "SQL"
+    ],
     "headlineEn": "ML Engineer · Tokyo Tech · Available April 2026",
     "headlineJa": "MLエンジニア · 東京工業大学 · 2026年4月〜",
     "openToWork": true,
     "status": "approved",
     "residenceArea": "東京都",
     "devExperienceYears": 3,
-    "pastClients": ["RIKEN AIP"],
+    "pastClients": [
+      "RIKEN AIP"
+    ],
     "yearsInJapan": 3,
     "hobbies": "Football, Photography",
     "videoUrl": "",
     "languages": [
-      { "name": "English", "level": "Native" },
-      { "name": "Japanese", "level": "Conversational" },
-      { "name": "Twi", "level": "Native" },
-      { "name": "French", "level": "Basic" }
+      {
+        "name": "English",
+        "level": "Native"
+      },
+      {
+        "name": "Japanese",
+        "level": "Conversational"
+      },
+      {
+        "name": "Twi",
+        "level": "Native"
+      },
+      {
+        "name": "French",
+        "level": "Basic"
+      }
     ],
     "experience": [
       {
@@ -58,7 +83,6 @@
     "country": "Senegal",
     "countryJa": "セネガル",
     "flag": "🇸🇳",
-    "avatarColor": "#1D9E75",
     "initials": "AD",
     "field": "Business",
     "fieldJa": "ビジネス・マーケティング",
@@ -69,23 +93,49 @@
     "degree": "B.Com",
     "graduationYear": 2025,
     "japaneseLevel": "N3",
-    "skills": ["Marketing Strategy", "Sales", "French", "Business Development", "Excel"],
-    "skillsJa": ["マーケティング戦略", "営業", "フランス語", "事業開発", "Excel"],
+    "skills": [
+      "Marketing Strategy",
+      "Sales",
+      "French",
+      "Business Development",
+      "Excel"
+    ],
+    "skillsJa": [
+      "マーケティング戦略",
+      "営業",
+      "フランス語",
+      "事業開発",
+      "Excel"
+    ],
     "headlineEn": "Marketing & Biz Dev · Keio University · Available Sept 2025",
     "headlineJa": "マーケティング・事業開発 · 慶應義塾大学 · 2025年9月〜",
     "openToWork": true,
     "status": "approved",
     "residenceArea": "東京都",
     "devExperienceYears": 2,
-    "pastClients": ["Dentsu Inc."],
+    "pastClients": [
+      "Dentsu Inc."
+    ],
     "yearsInJapan": 4,
     "hobbies": "Cooking, Music",
     "videoUrl": "",
     "languages": [
-      { "name": "French", "level": "Native" },
-      { "name": "Wolof", "level": "Native" },
-      { "name": "English", "level": "Fluent" },
-      { "name": "Japanese", "level": "Conversational" }
+      {
+        "name": "French",
+        "level": "Native"
+      },
+      {
+        "name": "Wolof",
+        "level": "Native"
+      },
+      {
+        "name": "English",
+        "level": "Fluent"
+      },
+      {
+        "name": "Japanese",
+        "level": "Conversational"
+      }
     ],
     "experience": [
       {
@@ -110,7 +160,6 @@
     "country": "Nigeria",
     "countryJa": "ナイジェリア",
     "flag": "🇳🇬",
-    "avatarColor": "#534AB7",
     "initials": "CO",
     "field": "Engineering",
     "fieldJa": "電気・組み込みシステム",
@@ -121,22 +170,45 @@
     "degree": "M.Eng",
     "graduationYear": 2026,
     "japaneseLevel": "N2",
-    "skills": ["IoT", "Embedded Systems", "C++", "Circuit Design", "FPGA"],
-    "skillsJa": ["IoT", "組み込みシステム", "C++", "回路設計", "FPGA"],
+    "skills": [
+      "IoT",
+      "Embedded Systems",
+      "C++",
+      "Circuit Design",
+      "FPGA"
+    ],
+    "skillsJa": [
+      "IoT",
+      "組み込みシステム",
+      "C++",
+      "回路設計",
+      "FPGA"
+    ],
     "headlineEn": "Embedded Engineer · Waseda University · Available April 2026",
     "headlineJa": "組み込みエンジニア · 早稲田大学 · 2026年4月〜",
     "openToWork": true,
     "status": "approved",
     "residenceArea": "東京都",
     "devExperienceYears": 4,
-    "pastClients": ["Panasonic Holdings"],
+    "pastClients": [
+      "Panasonic Holdings"
+    ],
     "yearsInJapan": 3,
     "hobbies": "Chess, Running",
     "videoUrl": "",
     "languages": [
-      { "name": "English", "level": "Native" },
-      { "name": "Igbo", "level": "Native" },
-      { "name": "Japanese", "level": "Business" }
+      {
+        "name": "English",
+        "level": "Native"
+      },
+      {
+        "name": "Igbo",
+        "level": "Native"
+      },
+      {
+        "name": "Japanese",
+        "level": "Business"
+      }
     ],
     "experience": [
       {
@@ -161,7 +233,6 @@
     "country": "Ethiopia",
     "countryJa": "エチオピア",
     "flag": "🇪🇹",
-    "avatarColor": "#BA7517",
     "initials": "FB",
     "field": "Data",
     "fieldJa": "データサイエンス",
@@ -172,22 +243,47 @@
     "degree": "M.Sc",
     "graduationYear": 2025,
     "japaneseLevel": "N1",
-    "skills": ["Data Science", "Python", "SQL", "Statistics", "R", "Tableau"],
-    "skillsJa": ["データサイエンス", "Python", "SQL", "統計解析", "R", "Tableau"],
+    "skills": [
+      "Data Science",
+      "Python",
+      "SQL",
+      "Statistics",
+      "R",
+      "Tableau"
+    ],
+    "skillsJa": [
+      "データサイエンス",
+      "Python",
+      "SQL",
+      "統計解析",
+      "R",
+      "Tableau"
+    ],
     "headlineEn": "Data Scientist · N1 Japanese · Osaka University · Available Now",
     "headlineJa": "データサイエンティスト · 日本語N1 · 大阪大学 · 即時対応可",
     "openToWork": true,
     "status": "approved",
     "residenceArea": "大阪府",
     "devExperienceYears": 5,
-    "pastClients": ["NTT Data Corporation"],
+    "pastClients": [
+      "NTT Data Corporation"
+    ],
     "yearsInJapan": 5,
     "hobbies": "Reading, Hiking",
     "videoUrl": "",
     "languages": [
-      { "name": "Amharic", "level": "Native" },
-      { "name": "English", "level": "Fluent" },
-      { "name": "Japanese", "level": "Business" }
+      {
+        "name": "Amharic",
+        "level": "Native"
+      },
+      {
+        "name": "English",
+        "level": "Fluent"
+      },
+      {
+        "name": "Japanese",
+        "level": "Business"
+      }
     ],
     "experience": [
       {
@@ -212,7 +308,6 @@
     "country": "Ghana",
     "countryJa": "ガーナ",
     "flag": "🇬🇭",
-    "avatarColor": "#D85A30",
     "initials": "ZM",
     "field": "Business",
     "fieldJa": "国際ビジネス・コンサルティング",
@@ -223,23 +318,49 @@
     "degree": "MBA",
     "graduationYear": 2025,
     "japaneseLevel": "N2",
-    "skills": ["Business Development", "Trade Finance", "Consulting", "French", "Stakeholder Management"],
-    "skillsJa": ["事業開発", "貿易金融", "コンサルティング", "フランス語", "ステークホルダー管理"],
+    "skills": [
+      "Business Development",
+      "Trade Finance",
+      "Consulting",
+      "French",
+      "Stakeholder Management"
+    ],
+    "skillsJa": [
+      "事業開発",
+      "貿易金融",
+      "コンサルティング",
+      "フランス語",
+      "ステークホルダー管理"
+    ],
     "headlineEn": "MBA · International Trade Consultant · Kyoto University",
     "headlineJa": "MBA · 国際貿易コンサルタント · 京都大学",
     "openToWork": true,
     "status": "approved",
     "residenceArea": "京都府",
     "devExperienceYears": 4,
-    "pastClients": ["JICA"],
+    "pastClients": [
+      "JICA"
+    ],
     "yearsInJapan": 2,
     "hobbies": "Painting, Travel",
     "videoUrl": "",
     "languages": [
-      { "name": "English", "level": "Native" },
-      { "name": "French", "level": "Fluent" },
-      { "name": "Twi", "level": "Native" },
-      { "name": "Japanese", "level": "Business" }
+      {
+        "name": "English",
+        "level": "Native"
+      },
+      {
+        "name": "French",
+        "level": "Fluent"
+      },
+      {
+        "name": "Twi",
+        "level": "Native"
+      },
+      {
+        "name": "Japanese",
+        "level": "Business"
+      }
     ],
     "experience": [
       {

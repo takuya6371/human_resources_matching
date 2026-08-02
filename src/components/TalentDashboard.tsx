@@ -4,18 +4,10 @@ import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
 import { uploadProfileImage } from '../lib/storage'
+import { isSafeHttpUrl } from '../lib/url'
 import type { User, JLPTLevel, LanguageLevel, Language, Experience } from '../types'
 
 const LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5']
-
-const LEVEL_COLORS: Record<string, { bg: string; text: string }> = {
-  N1: { bg: 'rgba(216,90,48,0.12)', text: '#D85A30' },
-  N2: { bg: 'rgba(29,158,117,0.12)', text: '#1D9E75' },
-  N3: { bg: 'rgba(83,74,183,0.12)', text: '#7F77DD' },
-  N4: { bg: 'rgba(186,117,23,0.12)', text: '#BA7517' },
-  N5: { bg: 'rgba(255,255,255,0.08)', text: 'rgba(255,255,255,0.5)' },
-}
-
 const LANG_LEVELS: LanguageLevel[] = ['Native', 'Fluent', 'Business', 'Conversational', 'Basic']
 
 interface EditForm {
@@ -47,14 +39,14 @@ interface EditForm {
   avatarUrl: string
 }
 
-const INPUT_CLS = 'w-full bg-dark-3 border border-white/[0.08] rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/20 outline-none focus:border-a-orange/40 transition-colors'
-const LABEL_CLS = 'block text-white/40 text-xs font-medium mb-1.5 uppercase tracking-wider'
+const INPUT_CLS = 'input-line'
+const LABEL_CLS = 'label-line'
 
-const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  draft:    { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' },
-  pending:  { bg: 'rgba(186,117,23,0.15)', color: '#BA7517' },
-  approved: { bg: 'rgba(29,158,117,0.15)', color: '#1D9E75' },
-  rejected: { bg: 'rgba(216,90,48,0.15)', color: '#D85A30' },
+const STATUS_COLOR: Record<string, string> = {
+  draft: '#B7B2A1',
+  pending: '#BA7517',
+  approved: '#1D7E5C',
+  rejected: '#A6332B',
 }
 
 export default function TalentDashboard({ user }: { user: User }) {
@@ -68,7 +60,6 @@ export default function TalentDashboard({ user }: { user: User }) {
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarError, setAvatarError] = useState('')
 
-  const level = LEVEL_COLORS[user.japaneseLevel] ?? LEVEL_COLORS['N3']
   const name = lang === 'ja' ? user.nameJa : user.nameEn
   const skills = lang === 'ja' ? user.skillsJa : user.skills
   const bio = lang === 'ja' ? user.bioJa : user.bioEn
@@ -178,29 +169,26 @@ export default function TalentDashboard({ user }: { user: User }) {
   }
 
   const hasAdditionalInfo = !!(user.residenceArea || user.devExperienceYears || user.yearsInJapan || user.hobbies || user.videoUrl || (user.pastClients && user.pastClients.length > 0))
+  const statusColor = STATUS_COLOR[user.status] ?? STATUS_COLOR.draft
 
   return (
-    <div className="min-h-screen bg-dark">
-      <nav className="bg-dark border-b border-white/[0.06] sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen line-page">
+      <nav className="line-page border-b border-hairline sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-                 style={{ background: 'linear-gradient(135deg, #D85A30 0%, #1D9E75 100%)' }}>
-              <span className="text-white font-bold text-xs">AT</span>
-            </div>
-            <span className="text-white font-medium text-lg tracking-tight">AfriTalent</span>
+            <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
           </Link>
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-dark-3 rounded-lg p-0.5 border border-white/[0.08]">
+            <div className="hidden sm:flex items-center border border-hairline">
               <button onClick={() => setLang('ja')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'ja' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>JA</button>
+                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${lang === 'ja' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>JA</button>
               <button onClick={() => setLang('en')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'en' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>EN</button>
+                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'en' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>EN</button>
               <button onClick={() => setLang('fr')}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${lang === 'fr' ? 'bg-white text-dark' : 'text-white/50 hover:text-white/80'}`}>FR</button>
+                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'fr' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>FR</button>
             </div>
             <button onClick={handleLogout}
-                    className="text-white/40 text-sm hover:text-white/70 transition-colors cursor-pointer">
+                    className="text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer">
               {t(lang, 'dashboard.logout')}
             </button>
           </div>
@@ -210,32 +198,31 @@ export default function TalentDashboard({ user }: { user: User }) {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
           <div>
-            <p className="text-white/40 text-sm mb-1">{t(lang, 'dashboard.welcome')}</p>
-            <h1 className="text-2xl sm:text-3xl font-medium text-white tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+            <p className="text-ink-soft text-sm mb-1">{t(lang, 'dashboard.welcome')}</p>
+            <h1 className="font-display font-medium text-ink text-2xl sm:text-3xl tracking-wide">
               {name} {user.flag}
             </h1>
           </div>
           {!editing && (
-            <button onClick={startEdit} className="btn-primary flex items-center gap-2 whitespace-nowrap self-start">
-              ✏️ {t(lang, 'dashboard.editBtn')}
+            <button onClick={startEdit} className="btn-line whitespace-nowrap self-start">
+              {t(lang, 'dashboard.editBtn')}
             </button>
           )}
         </div>
 
         {saved && (
-          <div className="mb-6 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
-               style={{ background: 'rgba(29,158,117,0.12)', color: '#1D9E75', border: '0.5px solid rgba(29,158,117,0.2)' }}>
+          <div className="mb-6 px-4 py-3 border text-sm flex items-center gap-2"
+               style={{ borderColor: '#1D7E5C', color: '#1D7E5C' }}>
             ✓ {t(lang, 'dashboard.savedMsg')}
           </div>
         )}
-
 
         {editing && form ? (
           <form onSubmit={handleSave}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <div className="space-y-5">
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-5">
                     {t(lang, 'dashboard.sectionBasic')}
                   </h2>
                   <div className="space-y-4">
@@ -243,19 +230,18 @@ export default function TalentDashboard({ user }: { user: User }) {
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.photo')}</label>
                       <div className="flex items-center gap-4">
                         {form.avatarUrl ? (
-                          <img src={form.avatarUrl} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
+                          <img src={form.avatarUrl} alt="" className="avatar-line w-16 h-16 text-lg" />
                         ) : (
-                          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-lg font-semibold flex-shrink-0"
-                               style={{ background: user.avatarColor + '22', border: `1.5px solid ${user.avatarColor}40`, color: user.avatarColor }}>
+                          <div className="avatar-line w-16 h-16 text-lg">
                             {user.initials}
                           </div>
                         )}
-                        <label className="btn-primary text-xs px-4 py-2 cursor-pointer">
-                          {uploadingAvatar ? '...' : t(lang, 'dashboard.uploadPhoto')}
+                        <label className="btn-line text-xs px-4 py-2 cursor-pointer">
+                          {uploadingAvatar ? '···' : t(lang, 'dashboard.uploadPhoto')}
                           <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploadingAvatar} />
                         </label>
                       </div>
-                      {avatarError && <p className="text-xs mt-2" style={{ color: '#D85A30' }}>{avatarError}</p>}
+                      {avatarError && <p className="text-xs mt-2 text-seal">{avatarError}</p>}
                     </div>
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.email')}</label>
@@ -287,16 +273,16 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <div className="flex items-center gap-3">
                       <input type="checkbox" id="openToWork" checked={form.openToWork}
                              onChange={e => setField('openToWork', e.target.checked)}
-                             className="w-4 h-4 accent-a-green cursor-pointer" />
-                      <label htmlFor="openToWork" className="text-white/60 text-sm cursor-pointer">
+                             className="w-4 h-4 accent-ink cursor-pointer" />
+                      <label htmlFor="openToWork" className="text-ink-soft text-sm cursor-pointer">
                         {t(lang, 'detail.openToWork')}
                       </label>
                     </div>
                   </div>
                 </section>
 
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-5">
                     {t(lang, 'dashboard.sectionEducation')}
                   </h2>
                   <div className="space-y-4">
@@ -317,8 +303,8 @@ export default function TalentDashboard({ user }: { user: User }) {
               </div>
 
               <div className="space-y-5">
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-5">
                     {t(lang, 'dashboard.sectionSkills')}
                   </h2>
                   <div className="space-y-4">
@@ -326,7 +312,7 @@ export default function TalentDashboard({ user }: { user: User }) {
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.skillsEn')}</label>
                       <input className={INPUT_CLS} value={form.skillsEn}
                              onChange={e => setField('skillsEn', e.target.value)} placeholder="React, Python, SQL" />
-                      <p className="text-white/25 text-xs mt-1">{t(lang, 'dashboard.skillsHint')}</p>
+                      <p className="text-ink-faint text-xs mt-1">{t(lang, 'dashboard.skillsHint')}</p>
                     </div>
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.skillsJa')}</label>
@@ -336,8 +322,8 @@ export default function TalentDashboard({ user }: { user: User }) {
                   </div>
                 </section>
 
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-5">
                     {t(lang, 'dashboard.sectionBio')}
                   </h2>
                   <div className="space-y-4">
@@ -354,8 +340,8 @@ export default function TalentDashboard({ user }: { user: User }) {
                   </div>
                 </section>
 
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-5">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-5">
                     {t(lang, 'dashboard.sectionAdditional')}
                   </h2>
                   <div className="space-y-4">
@@ -397,14 +383,14 @@ export default function TalentDashboard({ user }: { user: User }) {
             </div>
 
             {/* Languages */}
-            <section className="bg-dark-2 rounded-2xl p-6 card-border mt-5">
+            <section className="line-card p-6 mt-5">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest">
                   {t(lang, 'detail.languages')}
                 </h2>
                 <button type="button"
                         onClick={() => setField('languages', [...form.languages, { name: '', level: 'Conversational' }])}
-                        className="text-xs text-a-orange hover:opacity-80 transition-opacity cursor-pointer">
+                        className="btn-line-ghost cursor-pointer">
                   + {lang === 'ja' ? '追加' : 'Add'}
                 </button>
               </div>
@@ -420,36 +406,36 @@ export default function TalentDashboard({ user }: { user: User }) {
                     </select>
                     <button type="button"
                             onClick={() => setField('languages', form.languages.filter((_, j) => j !== i))}
-                            className="text-white/30 hover:text-white/60 transition-colors cursor-pointer px-2">✕</button>
+                            className="text-ink-faint hover:text-seal transition-colors cursor-pointer px-2">✕</button>
                   </div>
                 ))}
               </div>
             </section>
 
             {/* Experience */}
-            <section className="bg-dark-2 rounded-2xl p-6 card-border mt-5">
+            <section className="line-card p-6 mt-5">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest">
                   {t(lang, 'detail.experience')}
                 </h2>
                 <button type="button"
                         onClick={() => setField('experience', [...form.experience, { company: '', companyJa: '', role: '', roleJa: '', period: '', descriptionEn: '', descriptionJa: '' }])}
-                        className="text-xs text-a-orange hover:opacity-80 transition-opacity cursor-pointer">
+                        className="btn-line-ghost cursor-pointer">
                   + {lang === 'ja' ? '追加' : 'Add'}
                 </button>
               </div>
               <div className="space-y-6">
                 {form.experience.map((exp, i) => (
-                  <div key={i} className={`space-y-3 ${i > 0 ? 'pt-6 border-t border-white/[0.06]' : ''}`}>
+                  <div key={i} className={`space-y-3 ${i > 0 ? 'pt-6 border-t border-hairline' : ''}`}>
                     <div className="flex items-center justify-between">
-                      <p className="text-white/50 text-xs font-medium">{lang === 'ja' ? `経験 ${i + 1}` : `Experience ${i + 1}`}</p>
+                      <p className="text-ink-soft text-xs font-medium">{lang === 'ja' ? `経験 ${i + 1}` : `Experience ${i + 1}`}</p>
                       <button type="button"
                               onClick={() => setField('experience', form.experience.filter((_, j) => j !== i))}
-                              className="text-white/30 hover:text-white/60 transition-colors cursor-pointer text-xs">
+                              className="text-ink-faint hover:text-seal transition-colors cursor-pointer text-xs">
                         {lang === 'ja' ? '削除' : 'Remove'}
                       </button>
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div>
                         <label className={LABEL_CLS}>{lang === 'ja' ? '会社名（英語）' : 'Company (EN)'}</label>
                         <input className={INPUT_CLS} value={exp.company}
@@ -493,10 +479,10 @@ export default function TalentDashboard({ user }: { user: User }) {
 
             <div className="flex items-center justify-end gap-3 mt-6">
               <button type="button" onClick={() => setEditing(false)}
-                      className="px-6 py-2.5 rounded-xl text-sm text-white/50 hover:text-white/80 transition-colors cursor-pointer bg-dark-3 border border-white/[0.08]">
+                      className="px-6 py-2.5 text-sm text-ink-soft hover:text-ink transition-colors cursor-pointer border border-hairline">
                 {t(lang, 'dashboard.cancelBtn')}
               </button>
-              <button type="submit" className="btn-primary px-8">
+              <button type="submit" className="btn-line px-8">
                 {t(lang, 'dashboard.saveBtn')}
               </button>
             </div>
@@ -504,35 +490,28 @@ export default function TalentDashboard({ user }: { user: User }) {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2 space-y-5">
-              <div className="relative bg-dark-2 rounded-2xl p-6 card-border overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none"
-                     style={{ background: `radial-gradient(circle, ${user.avatarColor}15 0%, transparent 70%)` }} />
-                <div className="relative flex items-center gap-4">
+              <div className="line-card p-6">
+                <div className="flex items-center gap-4">
                   {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt="" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0" />
+                    <img src={user.avatarUrl} alt="" className="avatar-line w-20 h-20 text-2xl" />
                   ) : (
-                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-semibold flex-shrink-0"
-                         style={{ background: user.avatarColor + '22', border: `1.5px solid ${user.avatarColor}40`, color: user.avatarColor }}>
+                    <div className="avatar-line w-20 h-20 text-2xl">
                       {user.initials}
                     </div>
                   )}
                   <div>
-                    <h2 className="text-xl font-medium text-white tracking-tight">{name}</h2>
-                    <p className="text-white/40 text-sm mt-0.5">
+                    <h2 className="font-display font-medium text-ink text-xl tracking-wide">{name}</h2>
+                    <p className="text-ink-soft text-sm mt-0.5">
                       {lang === 'ja' ? user.countryJa : user.country} · {lang === 'ja' ? user.fieldJa : user.field}
                     </p>
                     {user.email && (
-                      <p className="text-white/30 text-xs mt-0.5">{user.email}</p>
+                      <p className="text-ink-faint text-xs mt-0.5">{user.email}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-semibold"
-                            style={{ background: level.bg, color: level.text }}>
-                        🇯🇵 {user.japaneseLevel}
-                      </span>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className="badge-line">{user.japaneseLevel}</span>
                       {(lang === 'ja' ? user.availableFromJa : user.availableFrom) && (
-                        <span className="px-2.5 py-1 rounded-lg text-xs"
-                              style={{ background: 'rgba(29,158,117,0.1)', color: '#1D9E75' }}>
-                          ✓ {lang === 'ja' ? user.availableFromJa : user.availableFrom}
+                        <span className="badge-line-ink">
+                          {lang === 'ja' ? user.availableFromJa : user.availableFrom}
                         </span>
                       )}
                     </div>
@@ -540,81 +519,78 @@ export default function TalentDashboard({ user }: { user: User }) {
                 </div>
               </div>
 
-              <section className="bg-dark-2 rounded-2xl p-6 card-border">
+              <section className="line-card p-6">
                 <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest">
+                    <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest">
                       {t(lang, 'dashboard.statusLabel')}
                     </h2>
-                    <span className="px-2.5 py-1 rounded-lg text-xs font-medium"
-                          style={{ background: (STATUS_STYLE[user.status] ?? STATUS_STYLE.draft).bg, color: (STATUS_STYLE[user.status] ?? STATUS_STYLE.draft).color }}>
+                    <span className="text-xs font-medium uppercase tracking-wide pb-[2px]"
+                          style={{ color: statusColor, borderBottom: `1.5px solid ${statusColor}` }}>
                       {t(lang, `dashboard.status${user.status.charAt(0).toUpperCase()}${user.status.slice(1)}`)}
                     </span>
                   </div>
                   {(user.status === 'draft' || user.status === 'rejected') && (
                     <button onClick={handleSubmitForReview} disabled={submitting}
-                            className="btn-primary text-xs px-4 py-2 disabled:opacity-50">
-                      {submitting ? '...' : t(lang, user.status === 'rejected' ? 'dashboard.resubmit' : 'dashboard.submitForReview')}
+                            className="btn-line text-xs px-4 py-2 disabled:opacity-50">
+                      {submitting ? '···' : t(lang, user.status === 'rejected' ? 'dashboard.resubmit' : 'dashboard.submitForReview')}
                     </button>
                   )}
                 </div>
                 {(user.status === 'draft' || user.status === 'pending') && (
-                  <p className="text-white/30 text-xs mt-2 leading-relaxed">{t(lang, 'dashboard.submitForReviewHint')}</p>
+                  <p className="text-ink-faint text-xs mt-2 leading-relaxed">{t(lang, 'dashboard.submitForReviewHint')}</p>
                 )}
                 {user.status === 'rejected' && user.adminNote && (
-                  <p className="text-white/50 text-xs mt-2 leading-relaxed">
-                    <span className="text-white/30">{t(lang, 'dashboard.adminNote')}: </span>"{user.adminNote}"
+                  <p className="text-ink-soft text-xs mt-2 leading-relaxed">
+                    <span className="text-ink-faint">{t(lang, 'dashboard.adminNote')}: </span>"{user.adminNote}"
                   </p>
                 )}
               </section>
 
-              <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">
+              <section className="line-card p-6">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-3">
                   {t(lang, 'detail.bio')}
                 </h2>
-                <p className="text-white/70 text-sm leading-relaxed">{bio}</p>
+                <p className="text-ink-soft text-sm leading-relaxed">{bio}</p>
               </section>
 
-              <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">
+              <section className="line-card p-6">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-3">
                   {t(lang, 'detail.skills')}
                 </h2>
-                <div className="flex flex-wrap gap-2">
-                  {skills.map(s => (
-                    <span key={s} className="px-3.5 py-1.5 rounded-xl text-sm font-medium"
-                          style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.75)', border: '0.5px solid rgba(255,255,255,0.1)' }}>
-                      {s}
-                    </span>
-                  ))}
-                </div>
+                <p className="text-ink-soft text-sm">{skills.join(' · ')}</p>
               </section>
 
               {hasAdditionalInfo && (
-                <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                  <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-3">
+                <section className="line-card p-6">
+                  <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-3">
                     {t(lang, 'dashboard.sectionAdditional')}
                   </h2>
                   <div className="space-y-2 text-sm">
                     {user.residenceArea && (
-                      <p className="text-white/60"><span className="text-white/30">{t(lang, 'dashboard.residenceArea')}: </span>{user.residenceArea}</p>
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.residenceArea')}: </span>{user.residenceArea}</p>
                     )}
                     {user.devExperienceYears != null && (
-                      <p className="text-white/60"><span className="text-white/30">{t(lang, 'dashboard.devExperienceYears')}: </span>{user.devExperienceYears}</p>
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.devExperienceYears')}: </span>{user.devExperienceYears}</p>
                     )}
                     {user.yearsInJapan != null && (
-                      <p className="text-white/60"><span className="text-white/30">{t(lang, 'dashboard.yearsInJapan')}: </span>{user.yearsInJapan}</p>
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.yearsInJapan')}: </span>{user.yearsInJapan}</p>
                     )}
                     {user.hobbies && (
-                      <p className="text-white/60"><span className="text-white/30">{t(lang, 'dashboard.hobbies')}: </span>{user.hobbies}</p>
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.hobbies')}: </span>{user.hobbies}</p>
                     )}
                     {user.videoUrl && (
-                      <p className="text-white/60">
-                        <span className="text-white/30">{t(lang, 'dashboard.videoUrl')}: </span>
-                        <a href={user.videoUrl} target="_blank" rel="noreferrer" className="text-a-orange hover:opacity-80 break-all">{user.videoUrl}</a>
+                      <p className="text-ink-soft">
+                        <span className="text-ink-faint">{t(lang, 'dashboard.videoUrl')}: </span>
+                        {isSafeHttpUrl(user.videoUrl) ? (
+                          <a href={user.videoUrl} target="_blank" rel="noreferrer" className="text-seal hover:opacity-70 break-all">{user.videoUrl}</a>
+                        ) : (
+                          <span className="break-all">{user.videoUrl}</span>
+                        )}
                       </p>
                     )}
                     {user.pastClients && user.pastClients.length > 0 && (
-                      <p className="text-white/60"><span className="text-white/30">{t(lang, 'dashboard.pastClients')}: </span>{user.pastClients.join(', ')}</p>
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.pastClients')}: </span>{user.pastClients.join(', ')}</p>
                     )}
                   </div>
                 </section>
@@ -622,31 +598,25 @@ export default function TalentDashboard({ user }: { user: User }) {
             </div>
 
             <div className="space-y-5">
-              <section className="bg-dark-2 rounded-2xl p-6 card-border">
-                <h2 className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-4">
+              <section className="line-card p-6">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-4">
                   {t(lang, 'detail.education')}
                 </h2>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                       style={{ background: 'rgba(83,74,183,0.15)' }}>
-                    <span className="text-lg">🎓</span>
-                  </div>
-                  <div>
-                    <p className="text-white text-sm font-medium leading-snug">
-                      {lang === 'ja' ? user.universityJa : user.university}
-                    </p>
-                    <p className="text-white/40 text-xs mt-1">
-                      {lang === 'ja' ? user.facultyJa : user.faculty}
-                    </p>
-                    <p className="text-white/30 text-xs mt-0.5">{user.degree} · {user.graduationYear}</p>
-                  </div>
+                <div>
+                  <p className="text-ink text-sm font-medium leading-snug">
+                    {lang === 'ja' ? user.universityJa : user.university}
+                  </p>
+                  <p className="text-ink-soft text-xs mt-1">
+                    {lang === 'ja' ? user.facultyJa : user.faculty}
+                  </p>
+                  <p className="text-ink-faint text-xs mt-0.5">{user.degree} · {user.graduationYear}</p>
                 </div>
               </section>
 
-              <div className="bg-dark-2 rounded-2xl p-6 card-border">
-                <p className="text-white/40 text-xs mb-3">{t(lang, 'dashboard.editHint')}</p>
-                <button onClick={startEdit} className="w-full btn-primary text-center py-2.5">
-                  ✏️ {t(lang, 'dashboard.editBtn')}
+              <div className="line-card p-6">
+                <p className="text-ink-faint text-xs mb-3">{t(lang, 'dashboard.editHint')}</p>
+                <button onClick={startEdit} className="btn-line w-full justify-center">
+                  {t(lang, 'dashboard.editBtn')}
                 </button>
               </div>
             </div>

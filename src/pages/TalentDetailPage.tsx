@@ -6,7 +6,8 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapProfileRow, mapTeaserRow } from '../lib/profileMapper'
+import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
+import { isSafeHttpUrl } from '../lib/url'
 import type { Talent, TalentTeaser } from '../types'
 
 const LEVEL_LABELS: Record<string, { en: string; ja: string; fr: string }> = {
@@ -40,7 +41,7 @@ export default function TalentDetailPage() {
       if (hasFullAccess) {
         // 企業アカウントは承認済みのみ。管理者は審査目的でどのステータスでも閲覧できる必要がある
         // （RLS自体はis_admin()で全ステータスの読み取りを許可しているので、ここで絞るとRLSより厳しくなってしまう）。
-        let query = supabase.from('profiles').select('*').eq('id', id)
+        let query = supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', id)
         if (accountType === 'company') query = query.eq('status', 'approved')
 
         const [{ data: profile }, { data: langs }, { data: exps }] = await Promise.all([
@@ -165,7 +166,11 @@ export default function TalentDetailPage() {
                     {talent.videoUrl && (
                       <p className="text-ink">
                         <span className="text-ink-faint">{t(lang, 'dashboard.videoUrl')}: </span>
-                        <a href={talent.videoUrl} target="_blank" rel="noreferrer" className="text-seal hover:opacity-70 break-all">{talent.videoUrl}</a>
+                        {isSafeHttpUrl(talent.videoUrl) ? (
+                          <a href={talent.videoUrl} target="_blank" rel="noreferrer" className="text-seal hover:opacity-70 break-all">{talent.videoUrl}</a>
+                        ) : (
+                          <span className="break-all">{talent.videoUrl}</span>
+                        )}
                       </p>
                     )}
                     {talent.pastClients && talent.pastClients.length > 0 && (

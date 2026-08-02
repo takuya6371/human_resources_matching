@@ -25,7 +25,6 @@ export interface Talent {
   country: string
   countryJa: string
   flag: string
-  avatarColor: string
   initials: string
   avatarUrl?: string
   field: string

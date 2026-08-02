@@ -8,12 +8,12 @@
   }
 
   body {
-    @apply bg-dark text-white antialiased;
+    @apply bg-paper text-ink antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
   ::selection {
-    background: rgba(216, 90, 48, 0.3);
+    background: rgba(166, 51, 43, 0.2);
   }
 
   ::-webkit-scrollbar {
@@ -21,44 +21,18 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0A0A0A;
+    background: #FAF8F4;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #2a2a2a;
+    background: #E7E2D6;
     border-radius: 3px;
   }
 }
 
 @layer components {
-  .card-border {
-    border: 0.5px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .glow-orange {
-    box-shadow: 0 0 60px rgba(216, 90, 48, 0.12);
-  }
-
-  .glow-green {
-    box-shadow: 0 0 60px rgba(29, 158, 117, 0.12);
-  }
-
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium;
-  }
-
-  .btn-primary {
-    @apply text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-opacity hover:opacity-90 cursor-pointer;
-    background: linear-gradient(135deg, #D85A30 0%, #BA7517 100%);
-  }
-
-  .btn-ghost {
-    @apply text-white/60 text-sm font-normal hover:text-white transition-colors;
-  }
-
   /* ------------------------------------------------------------
-     "Line" — quiet-luxury system, used on the pages being
-     re-themed first (Navbar, Home, talent list/detail).
+     "Line" — quiet-luxury design system used across the whole app.
      Boldness lives in one place — the filled CTA — everything
      else stays quiet hairlines and plain type, no boxed badges.
   ------------------------------------------------------------ */
@@ -99,5 +73,17 @@
 
   .avatar-line {
     @apply rounded-full border border-hairline flex items-center justify-center font-display font-medium text-ink flex-shrink-0 overflow-hidden;
+  }
+
+  /* shared form field styling — dashboards, login, contact */
+  .input-line {
+    @apply w-full bg-paper border border-hairline px-4 py-2.5 text-ink text-sm placeholder-ink-faint outline-none transition-colors;
+  }
+  .input-line:focus {
+    @apply border-ink;
+  }
+
+  .label-line {
+    @apply block text-ink-faint text-xs font-medium mb-1.5 uppercase tracking-wider;
   }
 }

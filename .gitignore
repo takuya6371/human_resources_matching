@@ -3,3 +3,6 @@ dist/
 .DS_Store
 *.local
 docs/dev-credentials.md
+
+# Local Netlify folder
+.netlify

@@ -1,13 +1,21 @@
 import type { Experience, Language, Talent, TalentTeaser } from '../types'
 
-export const AVATAR_COLORS = ['#D85A30', '#1D9E75', '#7F77DD', '#BA7517', '#2980B9']
+// 企業/管理者が一覧・詳細で閲覧する profiles の列を明示的に限定する。
+// email・admin_note（管理者の内部審査メモ）はUI上どこにも表示していないが、
+// select('*') のままだとAPIレスポンスのJSON上には流れてしまい、企業アカウントが
+// ネットワークタブを見れば直接メールアドレスや審査メモを読めてしまう。
+// そのため一覧・詳細ページ（企業/管理者向け）では常にこの列だけを取得する。
+export const PROFILE_PUBLIC_COLUMNS = [
+  'id', 'name_en', 'name_ja', 'country', 'country_ja', 'flag', 'avatar_url',
+  'field', 'field_ja', 'university_en', 'university_ja', 'faculty_en', 'faculty_ja',
+  'degree', 'graduation_year', 'japanese_level', 'skills', 'skills_ja',
+  'bio_en', 'bio_ja', 'available_from', 'available_from_ja', 'open_to_work',
+  'headline_en', 'headline_ja', 'status', 'residence_area', 'dev_experience_years',
+  'past_clients', 'years_in_japan', 'hobbies', 'video_url',
+].join(', ')
 
 export function deriveInitials(nameEn: string): string {
   return nameEn.split(' ').map(n => n[0] ?? '').join('').slice(0, 2).toUpperCase() || '??'
-}
-
-export function deriveAvatarColor(id: string): string {
-  return AVATAR_COLORS[id.charCodeAt(0) % AVATAR_COLORS.length]
 }
 
 // `profiles` テーブルの1行（+ 関連する言語・職務経験）を Talent 形状にマップする。
@@ -41,7 +49,6 @@ export function mapProfileRow(
     country: profile.country ?? '',
     countryJa: profile.country_ja ?? '',
     flag: profile.flag ?? '',
-    avatarColor: deriveAvatarColor(profile.id),
     initials: deriveInitials(nameEn),
     avatarUrl: profile.avatar_url ?? undefined,
     field: profile.field ?? '',

@@ -8,7 +8,7 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapProfileRow, mapTeaserRow } from '../lib/profileMapper'
+import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
 import type { Talent, TalentTeaser } from '../types'
 
 const FIELDS = ['IT', 'Business', 'Engineering', 'Data'] as const
@@ -48,7 +48,7 @@ export default function TalentListPage() {
       if (hasFullAccess) {
         const { data } = await supabase
           .from('profiles')
-          .select('*')
+          .select(PROFILE_PUBLIC_COLUMNS)
           .eq('status', 'approved')
           .order('created_at', { ascending: false })
         if (!cancelled) setTalents((data ?? []).map(row => mapProfileRow(row)))

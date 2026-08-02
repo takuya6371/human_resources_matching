@@ -7,7 +7,8 @@ export async function uploadProfileImage(file: File, ownerId: string): Promise<s
     throw new Error('FILE_TOO_LARGE')
   }
 
-  const ext = file.name.split('.').pop() ?? 'jpg'
+  const rawExt = file.name.split('.').pop() ?? 'jpg'
+  const ext = /^[a-zA-Z0-9]{1,8}$/.test(rawExt) ? rawExt : 'jpg'
   const path = `${ownerId}/photo-${Date.now()}.${ext}`
 
   const { error } = await supabase.storage.from('profile-images').upload(path, file, {

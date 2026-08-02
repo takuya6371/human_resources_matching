@@ -1,0 +1,11 @@
+-- ============================================================
+-- inquiries の過剰な権限付与を是正
+--
+-- 20260721060000_fix_grants.sql で `authenticated` に
+-- SELECT/INSERT/UPDATE/DELETE を一括付与していたが、実際に使われて
+-- いるのは管理者による一覧閲覧（SELECT、RLSのis_admin()で絞り込み）
+-- のみで、UPDATE/DELETEを許可するRLSポリシーは存在しない
+-- （ポリシーが無い操作はRLSにより暗黙的に拒否されるため今のところ
+-- 実害はないが、最小権限の原則に反するため是正する）。
+-- ============================================================
+revoke update, delete on public.inquiries from authenticated;

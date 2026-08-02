@@ -6,8 +6,8 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 
-const INPUT_CLS = 'w-full bg-paper border border-hairline px-4 py-3 text-ink text-sm placeholder-ink-faint outline-none focus:border-ink transition-colors'
-const LABEL_CLS = 'block text-ink-faint text-xs font-medium mb-2 uppercase tracking-wider'
+const INPUT_CLS = 'input-line'
+const LABEL_CLS = 'label-line'
 
 export default function ContactPage() {
   const { lang } = useLang()
