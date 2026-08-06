@@ -9,16 +9,9 @@ import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
+import { FIELDS, FIELDS_JA, LEVELS } from '../lib/constants'
 import type { Talent, TalentTeaser } from '../types'
 
-const FIELDS = ['IT', 'Business', 'Engineering', 'Data'] as const
-const FIELDS_JA: Record<string, string> = {
-  IT: 'IT・エンジニアリング',
-  Business: 'ビジネス',
-  Engineering: '工学',
-  Data: 'データ',
-}
-const LEVELS = ['N1', 'N2', 'N3', 'N4', 'N5'] as const
 const AREAS = ['東京都', '大阪府', '京都府', '神奈川県', '愛知県', '福岡県'] as const
 
 export default function TalentListPage() {

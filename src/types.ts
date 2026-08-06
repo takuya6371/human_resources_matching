@@ -77,6 +77,42 @@ export interface Company {
   logoUrl: string
 }
 
+export type JobStatus = 'draft' | 'open' | 'closed'
+export type ApplicationStatus = 'submitted' | 'reviewing' | 'accepted' | 'rejected' | 'withdrawn'
+
+export interface Job {
+  id: string
+  companyId: string
+  companyName?: string
+  companyNameJa?: string
+  companyLogoUrl?: string
+  titleEn: string
+  titleJa: string
+  descriptionEn: string
+  descriptionJa: string
+  field: string
+  fieldJa: string
+  japaneseLevel?: JLPTLevel
+  employmentType: string
+  salaryRange: string
+  location: string
+  status: JobStatus
+  createdAt: string
+}
+
+export interface Application {
+  id: string
+  jobId: string
+  profileId: string
+  status: ApplicationStatus
+  coverMessage: string
+  createdAt: string
+  // 一覧表示用にjoinして載せる相手側の情報（文脈によって片方のみ入る）
+  job?: Job
+  talentNameEn?: string
+  talentNameJa?: string
+}
+
 // profiles_teaser ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
 export interface TalentTeaser {
   id: string

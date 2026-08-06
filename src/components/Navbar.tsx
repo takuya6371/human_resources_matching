@@ -33,6 +33,19 @@ export default function Navbar() {
           <Link to="/talents" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.talents')}
           </Link>
+          <Link to="/jobs" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+            {t(lang, 'nav.jobs')}
+          </Link>
+          {user && user.role === 'talent' && (
+            <Link to="/applications" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+              {t(lang, 'nav.myApplications')}
+            </Link>
+          )}
+          {company && (
+            <Link to="/company/jobs" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+              {t(lang, 'nav.manageJobs')}
+            </Link>
+          )}
           <Link to="/contact" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.contact')}
           </Link>
@@ -126,6 +139,22 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.talents')}
           </Link>
+          <Link to="/jobs" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                onClick={() => setMenuOpen(false)}>
+            {t(lang, 'nav.jobs')}
+          </Link>
+          {user && user.role === 'talent' && (
+            <Link to="/applications" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.myApplications')}
+            </Link>
+          )}
+          {company && (
+            <Link to="/company/jobs" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.manageJobs')}
+            </Link>
+          )}
           <Link to="/contact" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.contact')}
