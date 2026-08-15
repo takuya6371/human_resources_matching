@@ -6,13 +6,14 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow } from '../lib/jobMapper'
-import { FIELDS, FIELDS_JA } from '../lib/constants'
-import type { Job } from '../types'
+import { FIELDS, FIELDS_JA, JOB_TYPES } from '../lib/constants'
+import type { Job, JobType } from '../types'
 
 export default function JobListPage() {
   const { lang } = useLang()
   const [search, setSearch] = useState('')
   const [activeField, setActiveField] = useState<string | null>(null)
+  const [activeJobType, setActiveJobType] = useState<JobType | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -39,9 +40,10 @@ export default function JobListPage() {
       const title = (lang === 'ja' ? job.titleJa : job.titleEn).toLowerCase()
       const matchSearch = !query || title.includes(query) || job.field.toLowerCase().includes(query)
       const matchField = !activeField || job.field === activeField
-      return matchSearch && matchField
+      const matchJobType = !activeJobType || job.jobType === activeJobType
+      return matchSearch && matchField && matchJobType
     })
-  }, [jobs, search, activeField, lang])
+  }, [jobs, search, activeField, activeJobType, lang])
 
   return (
     <div className="min-h-screen line-page">
@@ -88,6 +90,19 @@ export default function JobListPage() {
           ))}
         </div>
 
+        <div className="flex items-center gap-2 flex-wrap mb-8">
+          {JOB_TYPES.map(jt => (
+            <button key={jt}
+              onClick={() => setActiveJobType(activeJobType === jt ? null : jt)}
+              className={`px-3.5 py-1.5 text-xs font-medium transition-colors cursor-pointer border ${
+                activeJobType === jt ? 'bg-ink text-paper border-ink' : 'border-hairline text-ink-soft hover:border-ink hover:text-ink'
+              }`}
+            >
+              {t(lang, `jobs.jobType${jt.charAt(0).toUpperCase()}${jt.slice(1)}`)}
+            </button>
+          ))}
+        </div>
+
         <p className="text-ink-faint text-xs mb-5" style={{ fontVariantNumeric: 'tabular-nums' }}>
           {filtered.length} {t(lang, 'jobs.resultCount')}
         </p>
@@ -112,10 +127,14 @@ export default function JobListPage() {
                   <p className="font-display font-medium text-ink text-base mb-2">
                     {lang === 'ja' ? job.titleJa : job.titleEn}
                   </p>
-                  <p className="text-ink-soft text-xs mb-4">
+                  <p className="text-ink-soft text-xs mb-3">
                     {(lang === 'ja' ? job.fieldJa : job.field) || '—'}
                     {job.location && ` · ${job.location}`}
                   </p>
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="badge-line-ink">{t(lang, `jobs.jobType${job.jobType.charAt(0).toUpperCase()}${job.jobType.slice(1)}`)}</span>
+                    {job.remoteOk && <span className="badge-line-ink">{t(lang, 'jobs.remoteOkLabel')}</span>}
+                  </div>
                   <div className="flex items-center justify-between pt-4 border-t border-hairline">
                     <span className="text-xs text-ink-faint">{job.employmentType || '—'}</span>
                     <span className="text-xs font-medium text-ink group-hover:text-seal transition-colors">

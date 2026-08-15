@@ -7,8 +7,8 @@ import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow } from '../lib/jobMapper'
-import { FIELDS, FIELDS_JA, LEVELS } from '../lib/constants'
-import type { Job, JLPTLevel, JobStatus } from '../types'
+import { FIELDS, FIELDS_JA, LEVELS, COMPENSATION_LABEL_KEY } from '../lib/constants'
+import type { Job, JLPTLevel, JobStatus, JobType } from '../types'
 
 interface EditForm {
   titleEn: string
@@ -17,15 +17,20 @@ interface EditForm {
   descriptionJa: string
   field: string
   japaneseLevel: JLPTLevel | ''
+  jobType: JobType
+  remoteOk: boolean
   employmentType: string
   salaryRange: string
+  duration: string
+  deliverables: string
   location: string
   status: JobStatus
 }
 
 const EMPTY_FORM: EditForm = {
   titleEn: '', titleJa: '', descriptionEn: '', descriptionJa: '',
-  field: '', japaneseLevel: '', employmentType: '', salaryRange: '', location: '',
+  field: '', japaneseLevel: '', jobType: 'employment', remoteOk: false,
+  employmentType: '', salaryRange: '', duration: '', deliverables: '', location: '',
   status: 'draft',
 }
 
@@ -78,7 +83,9 @@ export default function CompanyJobsPage() {
       titleEn: job.titleEn, titleJa: job.titleJa,
       descriptionEn: job.descriptionEn, descriptionJa: job.descriptionJa,
       field: job.field, japaneseLevel: job.japaneseLevel ?? '',
-      employmentType: job.employmentType, salaryRange: job.salaryRange, location: job.location,
+      jobType: job.jobType, remoteOk: job.remoteOk,
+      employmentType: job.employmentType, salaryRange: job.salaryRange,
+      duration: job.duration ?? '', deliverables: job.deliverables ?? '', location: job.location,
       status: job.status,
     })
     setEditingId(job.id)
@@ -102,8 +109,12 @@ export default function CompanyJobsPage() {
       field: form.field,
       field_ja: form.field ? FIELDS_JA[form.field] : '',
       japanese_level: form.japaneseLevel || null,
+      job_type: form.jobType,
+      remote_ok: form.remoteOk,
       employment_type: form.employmentType,
       salary_range: form.salaryRange,
+      duration: form.duration || null,
+      deliverables: form.deliverables || null,
       location: form.location,
       status: form.status,
     }
@@ -199,6 +210,24 @@ export default function CompanyJobsPage() {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label-line">{t(lang, 'jobs.jobTypeLabel')}</label>
+                <select className="input-line" value={form.jobType} onChange={e => setField('jobType', e.target.value as JobType)}>
+                  <option value="employment">{t(lang, 'jobs.jobTypeEmployment')}</option>
+                  <option value="staffing">{t(lang, 'jobs.jobTypeStaffing')}</option>
+                  <option value="project">{t(lang, 'jobs.jobTypeProject')}</option>
+                </select>
+              </div>
+              <div className="flex items-end pb-2.5">
+                <label className="flex items-center gap-2.5 cursor-pointer">
+                  <input type="checkbox" checked={form.remoteOk} onChange={e => setField('remoteOk', e.target.checked)}
+                         className="w-4 h-4 accent-ink cursor-pointer" />
+                  <span className="text-ink-soft text-sm">{t(lang, 'jobs.remoteOkOption')}</span>
+                </label>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="label-line">{t(lang, 'jobs.employmentTypeLabel')}</label>
@@ -206,7 +235,7 @@ export default function CompanyJobsPage() {
                        placeholder={t(lang, 'jobs.employmentTypePlaceholder')} />
               </div>
               <div>
-                <label className="label-line">{t(lang, 'jobs.salaryRangeLabel')}</label>
+                <label className="label-line">{t(lang, COMPENSATION_LABEL_KEY[form.jobType])}</label>
                 <input className="input-line" value={form.salaryRange} onChange={e => setField('salaryRange', e.target.value)}
                        placeholder={t(lang, 'jobs.salaryRangePlaceholder')} />
               </div>
@@ -215,6 +244,23 @@ export default function CompanyJobsPage() {
                 <input className="input-line" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="東京都" />
               </div>
             </div>
+
+            {form.jobType !== 'employment' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="label-line">{t(lang, 'jobs.durationLabel')}</label>
+                  <input className="input-line" value={form.duration} onChange={e => setField('duration', e.target.value)}
+                         placeholder={t(lang, 'jobs.durationPlaceholder')} />
+                </div>
+                {form.jobType === 'project' && (
+                  <div>
+                    <label className="label-line">{t(lang, 'jobs.deliverablesLabel')}</label>
+                    <input className="input-line" value={form.deliverables} onChange={e => setField('deliverables', e.target.value)}
+                           placeholder={t(lang, 'jobs.deliverablesPlaceholder')} />
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button type="button" onClick={() => setMode('list')}
@@ -246,7 +292,9 @@ export default function CompanyJobsPage() {
                       </span>
                     </div>
                     <p className="text-ink-faint text-xs">
-                      {(lang === 'ja' ? job.fieldJa : job.field) || '—'} · {job.employmentType || '—'} · {job.location || '—'}
+                      {t(lang, `jobs.jobType${job.jobType.charAt(0).toUpperCase()}${job.jobType.slice(1)}`)}
+                      {job.remoteOk && ` · ${t(lang, 'jobs.remoteOkLabel')}`}
+                      {' · '}{(lang === 'ja' ? job.fieldJa : job.field) || '—'} · {job.location || '—'}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">

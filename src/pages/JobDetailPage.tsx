@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow } from '../lib/jobMapper'
-import { FIELDS_JA } from '../lib/constants'
+import { FIELDS_JA, COMPENSATION_LABEL_KEY } from '../lib/constants'
 import type { Job, ApplicationStatus } from '../types'
 
 export default function JobDetailPage() {
@@ -115,13 +115,23 @@ export default function JobDetailPage() {
           <h1 className="font-display font-medium text-ink text-2xl sm:text-3xl tracking-wide mb-3">
             {lang === 'ja' ? job.titleJa : job.titleEn}
           </h1>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className="badge-line-ink">{t(lang, `jobs.jobType${job.jobType.charAt(0).toUpperCase()}${job.jobType.slice(1)}`)}</span>
+            {job.remoteOk && <span className="badge-line-ink">{t(lang, 'jobs.remoteOkLabel')}</span>}
+            {job.japaneseLevel && <span className="badge-line">{job.japaneseLevel}</span>}
+          </div>
           <div className="flex flex-wrap gap-3 text-xs text-ink-soft">
             {job.field && <span>{lang === 'ja' ? (job.fieldJa || FIELDS_JA[job.field]) : job.field}</span>}
-            {job.japaneseLevel && <span className="badge-line">{job.japaneseLevel}</span>}
             {job.employmentType && <span>{job.employmentType}</span>}
             {job.location && <span>{job.location}</span>}
-            {job.salaryRange && <span>{job.salaryRange}</span>}
+            {job.salaryRange && <span>{t(lang, COMPENSATION_LABEL_KEY[job.jobType])}: {job.salaryRange}</span>}
+            {job.duration && <span>{t(lang, 'jobs.durationLabel')}: {job.duration}</span>}
           </div>
+          {job.deliverables && (
+            <p className="text-ink-soft text-xs mt-3 pt-3 border-t border-hairline">
+              <span className="text-ink-faint">{t(lang, 'jobs.deliverablesLabel')}: </span>{job.deliverables}
+            </p>
+          )}
         </div>
 
         {(job.descriptionEn || job.descriptionJa) && (

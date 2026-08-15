@@ -79,6 +79,8 @@ export interface Company {
 
 export type JobStatus = 'draft' | 'open' | 'closed'
 export type ApplicationStatus = 'submitted' | 'reviewing' | 'accepted' | 'rejected' | 'withdrawn'
+// employment: 正社員 / staffing: 業務委託（継続稼働） / project: 受託開発（単発プロジェクト）
+export type JobType = 'employment' | 'staffing' | 'project'
 
 export interface Job {
   id: string
@@ -93,8 +95,12 @@ export interface Job {
   field: string
   fieldJa: string
   japaneseLevel?: JLPTLevel
+  jobType: JobType
+  remoteOk: boolean
   employmentType: string
   salaryRange: string
+  duration?: string
+  deliverables?: string
   location: string
   status: JobStatus
   createdAt: string

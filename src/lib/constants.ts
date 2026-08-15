@@ -7,3 +7,11 @@ export const FIELDS_JA: Record<string, string> = {
   Data: 'データ',
 }
 export const LEVELS = ['N1', 'N2', 'N3', 'N4', 'N5'] as const
+
+export const JOB_TYPES = ['employment', 'staffing', 'project'] as const
+
+export const COMPENSATION_LABEL_KEY: Record<(typeof JOB_TYPES)[number], string> = {
+  employment: 'jobs.compensationLabelEmployment',
+  staffing: 'jobs.compensationLabelStaffing',
+  project: 'jobs.compensationLabelProject',
+}
