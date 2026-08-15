@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow } from '../lib/jobMapper'
+import { fillMissingJapanese } from '../lib/translate'
 import { FIELDS, FIELDS_JA, LEVELS, COMPENSATION_LABEL_KEY } from '../lib/constants'
 import type { Job, JLPTLevel, JobStatus, JobType } from '../types'
 
@@ -101,11 +102,16 @@ export default function CompanyJobsPage() {
     if (!company) return
     setSaving(true)
 
+    const [titleJa, descriptionJa] = await fillMissingJapanese([
+      { en: form.titleEn, ja: form.titleJa },
+      { en: form.descriptionEn, ja: form.descriptionJa },
+    ])
+
     const payload = {
       title_en: form.titleEn,
-      title_ja: form.titleJa,
+      title_ja: titleJa,
       description_en: form.descriptionEn,
-      description_ja: form.descriptionJa,
+      description_ja: descriptionJa,
       field: form.field,
       field_ja: form.field ? FIELDS_JA[form.field] : '',
       japanese_level: form.japaneseLevel || null,
@@ -170,7 +176,8 @@ export default function CompanyJobsPage() {
               </div>
               <div>
                 <label className="label-line">{t(lang, 'jobs.titleJaLabel')}</label>
-                <input className="input-line" value={form.titleJa} onChange={e => setField('titleJa', e.target.value)} required />
+                <input className="input-line" value={form.titleJa} onChange={e => setField('titleJa', e.target.value)}
+                       placeholder={t(lang, 'jobs.autoTranslateHint')} />
               </div>
             </div>
 
@@ -181,7 +188,8 @@ export default function CompanyJobsPage() {
               </div>
               <div>
                 <label className="label-line">{t(lang, 'jobs.descJaLabel')}</label>
-                <textarea className="input-line resize-none" rows={5} value={form.descriptionJa} onChange={e => setField('descriptionJa', e.target.value)} />
+                <textarea className="input-line resize-none" rows={5} value={form.descriptionJa} onChange={e => setField('descriptionJa', e.target.value)}
+                          placeholder={t(lang, 'jobs.autoTranslateHint')} />
               </div>
             </div>
 

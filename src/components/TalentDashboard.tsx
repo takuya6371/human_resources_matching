@@ -5,6 +5,7 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 import { uploadProfileImage } from '../lib/storage'
 import { isSafeHttpUrl } from '../lib/url'
+import { fillMissingJapanese, translateToJa } from '../lib/translate'
 import type { User, JLPTLevel, LanguageLevel, Language, Experience } from '../types'
 
 const LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5']
@@ -119,22 +120,34 @@ export default function TalentDashboard({ user }: { user: User }) {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
+
+    const [headlineJa, bioJa] = await fillMissingJapanese([
+      { en: form.headlineEn, ja: form.headlineJa },
+      { en: form.bioEn, ja: form.bioJa },
+    ])
+
+    const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
+    const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
+    const skillsJaArr = skillsJaArrInput.length > 0
+      ? skillsJaArrInput
+      : (skillsEnArr.length > 0 ? await translateToJa(skillsEnArr) : [])
+
     const updates: Partial<User> = {
       email: form.email,
       nameEn: form.nameEn,
       nameJa: form.nameJa,
       headlineEn: form.headlineEn,
-      headlineJa: form.headlineJa,
+      headlineJa,
       university: form.university,
       universityJa: form.universityJa,
       faculty: form.faculty,
       facultyJa: form.facultyJa,
       japaneseLevel: form.japaneseLevel,
       openToWork: form.openToWork,
-      skills: form.skillsEn.split(',').map(s => s.trim()).filter(Boolean),
-      skillsJa: form.skillsJa.split(',').map(s => s.trim()).filter(Boolean),
+      skills: skillsEnArr,
+      skillsJa: skillsJaArr,
       bioEn: form.bioEn,
-      bioJa: form.bioJa,
+      bioJa,
       availableFrom: form.availableFrom,
       availableFromJa: form.availableFromJa,
       languages: form.languages,
@@ -260,7 +273,8 @@ export default function TalentDashboard({ user }: { user: User }) {
                       <div key={key}>
                         <label className={LABEL_CLS}>{t(lang, labelKey)}</label>
                         <input className={INPUT_CLS} value={form[key]}
-                               onChange={e => setField(key, e.target.value)} />
+                               onChange={e => setField(key, e.target.value)}
+                               placeholder={key === 'headlineJa' ? t(lang, 'jobs.autoTranslateHint') : undefined} />
                       </div>
                     ))}
                     <div>
@@ -317,7 +331,7 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.skillsJa')}</label>
                       <input className={INPUT_CLS} value={form.skillsJa}
-                             onChange={e => setField('skillsJa', e.target.value)} placeholder="React, Python, SQL" />
+                             onChange={e => setField('skillsJa', e.target.value)} placeholder={t(lang, 'jobs.autoTranslateHint')} />
                     </div>
                   </div>
                 </section>
@@ -335,7 +349,8 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.bioJa')}</label>
                       <textarea className={`${INPUT_CLS} resize-none`} rows={4}
-                                value={form.bioJa} onChange={e => setField('bioJa', e.target.value)} />
+                                value={form.bioJa} onChange={e => setField('bioJa', e.target.value)}
+                                placeholder={t(lang, 'jobs.autoTranslateHint')} />
                     </div>
                   </div>
                 </section>
