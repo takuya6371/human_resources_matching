@@ -6,7 +6,7 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapJobRow, mapApplicationRow } from '../lib/jobMapper'
+import { mapJobRow, mapApplicationRow, jobTitle } from '../lib/jobMapper'
 import type { Job, Application, ApplicationStatus } from '../types'
 
 const STATUS_COLOR: Record<ApplicationStatus, string> = {
@@ -71,7 +71,7 @@ export default function JobApplicantsPage() {
           {t(lang, 'jobs.applicantsHeading')}
         </h1>
         {job && (
-          <p className="text-ink-soft text-sm mb-8">{lang === 'ja' ? job.titleJa : job.titleEn}</p>
+          <p className="text-ink-soft text-sm mb-8">{jobTitle(job, lang)}</p>
         )}
 
         {fetching ? (

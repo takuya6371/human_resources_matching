@@ -6,7 +6,7 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapJobRow } from '../lib/jobMapper'
+import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { fillMissingJapanese } from '../lib/translate'
 import { FIELDS, FIELDS_JA, LEVELS, COMPENSATION_LABEL_KEY } from '../lib/constants'
 import type { Job, JLPTLevel, JobStatus, JobType } from '../types'
@@ -293,7 +293,7 @@ export default function CompanyJobsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-ink font-medium">{lang === 'ja' ? job.titleJa : job.titleEn}</span>
+                      <span className="text-ink font-medium">{jobTitle(job, lang)}</span>
                       <span className="text-xs font-medium uppercase tracking-wide pb-[2px]"
                             style={{ color: STATUS_COLOR[job.status], borderBottom: `1.5px solid ${STATUS_COLOR[job.status]}` }}>
                         {t(lang, `jobs.status${job.status.charAt(0).toUpperCase()}${job.status.slice(1)}`)}

@@ -6,7 +6,7 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapJobRow } from '../lib/jobMapper'
+import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { FIELDS_JA, COMPENSATION_LABEL_KEY } from '../lib/constants'
 import type { Job, ApplicationStatus } from '../types'
 
@@ -113,7 +113,7 @@ export default function JobDetailPage() {
             <p className="text-ink-soft text-sm">{companyName}</p>
           </div>
           <h1 className="font-display font-medium text-ink text-2xl sm:text-3xl tracking-wide mb-3">
-            {lang === 'ja' ? job.titleJa : job.titleEn}
+            {jobTitle(job, lang)}
           </h1>
           <div className="flex flex-wrap items-center gap-2 mb-3">
             <span className="badge-line-ink">{t(lang, `jobs.jobType${job.jobType.charAt(0).toUpperCase()}${job.jobType.slice(1)}`)}</span>

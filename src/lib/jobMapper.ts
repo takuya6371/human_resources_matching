@@ -1,4 +1,12 @@
-import type { Application, Job } from '../types'
+import type { Application, Job, Lang } from '../types'
+
+// 日本語欄が空欄（自動翻訳前・翻訳失敗時）でもタイトルが完全に空欄で
+// 表示されないよう、もう一方の言語にフォールバックする。
+export function jobTitle(job: Job, lang: Lang): string {
+  const primary = lang === 'ja' ? job.titleJa : job.titleEn
+  const fallback = lang === 'ja' ? job.titleEn : job.titleJa
+  return primary || fallback
+}
 
 export function mapJobRow(row: Record<string, any>): Job {
   return {

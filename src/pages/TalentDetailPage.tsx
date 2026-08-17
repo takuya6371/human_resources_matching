@@ -39,10 +39,10 @@ export default function TalentDetailPage() {
 
     async function load() {
       if (hasFullAccess) {
-        // 企業アカウントは承認済みのみ。管理者は審査目的でどのステータスでも閲覧できる必要がある
-        // （RLS自体はis_admin()で全ステータスの読み取りを許可しているので、ここで絞るとRLSより厳しくなってしまう）。
-        let query = supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', id)
-        if (accountType === 'company') query = query.eq('status', 'approved')
+        // ステータスによる絞り込みはRLSに委ねる（承認済み or 自分の求人への応募者は
+        // 企業から閲覧可能、管理者は全件閲覧可能）。ここでアプリ側から追加で絞ると
+        // RLSより厳しくなってしまう。
+        const query = supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', id)
 
         const [{ data: profile }, { data: langs }, { data: exps }] = await Promise.all([
           query.single(),

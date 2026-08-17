@@ -6,7 +6,7 @@ import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapApplicationRow } from '../lib/jobMapper'
+import { mapApplicationRow, jobTitle } from '../lib/jobMapper'
 import type { Application, ApplicationStatus } from '../types'
 
 const STATUS_COLOR: Record<ApplicationStatus, string> = {
@@ -88,7 +88,7 @@ export default function MyApplicationsPage() {
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         {job && (
                           <Link to={`/jobs/${job.id}`} className="text-ink font-medium no-underline hover:text-seal transition-colors">
-                            {lang === 'ja' ? job.titleJa : job.titleEn}
+                            {jobTitle(job, lang)}
                           </Link>
                         )}
                         <span className="text-xs font-medium uppercase tracking-wide pb-[2px]"

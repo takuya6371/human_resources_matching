@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapJobRow } from '../lib/jobMapper'
+import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { FIELDS, FIELDS_JA, JOB_TYPES } from '../lib/constants'
 import type { Job, JobType } from '../types'
 
@@ -37,7 +37,7 @@ export default function JobListPage() {
   const filtered = useMemo(() => {
     const query = search.trim().toLowerCase()
     return jobs.filter(job => {
-      const title = (lang === 'ja' ? job.titleJa : job.titleEn).toLowerCase()
+      const title = jobTitle(job, lang).toLowerCase()
       const matchSearch = !query || title.includes(query) || job.field.toLowerCase().includes(query)
       const matchField = !activeField || job.field === activeField
       const matchJobType = !activeJobType || job.jobType === activeJobType
@@ -125,7 +125,7 @@ export default function JobListPage() {
                     <p className="text-ink-soft text-xs">{(lang === 'ja' && job.companyNameJa) ? job.companyNameJa : job.companyName}</p>
                   </div>
                   <p className="font-display font-medium text-ink text-base mb-2">
-                    {lang === 'ja' ? job.titleJa : job.titleEn}
+                    {jobTitle(job, lang)}
                   </p>
                   <p className="text-ink-soft text-xs mb-3">
                     {(lang === 'ja' ? job.fieldJa : job.field) || '—'}
