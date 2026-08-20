@@ -27,7 +27,6 @@ declare
 begin
   for rec in
     select * from (values
-      ('takuya6371@gmail.com', 'AfriAdmin2026!', 'talent',  null::text),
       ('admin@test.local',     'testpass123',    'talent',  null),
       ('talent1@test.local',   'testpass123',    'talent',  null),
       ('talent2@test.local',   'testpass123',    'talent',  null),
@@ -70,7 +69,7 @@ $seed$;
 -- 管理者権限の付与
 -- ------------------------------------------------------------
 update public.profiles set role = 'admin'
-where email in ('takuya6371@gmail.com', 'admin@test.local');
+where email in ('admin@test.local');
 
 -- ------------------------------------------------------------
 -- talent1: 標準的な内容（承認済み）
