@@ -33,7 +33,10 @@ begin
       ('talent3@test.local',   'testpass123',    'talent',  null),
       ('talent4@test.local',   'testpass123',    'talent',  null),
       ('talent5@test.local',   'testpass123',    'talent',  null),
-      ('company1@test.local',  'testpass123',    'company', 'Test Corp')
+      ('company1@test.local',  'testpass123',    'company', 'Test Corp'),
+      ('company2@test.local',  'testpass123',    'company', 'Sakura Digital Works'),
+      ('company3@test.local',  'testpass123',    'company', 'Nippon Fintech Partners'),
+      ('company4@test.local',  'testpass123',    'company', 'GreenLeaf Manufacturing')
     ) as t(email, password, role, company_name)
   loop
     v_id := gen_random_uuid();
@@ -209,3 +212,110 @@ update public.companies set
   description = 'QA目的のテスト用会社概要です。',
   industry = 'IT', website = 'https://example.com'
 where id in (select id from auth.users where email = 'company1@test.local');
+
+-- ------------------------------------------------------------
+-- company2〜4: 求人一覧を賑やかにするための追加企業（英語のみ、
+-- 日本語欄はあえて空欄のまま保存し、自動翻訳のフォールバック動作も
+-- 一覧上で確認できるようにしている）
+-- ------------------------------------------------------------
+update public.companies set
+  name = 'Sakura Digital Works',
+  description = 'A Tokyo-based digital agency building web platforms and mobile apps for clients across Japan and Southeast Asia.',
+  industry = 'IT', website = 'https://example.com/sakura-digital'
+where id in (select id from auth.users where email = 'company2@test.local');
+
+update public.companies set
+  name = 'Nippon Fintech Partners',
+  description = 'A fintech company modernizing payments and lending infrastructure for small businesses in Japan.',
+  industry = 'Finance', website = 'https://example.com/nippon-fintech'
+where id in (select id from auth.users where email = 'company3@test.local');
+
+update public.companies set
+  name = 'GreenLeaf Manufacturing',
+  description = 'A manufacturing company automating production lines and expanding into new export markets.',
+  industry = 'Manufacturing', website = 'https://example.com/greenleaf-mfg'
+where id in (select id from auth.users where email = 'company4@test.local');
+
+-- ------------------------------------------------------------
+-- 求人（案件・業務委託サンプル、英語のみ）
+--
+-- job_type = 'project'  : 受託開発・単発プロジェクト（成果物・契約期間あり）
+-- job_type = 'staffing' : 業務委託・継続稼働（月額単価、契約期間は更新前提）
+-- ------------------------------------------------------------
+insert into public.jobs (
+  company_id, title_en, title_ja, description_en, description_ja,
+  field, field_ja, japanese_level, job_type, remote_ok,
+  employment_type, salary_range, duration, deliverables, location, status
+)
+select c.id, j.title_en, '', j.description_en, '',
+       j.field, j.field_ja, j.japanese_level::jlpt_level, j.job_type::job_type, j.remote_ok,
+       j.employment_type, j.salary_range, j.duration, j.deliverables, j.location, 'open'::job_status
+from (values
+  -- company1: Test Corp
+  ('company1@test.local',
+   'E-Commerce Platform Rebuild', 'IT', 'IT・エンジニアリング', 'N3', 'project', true,
+   'Contract (project-based)', '¥3.5M–5M total', '4 months', 'Full storefront + admin panel rebuild on Next.js, migrated from a legacy PHP monolith.', 'Tokyo (remote OK)',
+   'We are replacing our aging e-commerce backend with a modern Next.js + headless commerce stack. Looking for a small team or individual contractor to own the rebuild end to end, from data migration to launch.'),
+  ('company1@test.local',
+   'Backend Engineer, Ongoing (Fintech Integrations)', 'IT', 'IT・エンジニアリング', 'N2', 'staffing', true,
+   'Contract (ongoing, renewable)', '¥600K–800K / month', '6 months (renewable)', null, 'Tokyo (remote OK)',
+   'Join our platform team building integrations with Japanese banking and payment APIs. Ongoing contract with strong potential for renewal. Go or Node.js experience preferred.'),
+  ('company1@test.local',
+   'QA / Test Automation Engineer', 'IT', 'IT・エンジニアリング', 'N3', 'staffing', true,
+   'Contract (ongoing)', '¥450K–600K / month', '3 months (renewable)', null, 'Tokyo (remote OK)',
+   'We need a test automation engineer to build out our E2E and regression suite (Playwright) ahead of a major release cycle. Ongoing work, not a fixed-scope project.'),
+
+  -- company2: Sakura Digital Works
+  ('company2@test.local',
+   'Mobile App MVP Development (React Native)', 'IT', 'IT・エンジニアリング', 'N4', 'project', true,
+   'Contract (project-based)', '¥4M–6M total', '5 months', 'iOS + Android MVP with authentication, booking flow, and push notifications, delivered to app store submission.', 'Remote (Japan-based clients)',
+   'Building a booking app MVP for a hospitality client. We need a contractor or small team to take it from Figma designs to app store submission.'),
+  ('company2@test.local',
+   'Corporate Website Renewal', 'IT', 'IT・エンジニアリング', 'N3', 'project', true,
+   'Contract (project-based)', '¥1.2M–1.8M total', '2 months', '12-page marketing site migrated from WordPress to a headless CMS (Sanity), including CMS training for the client team.', 'Remote',
+   'A manufacturing client needs their corporate site rebuilt on modern infrastructure. Fixed-scope project with a hard deadline tied to a trade show launch.'),
+  ('company2@test.local',
+   'Frontend Engineer, Ongoing (Design Systems)', 'IT', 'IT・エンジニアリング', 'N3', 'staffing', true,
+   'Contract (ongoing, renewable)', '¥550K–700K / month', '4 months (renewable)', null, 'Remote',
+   'We maintain design systems for several enterprise clients. Looking for an ongoing contractor with strong React + TypeScript skills and an eye for component API design.'),
+  ('company2@test.local',
+   'UI/UX Designer, Ongoing', 'Business', 'ビジネス', 'N4', 'staffing', true,
+   'Contract (ongoing)', '¥400K–550K / month', '3 months (renewable)', null, 'Remote',
+   'Ongoing design support across multiple client projects: wireframes, prototypes, and design QA during implementation.'),
+
+  -- company3: Nippon Fintech Partners
+  ('company3@test.local',
+   'Data Pipeline & Reporting Dashboard Build', 'Data', 'データ', 'N2', 'project', false,
+   'Contract (project-based)', '¥3M–4.5M total', '3 months', 'ETL pipeline (Airflow) consolidating transaction data from 4 sources, plus a Looker dashboard for the risk team.', 'Tokyo (on-site 2 days/week)',
+   'Our risk team is flying blind without consolidated reporting. Fixed-scope project to build the pipeline and initial dashboard set, with a handover period for our internal team to take over maintenance.'),
+  ('company3@test.local',
+   'Data Analyst, Ongoing (Credit Risk)', 'Data', 'データ', 'N2', 'staffing', false,
+   'Contract (ongoing, renewable)', '¥550K–750K / month', '6 months (renewable)', null, 'Tokyo (hybrid)',
+   'Ongoing analytical support for our credit risk team: cohort analysis, default prediction model monitoring, and ad hoc reporting for leadership.'),
+  ('company3@test.local',
+   'Business Development Associate, Ongoing', 'Business', 'ビジネス', 'N1', 'staffing', false,
+   'Contract (ongoing)', '¥500K–650K / month', '6 months (renewable)', null, 'Tokyo',
+   'Support our expansion into serving foreign-owned SMEs in Japan: partner outreach, market research, and pitch material preparation. Native or near-native Japanese required for client-facing work.'),
+  ('company3@test.local',
+   'Market Entry Research Report — West Africa Remittances', 'Business', 'ビジネス', 'N3', 'project', true,
+   'Contract (project-based)', '¥900K–1.3M total', '6 weeks', 'A ~40-page report covering regulatory landscape, competitor mapping, and a go-to-market recommendation for launching a remittance product into 3 West African markets.', 'Remote',
+   'We are evaluating whether to launch a remittance corridor product into West Africa and need a rigorous, evidence-based market entry report to support a board decision.'),
+
+  -- company4: GreenLeaf Manufacturing
+  ('company4@test.local',
+   'Manufacturing Process Automation (PLC)', 'Engineering', '工学', 'N3', 'project', false,
+   'Contract (project-based)', '¥2.5M–3.5M total', '3 months', 'PLC-based automation retrofit for one production line, including safety interlocks and an operator dashboard.', 'Osaka (on-site required)',
+   'Retrofitting one of our older production lines with PLC-based automation to reduce manual handling. On-site work required due to equipment access and safety sign-off.'),
+  ('company4@test.local',
+   'Mechanical Design Engineer, Ongoing', 'Engineering', '工学', 'N3', 'staffing', false,
+   'Contract (ongoing, renewable)', '¥500K–650K / month', '6 months (renewable)', null, 'Osaka (on-site)',
+   'Ongoing mechanical design support (CAD, tolerance analysis, DFM reviews) as we bring two new product lines through prototyping.'),
+  ('company4@test.local',
+   'Export Compliance & Logistics Coordinator, Ongoing', 'Business', 'ビジネス', 'N2', 'staffing', false,
+   'Contract (ongoing)', '¥450K–600K / month', '4 months (renewable)', null, 'Osaka',
+   'As we expand exports into new markets, we need ongoing support coordinating customs documentation, freight forwarders, and compliance checks.')
+) as j(
+  company_email, title_en, field, field_ja, japanese_level, job_type, remote_ok,
+  employment_type, salary_range, duration, deliverables, location, description_en
+)
+join auth.users c on c.email = j.company_email;
