@@ -12,7 +12,7 @@ import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/prof
 import { FIELDS, FIELDS_JA, LEVELS } from '../lib/constants'
 import type { Talent, TalentTeaser } from '../types'
 
-const AREAS = ['東京都', '大阪府', '京都府', '神奈川県', '愛知県', '福岡県'] as const
+const AREAS = ['Tokyo', 'Osaka', 'Kyoto', 'Kanagawa', 'Aichi', 'Fukuoka'] as const
 
 export default function TalentListPage() {
   const { lang } = useLang()

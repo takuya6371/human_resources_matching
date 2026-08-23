@@ -363,7 +363,7 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.residenceArea')}</label>
                       <input className={INPUT_CLS} value={form.residenceArea}
-                             onChange={e => setField('residenceArea', e.target.value)} placeholder="東京都" />
+                             onChange={e => setField('residenceArea', e.target.value)} placeholder="Tokyo" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>

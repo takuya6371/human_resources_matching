@@ -8,7 +8,26 @@
       "Bash(curl *)",
       "Bash(docker info *)",
       "Bash(open -a Docker)",
-      "Bash(PGPASSWORD=postgres psql *)"
+      "Bash(PGPASSWORD=postgres psql *)",
+      "Bash(npx netlify *)",
+      "Bash(grep -v \"href=\\\\\"/\\\\|href={\\\\`/\\\\|no-underline\")",
+      "Bash(python3 *)",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:support.deepl.com)",
+      "Bash(npm --version)",
+      "Bash(env)"
+    ]
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Ping.aiff"
+          }
+        ]
+      }
     ]
   }
 }

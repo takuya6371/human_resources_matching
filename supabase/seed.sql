@@ -111,10 +111,10 @@ update public.profiles set
   headline_en = 'MBA-track generalist bridging Japan and West Africa',
   headline_ja = '日本と西アフリカを繋ぐビジネスジェネラリスト',
   open_to_work = true,
-  residence_area = '東京都',
+  residence_area = 'Tokyo',
   past_clients = '{"Mitsubishi Corporation","Rakuten Group"}',
   years_in_japan = 4,
-  hobbies = '茶道、マラソン、ナイジェリア料理',
+  hobbies = 'Tea ceremony, marathon running, Nigerian cooking',
   video_url = 'https://example.com/videos/amara-intro.mp4'
 where email = 'talent2@test.local';
 
@@ -171,10 +171,10 @@ update public.profiles set
   headline_en = 'Data scientist who can''t stop A/B testing everything',
   headline_ja = '何でもA/Bテストしたがるデータサイエンティスト',
   open_to_work = true,
-  residence_area = '神奈川県',
+  residence_area = 'Kanagawa',
   years_in_japan = 2,
   dev_experience_years = 3,
-  hobbies = 'ボルダリング、SF小説、猫2匹（モモ・タロウ）',
+  hobbies = 'Bouldering, sci-fi novels, two cats (Momo & Taro)',
   video_url = 'https://example.com/fatima-intro.mp4'
 where email = 'talent4@test.local';
 
@@ -194,7 +194,7 @@ update public.profiles set
   bio_en = 'Backend engineer interested in distributed systems.',
   bio_ja = '分散システムに興味があるバックエンドエンジニアです。',
   available_from = '2026-04-01', available_from_ja = '2026年4月〜',
-  open_to_work = true, residence_area = '大阪府'
+  open_to_work = true, residence_area = 'Osaka'
 where email = 'talent5@test.local';
 
 insert into public.profile_languages (profile_id, language, level, sort_order)
@@ -254,65 +254,65 @@ from (values
   -- company1: Test Corp
   ('company1@test.local',
    'E-Commerce Platform Rebuild', 'IT', 'IT・エンジニアリング', 'N3', 'project', true,
-   'Contract (project-based)', '¥3.5M–5M total', '4 months', 'Full storefront + admin panel rebuild on Next.js, migrated from a legacy PHP monolith.', 'Tokyo (remote OK)',
+   'Contract (project-based)', '$23,000–33,000 total', '4 months', 'Full storefront + admin panel rebuild on Next.js, migrated from a legacy PHP monolith.', 'Tokyo (remote OK)',
    'We are replacing our aging e-commerce backend with a modern Next.js + headless commerce stack. Looking for a small team or individual contractor to own the rebuild end to end, from data migration to launch.'),
   ('company1@test.local',
    'Backend Engineer, Ongoing (Fintech Integrations)', 'IT', 'IT・エンジニアリング', 'N2', 'staffing', true,
-   'Contract (ongoing, renewable)', '¥600K–800K / month', '6 months (renewable)', null, 'Tokyo (remote OK)',
+   'Contract (ongoing, renewable)', '$4,000–5,300 / month', '6 months (renewable)', null, 'Tokyo (remote OK)',
    'Join our platform team building integrations with Japanese banking and payment APIs. Ongoing contract with strong potential for renewal. Go or Node.js experience preferred.'),
   ('company1@test.local',
    'QA / Test Automation Engineer', 'IT', 'IT・エンジニアリング', 'N3', 'staffing', true,
-   'Contract (ongoing)', '¥450K–600K / month', '3 months (renewable)', null, 'Tokyo (remote OK)',
+   'Contract (ongoing)', '$3,000–4,000 / month', '3 months (renewable)', null, 'Tokyo (remote OK)',
    'We need a test automation engineer to build out our E2E and regression suite (Playwright) ahead of a major release cycle. Ongoing work, not a fixed-scope project.'),
 
   -- company2: Sakura Digital Works
   ('company2@test.local',
    'Mobile App MVP Development (React Native)', 'IT', 'IT・エンジニアリング', 'N4', 'project', true,
-   'Contract (project-based)', '¥4M–6M total', '5 months', 'iOS + Android MVP with authentication, booking flow, and push notifications, delivered to app store submission.', 'Remote (Japan-based clients)',
+   'Contract (project-based)', '$27,000–40,000 total', '5 months', 'iOS + Android MVP with authentication, booking flow, and push notifications, delivered to app store submission.', 'Remote (Japan-based clients)',
    'Building a booking app MVP for a hospitality client. We need a contractor or small team to take it from Figma designs to app store submission.'),
   ('company2@test.local',
    'Corporate Website Renewal', 'IT', 'IT・エンジニアリング', 'N3', 'project', true,
-   'Contract (project-based)', '¥1.2M–1.8M total', '2 months', '12-page marketing site migrated from WordPress to a headless CMS (Sanity), including CMS training for the client team.', 'Remote',
+   'Contract (project-based)', '$8,000–12,000 total', '2 months', '12-page marketing site migrated from WordPress to a headless CMS (Sanity), including CMS training for the client team.', 'Remote',
    'A manufacturing client needs their corporate site rebuilt on modern infrastructure. Fixed-scope project with a hard deadline tied to a trade show launch.'),
   ('company2@test.local',
    'Frontend Engineer, Ongoing (Design Systems)', 'IT', 'IT・エンジニアリング', 'N3', 'staffing', true,
-   'Contract (ongoing, renewable)', '¥550K–700K / month', '4 months (renewable)', null, 'Remote',
+   'Contract (ongoing, renewable)', '$3,700–4,700 / month', '4 months (renewable)', null, 'Remote',
    'We maintain design systems for several enterprise clients. Looking for an ongoing contractor with strong React + TypeScript skills and an eye for component API design.'),
   ('company2@test.local',
    'UI/UX Designer, Ongoing', 'Business', 'ビジネス', 'N4', 'staffing', true,
-   'Contract (ongoing)', '¥400K–550K / month', '3 months (renewable)', null, 'Remote',
+   'Contract (ongoing)', '$2,700–3,700 / month', '3 months (renewable)', null, 'Remote',
    'Ongoing design support across multiple client projects: wireframes, prototypes, and design QA during implementation.'),
 
   -- company3: Nippon Fintech Partners
   ('company3@test.local',
    'Data Pipeline & Reporting Dashboard Build', 'Data', 'データ', 'N2', 'project', false,
-   'Contract (project-based)', '¥3M–4.5M total', '3 months', 'ETL pipeline (Airflow) consolidating transaction data from 4 sources, plus a Looker dashboard for the risk team.', 'Tokyo (on-site 2 days/week)',
+   'Contract (project-based)', '$20,000–30,000 total', '3 months', 'ETL pipeline (Airflow) consolidating transaction data from 4 sources, plus a Looker dashboard for the risk team.', 'Tokyo (on-site 2 days/week)',
    'Our risk team is flying blind without consolidated reporting. Fixed-scope project to build the pipeline and initial dashboard set, with a handover period for our internal team to take over maintenance.'),
   ('company3@test.local',
    'Data Analyst, Ongoing (Credit Risk)', 'Data', 'データ', 'N2', 'staffing', false,
-   'Contract (ongoing, renewable)', '¥550K–750K / month', '6 months (renewable)', null, 'Tokyo (hybrid)',
+   'Contract (ongoing, renewable)', '$3,700–5,000 / month', '6 months (renewable)', null, 'Tokyo (hybrid)',
    'Ongoing analytical support for our credit risk team: cohort analysis, default prediction model monitoring, and ad hoc reporting for leadership.'),
   ('company3@test.local',
    'Business Development Associate, Ongoing', 'Business', 'ビジネス', 'N1', 'staffing', false,
-   'Contract (ongoing)', '¥500K–650K / month', '6 months (renewable)', null, 'Tokyo',
+   'Contract (ongoing)', '$3,300–4,300 / month', '6 months (renewable)', null, 'Tokyo',
    'Support our expansion into serving foreign-owned SMEs in Japan: partner outreach, market research, and pitch material preparation. Native or near-native Japanese required for client-facing work.'),
   ('company3@test.local',
    'Market Entry Research Report — West Africa Remittances', 'Business', 'ビジネス', 'N3', 'project', true,
-   'Contract (project-based)', '¥900K–1.3M total', '6 weeks', 'A ~40-page report covering regulatory landscape, competitor mapping, and a go-to-market recommendation for launching a remittance product into 3 West African markets.', 'Remote',
+   'Contract (project-based)', '$6,000–8,700 total', '6 weeks', 'A ~40-page report covering regulatory landscape, competitor mapping, and a go-to-market recommendation for launching a remittance product into 3 West African markets.', 'Remote',
    'We are evaluating whether to launch a remittance corridor product into West Africa and need a rigorous, evidence-based market entry report to support a board decision.'),
 
   -- company4: GreenLeaf Manufacturing
   ('company4@test.local',
    'Manufacturing Process Automation (PLC)', 'Engineering', '工学', 'N3', 'project', false,
-   'Contract (project-based)', '¥2.5M–3.5M total', '3 months', 'PLC-based automation retrofit for one production line, including safety interlocks and an operator dashboard.', 'Osaka (on-site required)',
+   'Contract (project-based)', '$17,000–23,000 total', '3 months', 'PLC-based automation retrofit for one production line, including safety interlocks and an operator dashboard.', 'Osaka (on-site required)',
    'Retrofitting one of our older production lines with PLC-based automation to reduce manual handling. On-site work required due to equipment access and safety sign-off.'),
   ('company4@test.local',
    'Mechanical Design Engineer, Ongoing', 'Engineering', '工学', 'N3', 'staffing', false,
-   'Contract (ongoing, renewable)', '¥500K–650K / month', '6 months (renewable)', null, 'Osaka (on-site)',
+   'Contract (ongoing, renewable)', '$3,300–4,300 / month', '6 months (renewable)', null, 'Osaka (on-site)',
    'Ongoing mechanical design support (CAD, tolerance analysis, DFM reviews) as we bring two new product lines through prototyping.'),
   ('company4@test.local',
    'Export Compliance & Logistics Coordinator, Ongoing', 'Business', 'ビジネス', 'N2', 'staffing', false,
-   'Contract (ongoing)', '¥450K–600K / month', '4 months (renewable)', null, 'Osaka',
+   'Contract (ongoing)', '$3,000–4,000 / month', '4 months (renewable)', null, 'Osaka',
    'As we expand exports into new markets, we need ongoing support coordinating customs documentation, freight forwarders, and compliance checks.')
 ) as j(
   company_email, title_en, field, field_ja, japanese_level, job_type, remote_ok,

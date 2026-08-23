@@ -249,7 +249,7 @@ export default function CompanyJobsPage() {
               </div>
               <div>
                 <label className="label-line">{t(lang, 'jobs.locationLabel')}</label>
-                <input className="input-line" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="東京都" />
+                <input className="input-line" value={form.location} onChange={e => setField('location', e.target.value)} placeholder="Tokyo" />
               </div>
             </div>
 
