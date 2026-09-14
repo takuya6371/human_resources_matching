@@ -70,7 +70,7 @@
 | Navbar, Footer, Layout, AdminLayout, Sidebar, AuthLayout, ProtectedRoute, ScrollToTop, PageNotFound | IN(骨格) |
 | PostCard, FollowButton, InterestButton, SaveButton, MessageButton, LanguageSwitcher, LogoCarousel, CookieConsent, Badges, ReputationBadges, ShareSheet, AuthPrompt, AuthRoleSelector, SocialAuthButtons, GoogleIcon, AfricaLogo | IN(IN対象ページの付随部品) |
 | BoostModal, PlanCard, CreditEarning | OUT(課金連動) |
-| ResumeAnalyzer, Chatbot, GithubRepos | OUT(base44サーバー関数依存、未納品) |
+| ResumeAnalyzer, Chatbot, GithubRepos | OUT(今回はコア機能優先のため対象外。関数実装自体は`base44/functions/`に存在し移植可能 — 詳細は上記スコープ方針を参照) |
 
 ## docs/handover の取り込み方針
 
