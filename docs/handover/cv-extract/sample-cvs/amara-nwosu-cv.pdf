@@ -1,0 +1,124 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [5 0 R 7 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4348 >>
+stream
+BT
+/F2 17 Tf 1 0 0 1 56.00 785.89 Tm (AMARA CHINELO NWOSU) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 763.45 Tm (Full-Stack Engineer - Nairobi, Kenya) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 750.25 Tm (amara.nwosu@protonmail.com | +254 712 448 903) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 737.05 Tm (github.com/amaranwosu | linkedin.com/in/amaranwosu | amaranwosu.dev) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 710.59 Tm (PERSONAL DETAILS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 697.39 Tm (Date of Birth: 18 April 1996) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 684.19 Tm (Gender: Female) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 670.99 Tm (Nationality: Kenyan) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 657.79 Tm (Address: 12 Kirimani Road, Kilimani, Nairobi 00100, Kenya) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 631.33 Tm (PROFILE) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 618.13 Tm (Full-stack engineer with 7 years building logistics and e-commerce platforms for) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 604.93 Tm (East African markets. I own services end to end, from schema design through to) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 591.73 Tm (on-call. Since 2023 I have been studying Japanese seriously and passed JLPT N2 in) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 578.53 Tm (July 2025. I am looking for a remote-first role with a Japanese company and am) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 565.33 Tm (open to relocating to Tokyo within twelve months.) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 538.87 Tm (WORK EXPERIENCE) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 518.41 Tm (Lead Software Engineer - Sendy Logistics, Nairobi, Kenya) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 505.21 Tm (February 2023 - Present) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 492.01 Tm (- Lead a team of 5 on the dispatch platform that routes about 40,000 deliveries a day) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 478.81 Tm (across Kenya, Uganda and Tanzania) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 465.61 Tm (- Rewrote the route-assignment service in Go, cutting median assignment time from) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 452.41 Tm (4.2 seconds to 900 milliseconds) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 439.21 Tm (- Introduced trunk-based development and a staging pipeline; releases went from) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 426.01 Tm (fortnightly to daily) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 412.81 Tm (- Ran the migration of 6 years of trip history from MySQL to PostgreSQL with) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 399.61 Tm (zero downtime) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 386.41 Tm (- Stack: Go, TypeScript, React, PostgreSQL, Redis, Kafka, Docker, Kubernetes, GCP) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 365.95 Tm (Senior Software Engineer - Twiga Foods, Nairobi, Kenya) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 352.75 Tm (March 2020 - August 2022) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 339.55 Tm (- Built the vendor-facing ordering portal used by 12,000 informal retailers) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 326.35 Tm (- Cut checkout abandonment from 41% to 23% by rebuilding the cart flow and adding) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 313.15 Tm (offline-first support for intermittent connections) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 299.95 Tm (- Designed the pricing service that reconciles daily produce prices across 9 depots) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 286.75 Tm (- Mentored 3 junior engineers, two of whom were promoted within the year) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 273.55 Tm (- Stack: Python, Django, ReactJS, PostgreSQL, Celery, RabbitMQ, AWS) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 253.09 Tm (Software Engineer - Andela \(remote, contracted to a Berlin fintech\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 239.89 Tm (June 2018 - February 2020) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 226.69 Tm (- Remote contract with a German client, working a permanent 2-hour offset) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 213.49 Tm (- Built and maintained payment reconciliation APIs in Node.js and Express) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 200.29 Tm (- Wrote the internal tooling that flagged mismatched settlements before they aged) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 187.09 Tm (- First experience of fully asynchronous, written-first engineering culture) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 173.89 Tm (- Stack: Node.js, Express, MongoDB, React.js, Docker) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 147.43 Tm (EDUCATION) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 126.97 Tm (BSc Computer Science, First Class Honours) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 113.77 Tm (University of Nairobi, Kenya - 2014 to 2018) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 93.31 Tm (Japanese Language Programme \(part-time, evenings\)) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 80.11 Tm (Nairobi Japanese Language School - 2023 to present) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 2381 >>
+stream
+BT
+/F2 10.5 Tf 1 0 0 1 56.00 785.89 Tm (LANGUAGES) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 772.69 Tm (English - Native) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 759.49 Tm (Swahili - Native) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 746.29 Tm (Igbo - Conversational) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 733.09 Tm (Japanese - JLPT N2, passed July 2025. Comfortable in daily standups, still slow) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 719.89 Tm (in long written specs.) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 706.69 Tm (German - Basic \(A2\), picked up during the Berlin contract) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 680.23 Tm (SKILLS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 667.03 Tm (Go, Golang, TypeScript, JavaScript, Python, Django, React, ReactJS, React.js,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 653.83 Tm (Node.js, NodeJS, PostgreSQL, Postgres, MySQL, MongoDB, Redis, Kafka, RabbitMQ,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 640.63 Tm (Docker, Kubernetes, Terraform, GCP, AWS, REST APIs, gRPC, GraphQL, System Design,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 627.43 Tm (Distributed Systems, Technical Leadership, Mentoring) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 600.97 Tm (CERTIFICATIONS) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 587.77 Tm (JLPT N2 - Japan Foundation, 2025) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 574.57 Tm (Google Cloud Professional Cloud Architect, 2024 \(ID: GCP-PCA-118442\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 561.37 Tm (AWS Certified Developer - Associate, 2021) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 534.91 Tm (PROJECTS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 521.71 Tm (matatu-times - Open-source GTFS feed builder for Nairobi's minibus network.) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 508.51 Tm (Go and PostGIS, used by two city planning teams. github.com/amaranwosu/matatu-times) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 488.05 Tm (kanji-drill - Spaced-repetition drill app I built to get through N2 kanji.) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 474.85 Tm (TypeScript, React, IndexedDB. amaranwosu.dev/kanji-drill) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 448.39 Tm (AVAILABILITY) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 435.19 Tm (Available from 1 May 2026 \(two months' notice at Sendy\).) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 421.99 Tm (Open to fully remote roles with Japanese companies; happy to overlap with JST) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 408.79 Tm (mornings. Open to relocating to Tokyo after about twelve months.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 395.59 Tm (Target countries: Japan, Singapore, Germany.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 382.39 Tm (Salary expectation: USD 68,000 - 85,000.) Tj
+ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000468 00000 n 
+0000004868 00000 n 
+0000005010 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+7443
+%%EOF

@@ -1,0 +1,169 @@
+/* ============================================================
+   "Line" — the same quiet-luxury system as the rest of AfriTalent.
+   Tokens copied from tailwind.config.js / globals.css so the two
+   surfaces are one product.
+   ============================================================ */
+:root{
+  --paper:#FAF8F4; --ink:#1C1B18; --ink-soft:#8A8577; --ink-faint:#B7B2A1;
+  --hairline:#E7E2D6; --seal:#A6332B; --ok:#1D7E5C; --pending:#BA7517;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --display:Futura,'Century Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  --jp:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',Meiryo,var(--sans);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(166,51,43,.2)}
+button{font-family:inherit}
+.page{font-family:var(--display);font-weight:500;letter-spacing:.02em}
+.lede{color:var(--ink-soft);max-width:64ch;line-height:1.6}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--paper);
+  background:var(--ink);border:1px solid var(--ink);cursor:pointer;transition:background-color .15s,border-color .15s}
+.btn:hover:not(:disabled){background:var(--seal);border-color:var(--seal)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.sm{padding:8px 15px;font-size:10px}
+.btn.ghost{background:none;color:var(--ink-soft);border-color:var(--hairline)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--ink-soft);background:none}
+.sect{color:var(--ink-faint);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+
+/* ---- shell ---- */
+.top{border-bottom:1px solid var(--hairline);background:rgba(250,248,244,.94);backdrop-filter:blur(4px);
+  position:sticky;top:0;z-index:40}
+.top .in{max-width:1280px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.wordmark{font-family:var(--display);font-weight:500;font-size:17px;letter-spacing:.05em;text-transform:uppercase}
+.who{display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap}
+.who select{font-family:var(--sans);font-size:13px;padding:8px 12px;border:1px solid var(--hairline);
+  background:var(--paper);color:var(--ink);outline:none;cursor:pointer;max-width:min(52vw,300px)}
+.who select:focus{border-color:var(--ink)}
+
+.shell{max-width:1280px;margin:0 auto;height:calc(100vh - 60px);display:grid;
+  grid-template-columns:290px 1fr 300px;min-height:0}
+.col{min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.col.threads{border-right:1px solid var(--hairline)}
+.col.side{border-left:1px solid var(--hairline)}
+.colhead{padding:16px 18px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;
+  justify-content:space-between;gap:10px;flex:none}
+.scroll{overflow-y:auto;flex:1;min-height:0}
+::-webkit-scrollbar{width:7px}
+::-webkit-scrollbar-thumb{background:var(--hairline);border-radius:4px}
+
+/* ---- thread list ---- */
+.thread{display:flex;gap:12px;padding:14px 18px;border-bottom:1px solid var(--hairline);
+  cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left}
+.thread:hover{background:rgba(28,27,24,.025)}
+.thread.on{background:rgba(28,27,24,.05)}
+.thread .av{width:38px;height:38px;border-radius:9999px;border:1px solid var(--hairline);flex:none;
+  display:grid;place-items:center;font-family:var(--display);font-size:13px;overflow:hidden}
+.thread .av img{width:100%;height:100%;object-fit:cover}
+.thread .meta{flex:1;min-width:0}
+.thread .nm{font-size:14px;font-weight:500;display:flex;align-items:center;gap:6px}
+.thread .nm .flag{font-size:13px}
+.thread .sub{font-size:12px;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.thread .prev{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.thread.locked .nm,.thread.locked .prev{color:var(--seal)}
+.pill{font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;padding:2px 6px;
+  border:1px solid currentColor;white-space:nowrap}
+.pill.flag{color:var(--seal)} .pill.support{color:var(--pending)} .pill.new{color:var(--ok)}
+
+/* The company a representative speaks for, next to their name wherever their
+   name appears. A recruiter is only meaningful as the company they are from. */
+.co{display:inline-block;font-size:10.5px;letter-spacing:.03em;color:var(--ink-soft);
+  border:1px solid var(--hairline);padding:1px 6px;vertical-align:middle;white-space:nowrap;
+  font-family:var(--jp)}
+.convhead .co{font-size:11px}
+.stamp .co{font-size:9.5px;padding:0 4px;margin-left:4px}
+
+/* ---- messages ---- */
+.convhead{padding:15px 22px;border-bottom:1px solid var(--hairline);display:flex;align-items:center;gap:14px;flex:none}
+.convhead .av{width:40px;height:40px;border-radius:9999px;border:1px solid var(--hairline);flex:none;
+  display:grid;place-items:center;font-family:var(--display);font-size:14px;overflow:hidden}
+.convhead .av img{width:100%;height:100%;object-fit:cover}
+.convhead h2{margin:0;font-size:15px;font-weight:500}
+.convhead p{margin:2px 0 0;font-size:12px;color:var(--ink-faint)}
+.msgs{padding:22px;display:flex;flex-direction:column;gap:16px}
+.msg{max-width:min(76%,540px);display:flex;flex-direction:column;gap:0}
+.msg.mine{align-self:flex-end;align-items:flex-end}
+.bubble{border:1px solid var(--hairline);padding:11px 15px;font-size:14.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.mine .bubble{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.bubble.jp{font-family:var(--jp)}
+.tr{font-size:12px;color:var(--ink-faint);line-height:1.5;padding:6px 15px 0;border-left:1px solid var(--hairline);
+  margin-top:7px;overflow-wrap:anywhere}
+.msg.mine .tr{border-left:none;border-right:1px solid var(--hairline);text-align:right}
+.tr.jp{font-family:var(--jp)}
+.tr .lbl{font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-faint);opacity:.75;display:block;margin-bottom:2px}
+.stamp{font-size:10.5px;color:var(--ink-faint);margin-top:6px;font-variant-numeric:tabular-nums}
+
+/* system / guardian notices */
+.sys{align-self:center;max-width:min(88%,620px);text-align:center;font-size:12.5px;color:var(--ink-soft);
+  line-height:1.6;padding:12px 16px;border:1px dashed var(--hairline)}
+.sys b{color:var(--ink);font-weight:600}
+.sys.stop{border:1px solid var(--seal);border-left-width:3px;text-align:left;color:var(--ink)}
+.sys.support{border:1px solid var(--pending);border-left-width:3px;text-align:left}
+.sys .who{font-size:10px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;
+  display:block;margin-bottom:5px;margin-left:0}
+.sys.stop .who{color:var(--seal)} .sys.support .who{color:var(--pending)}
+/* the guardian's standing notice — present, not shouting */
+.sys.watching{border:1px solid var(--hairline);border-left:3px solid var(--ink-faint);
+  text-align:left;background:rgba(28,27,24,.015);max-width:min(92%,660px)}
+.sys.watching .who{color:var(--ink-faint)}
+
+/* ---- composer ---- */
+.composer{border-top:1px solid var(--hairline);padding:14px 22px 18px;flex:none;background:var(--paper)}
+.composer .warn{border-left:3px solid var(--seal);padding:9px 13px;margin-bottom:11px;font-size:12.5px;line-height:1.5}
+.composer .warn b{color:var(--seal)}
+.composer .row{display:flex;gap:12px;align-items:flex-end}
+.composer textarea{flex:1;resize:none;border:1px solid var(--hairline);background:var(--paper);color:var(--ink);
+  padding:11px 14px;font-family:var(--sans);font-size:14.5px;line-height:1.5;outline:none;min-height:46px;max-height:150px}
+.composer textarea:focus{border-color:var(--ink)}
+.composer textarea.bad{border-color:var(--seal)}
+.composer .hint{font-size:11px;color:var(--ink-faint);margin-top:9px}
+.locked-note{border:1px solid var(--seal);border-left-width:3px;padding:14px 16px;font-size:13px;line-height:1.6}
+.locked-note b{color:var(--seal)}
+
+/* ---- side panel ---- */
+.side .block{padding:18px;border-bottom:1px solid var(--hairline)}
+.side .block h3{margin:0 0 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint)}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:4px 0}
+.kv span:last-child{color:var(--ink-soft);text-align:right}
+.log{font-size:12px;line-height:1.55;padding:9px 0;border-top:1px solid var(--hairline)}
+.log:first-of-type{border-top:none}
+.log .t{font-family:var(--mono);font-size:10px;color:var(--ink-faint)}
+.log .v{display:inline-block;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;margin-right:6px}
+.log .v.block{color:var(--seal)} .log .v.review{color:var(--pending)} .log .v.clear{color:var(--ok)}
+.meter{height:3px;background:var(--hairline);margin:10px 0 6px}
+.meter i{display:block;height:100%;background:var(--ink)}
+
+/* ---- admin ---- */
+.admin{max-width:1000px;margin:0 auto;padding:34px 24px 80px}
+.case{border:1px solid var(--hairline);padding:20px;margin-bottom:18px}
+.case.open{border-left:3px solid var(--seal)}
+.case h3{margin:0 0 4px;font-size:15px;font-weight:500}
+.case .sub{font-size:12px;color:var(--ink-faint);margin-bottom:14px}
+.case .quote{border-left:2px solid var(--seal);padding:8px 14px;margin:12px 0;font-size:13.5px;white-space:pre-wrap}
+.case .acts{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+.empty{height:100%;display:grid;place-items:center;text-align:center;color:var(--ink-faint);padding:40px}
+.hidden{display:none !important}
+
+@media(max-width:1080px){
+  .shell{grid-template-columns:250px 1fr}
+  .col.side{display:none}
+}
+@media(max-width:720px){
+  .shell{grid-template-columns:1fr;height:auto}
+  .col.threads{border-right:none;border-bottom:1px solid var(--hairline);max-height:34vh}
+  .msg{max-width:88%}
+}
+
+/* brief confirmation for actions whose effect may not be visible */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);
+  background:var(--ink);color:var(--paper);padding:11px 20px;font-size:13px;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;z-index:200}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.retry{background:none;border:none;padding:0;font:inherit;color:var(--seal);
+  cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.retry:hover{opacity:.7}

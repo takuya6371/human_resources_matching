@@ -1,0 +1,89 @@
+AMARA CHINELO NWOSU
+Full-Stack Engineer - Nairobi, Kenya
+amara.nwosu@protonmail.com | +254 712 448 903
+github.com/amaranwosu | linkedin.com/in/amaranwosu | amaranwosu.dev
+
+PERSONAL DETAILS
+Date of Birth: 18 April 1996
+Gender: Female
+Nationality: Kenyan
+Address: 12 Kirimani Road, Kilimani, Nairobi 00100, Kenya
+
+PROFILE
+Full-stack engineer with 7 years building logistics and e-commerce platforms for
+East African markets. I own services end to end, from schema design through to
+on-call. Since 2023 I have been studying Japanese seriously and passed JLPT N2 in
+July 2025. I am looking for a remote-first role with a Japanese company and am
+open to relocating to Tokyo within twelve months.
+
+WORK EXPERIENCE
+
+Lead Software Engineer - Sendy Logistics, Nairobi, Kenya
+February 2023 - Present
+- Lead a team of 5 on the dispatch platform that routes about 40,000 deliveries a day
+  across Kenya, Uganda and Tanzania
+- Rewrote the route-assignment service in Go, cutting median assignment time from
+  4.2 seconds to 900 milliseconds
+- Introduced trunk-based development and a staging pipeline; releases went from
+  fortnightly to daily
+- Ran the migration of 6 years of trip history from MySQL to PostgreSQL with
+  zero downtime
+- Stack: Go, TypeScript, React, PostgreSQL, Redis, Kafka, Docker, Kubernetes, GCP
+
+Senior Software Engineer - Twiga Foods, Nairobi, Kenya
+March 2020 - August 2022
+- Built the vendor-facing ordering portal used by 12,000 informal retailers
+- Cut checkout abandonment from 41% to 23% by rebuilding the cart flow and adding
+  offline-first support for intermittent connections
+- Designed the pricing service that reconciles daily produce prices across 9 depots
+- Mentored 3 junior engineers, two of whom were promoted within the year
+- Stack: Python, Django, ReactJS, PostgreSQL, Celery, RabbitMQ, AWS
+
+Software Engineer - Andela (remote, contracted to a Berlin fintech)
+June 2018 - February 2020
+- Remote contract with a German client, working a permanent 2-hour offset
+- Built and maintained payment reconciliation APIs in Node.js and Express
+- Wrote the internal tooling that flagged mismatched settlements before they aged
+- First experience of fully asynchronous, written-first engineering culture
+- Stack: Node.js, Express, MongoDB, React.js, Docker
+
+EDUCATION
+
+BSc Computer Science, First Class Honours
+University of Nairobi, Kenya - 2014 to 2018
+
+Japanese Language Programme (part-time, evenings)
+Nairobi Japanese Language School - 2023 to present
+
+LANGUAGES
+English - Native
+Swahili - Native
+Igbo - Conversational
+Japanese - JLPT N2, passed July 2025. Comfortable in daily standups, still slow
+  in long written specs.
+German - Basic (A2), picked up during the Berlin contract
+
+SKILLS
+Go, Golang, TypeScript, JavaScript, Python, Django, React, ReactJS, React.js,
+Node.js, NodeJS, PostgreSQL, Postgres, MySQL, MongoDB, Redis, Kafka, RabbitMQ,
+Docker, Kubernetes, Terraform, GCP, AWS, REST APIs, gRPC, GraphQL, System Design,
+Distributed Systems, Technical Leadership, Mentoring
+
+CERTIFICATIONS
+JLPT N2 - Japan Foundation, 2025
+Google Cloud Professional Cloud Architect, 2024 (ID: GCP-PCA-118442)
+AWS Certified Developer - Associate, 2021
+
+PROJECTS
+matatu-times - Open-source GTFS feed builder for Nairobi's minibus network.
+  Go and PostGIS, used by two city planning teams. github.com/amaranwosu/matatu-times
+
+kanji-drill - Spaced-repetition drill app I built to get through N2 kanji.
+  TypeScript, React, IndexedDB. amaranwosu.dev/kanji-drill
+
+AVAILABILITY
+Available from 1 May 2026 (two months' notice at Sendy).
+Open to fully remote roles with Japanese companies; happy to overlap with JST
+mornings. Open to relocating to Tokyo after about twelve months.
+Target countries: Japan, Singapore, Germany.
+Salary expectation: USD 68,000 - 85,000.

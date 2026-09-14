@@ -1,0 +1,122 @@
+{
+  "name": "CompanyProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Linked company representative user id"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "company_size": {
+      "type": "string",
+      "enum": [
+        "1-10",
+        "11-50",
+        "51-200",
+        "201-1000",
+        "1000+"
+      ],
+      "default": "11-50"
+    },
+    "location": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "hiring_roles": {
+      "type": "string",
+      "description": "Roles currently hiring for"
+    },
+    "language_requirements": {
+      "type": "string"
+    },
+    "visa_sponsorship": {
+      "type": "boolean",
+      "default": false
+    },
+    "remote_policy": {
+      "type": "string",
+      "enum": [
+        "onsite",
+        "remote",
+        "hybrid"
+      ],
+      "default": "hybrid"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "profile_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "premium",
+        "pro"
+      ],
+      "default": "free"
+    },
+    "premium_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Premium expiry date"
+    }
+  },
+  "required": [
+    "company_name",
+    "email"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

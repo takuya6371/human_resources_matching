@@ -1,0 +1,7 @@
+{
+  "name": "afritalent-messages",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Moderated messaging between African talent and Japanese company representatives. Runs in the browser, no backend."
+}

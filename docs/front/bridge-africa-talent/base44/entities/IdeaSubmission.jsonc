@@ -1,0 +1,89 @@
+{
+  "name": "IdeaSubmission",
+  "type": "object",
+  "properties": {
+    "challenge_id": {
+      "type": "string"
+    },
+    "challenge_title": {
+      "type": "string"
+    },
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "talent_id": {
+      "type": "string"
+    },
+    "talent_name": {
+      "type": "string"
+    },
+    "talent_photo": {
+      "type": "string"
+    },
+    "approach": {
+      "type": "string",
+      "description": "Main required field: how would you approach or solve this challenge?"
+    },
+    "how_it_works": {
+      "type": "string"
+    },
+    "expected_result": {
+      "type": "string"
+    },
+    "supporting_url": {
+      "type": "string",
+      "description": "Optional link to GitHub, Figma, video, prototype, website"
+    },
+    "collaboration": {
+      "type": "boolean",
+      "default": false,
+      "description": "Open to collaboration"
+    },
+    "skills": {
+      "type": "string",
+      "description": "Comma-separated relevant skills"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "under_review",
+        "shortlisted",
+        "interested",
+        "more_details",
+        "discussion",
+        "finalist",
+        "winner",
+        "selected_collab",
+        "project_started",
+        "completed"
+      ],
+      "default": "submitted"
+    }
+  },
+  "required": [
+    "challenge_id",
+    "talent_id",
+    "approach"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": null,
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,3702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AfriTalent — Build your profile</title>
+<meta name="description" content="Upload your CV, review what we found, publish a profile.">
+
+<!-- Client-side text extraction. Same three paths the production flow uses. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
+
+<!-- Optional. Holds the Gemini key so it is picked up automatically.
+     Copy config.example.js -> config.js. Missing file is fine: demo mode. -->
+<script src="config.js" onerror="window.__NO_CONFIG=true"></script>
+
+<style>
+/* ============================================================
+   "Line" — the quiet-luxury design system from the app.
+   Tokens copied verbatim from tailwind.config.js and
+   src/styles/globals.css so this page and the React app are
+   the same object. Boldness lives in exactly one place: the
+   filled ink CTA. Everything else is hairlines and plain type.
+   ============================================================ */
+:root{
+  --paper:#FAF8F4;
+  --ink:#1C1B18;
+  --ink-soft:#8A8577;
+  --ink-faint:#B7B2A1;
+  --hairline:#E7E2D6;
+  --seal:#A6332B;
+  --ok:#1D7E5C;
+  --pending:#BA7517;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --display:Futura,'Century Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::selection{background:rgba(166,51,43,.2)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--paper)}
+::-webkit-scrollbar-thumb{background:var(--hairline);border-radius:3px}
+img{max-width:100%}
+a{color:inherit}
+
+/* ---- primitives (1:1 with globals.css @layer components) ---- */
+.line-card{border:1px solid var(--hairline);background:var(--paper)}
+.btn-line{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 24px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--paper);background:var(--ink);border:1px solid var(--ink);cursor:pointer;
+  transition:background-color .15s,border-color .15s;font-family:var(--sans)}
+.btn-line:hover:not(:disabled){background:var(--seal);border-color:var(--seal)}
+.btn-line:disabled{opacity:.35;cursor:not-allowed}
+.btn-line.sm{padding:8px 16px;font-size:10px}
+.btn-line-ghost{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;color:var(--ink);padding:0 0 3px;cursor:pointer;
+  background:none;border:none;border-bottom:1px solid currentColor;transition:color .15s;font-family:var(--sans)}
+.btn-line-ghost:hover{color:var(--seal)}
+.btn-quiet{border:1px solid var(--hairline);background:none;color:var(--ink-soft);
+  padding:10px 22px;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s;font-family:var(--sans)}
+.btn-quiet:hover{color:var(--ink);border-color:var(--ink-soft)}
+.badge-line{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--seal);padding-bottom:2px;border-bottom:1.5px solid var(--seal)}
+.badge-line-ink{display:inline-flex;align-items:center;gap:4px;font-size:11px;
+  text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);padding-bottom:2px;border-bottom:1px solid var(--hairline)}
+.avatar-line{border-radius:9999px;border:1px solid var(--hairline);display:flex;align-items:center;
+  justify-content:center;font-family:var(--display);font-weight:500;color:var(--ink);flex:none;overflow:hidden}
+.input-line{width:100%;background:var(--paper);border:1px solid var(--hairline);
+  padding:10px 16px;color:var(--ink);font-size:14px;outline:none;transition:border-color .15s;font-family:var(--sans)}
+.input-line:focus{border-color:var(--ink)}
+.input-line::placeholder{color:var(--ink-faint)}
+.label-line{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+  color:var(--ink-faint);font-size:12px;font-weight:500;
+  margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.sect-h{color:var(--ink-faint);font-size:12px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.12em;margin:0 0 16px}
+.display{font-family:var(--display);font-weight:500;letter-spacing:.02em}
+
+/* ---- navbar (Navbar.tsx) ---- */
+nav.top{border-bottom:1px solid var(--hairline);position:sticky;top:0;z-index:50;
+  background:rgba(250,248,244,.92);backdrop-filter:blur(4px)}
+nav.top .inner{max-width:1152px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wordmark{font-family:var(--display);font-weight:500;font-size:18px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;color:var(--ink)}
+.navlinks{display:flex;align-items:center;gap:32px}
+.navlinks a{color:var(--ink-soft);font-size:14px;text-decoration:none;transition:color .15s}
+.navlinks a:hover{color:var(--ink)}
+.langsw{display:flex;border:1px solid var(--hairline)}
+.langsw button{padding:6px 12px;font-size:12px;font-weight:500;background:none;border:none;
+  border-left:1px solid var(--hairline);color:var(--ink-soft);cursor:pointer;font-family:var(--sans)}
+.langsw button:first-child{border-left:none}
+.langsw button.on{background:var(--ink);color:var(--paper)}
+@media(max-width:860px){.navlinks{display:none}}
+
+/* ---- page shell ---- */
+main{max-width:1152px;margin:0 auto;padding:36px 24px 96px}
+.narrow{max-width:760px;margin:0 auto}
+h1.page{font-family:var(--display);font-weight:500;letter-spacing:.02em;font-size:30px;margin:0 0 8px}
+p.lede{color:var(--ink-soft);font-size:15px;margin:0 0 32px;max-width:60ch;line-height:1.6}
+
+/* ---- step rail ---- */
+.rail{display:flex;align-items:center;gap:0;margin-bottom:36px;flex-wrap:wrap}
+.rail .st{display:flex;align-items:center;gap:9px;padding-right:18px}
+.rail .st + .st{padding-left:18px;border-left:1px solid var(--hairline)}
+.rail .n{width:22px;height:22px;border-radius:9999px;border:1px solid var(--hairline);
+  display:grid;place-items:center;font-size:11px;color:var(--ink-faint);flex:none;font-variant-numeric:tabular-nums}
+.rail .lb{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);white-space:nowrap}
+.rail .st.on .n{border-color:var(--seal);color:var(--seal)}
+.rail .st.on .lb{color:var(--ink)}
+.rail .st.done .n{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.rail .st.done .lb{color:var(--ink-soft)}
+
+/* ---- step 1: sources ---- */
+.drop{border:1px solid var(--hairline);padding:56px 28px;text-align:center;
+  background:var(--paper);transition:border-color .15s,background-color .15s;cursor:pointer}
+.drop:hover,.drop:focus-visible{border-color:var(--ink-soft);outline:none}
+.drop.over{border-color:var(--seal);background:rgba(166,51,43,.03)}
+.drop .mark{width:40px;height:40px;margin:0 auto 18px;border:1px solid var(--hairline);
+  border-radius:9999px;display:grid;place-items:center;color:var(--ink-faint)}
+.drop.over .mark{border-color:var(--seal);color:var(--seal)}
+.drop h2{font-family:var(--display);font-weight:500;font-size:19px;margin:0 0 6px;letter-spacing:.02em}
+.drop p{margin:0 0 22px;color:var(--ink-soft);font-size:14px}
+.drop .fmt{margin-top:20px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.orrule{display:flex;align-items:center;gap:16px;margin:28px 0 22px;
+  font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.orrule::before,.orrule::after{content:"";height:1px;background:var(--hairline);flex:1}
+.sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.src{display:flex;align-items:center;gap:12px;padding:16px;border:1px solid var(--hairline);
+  background:none;cursor:pointer;text-align:left;transition:border-color .15s;font-family:var(--sans);width:100%}
+.src:hover:not(:disabled){border-color:var(--ink-soft)}
+.src:disabled{opacity:.5;cursor:not-allowed}
+.src .ic{width:26px;height:26px;flex:none;display:grid;place-items:center}
+.src .tx b{display:block;font-size:14px;font-weight:500;color:var(--ink)}
+.src .tx span{display:block;font-size:12px;color:var(--ink-faint);margin-top:1px}
+.filechip{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid var(--hairline);margin-top:20px}
+.filechip .nm{flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filechip .nm span{display:block;font-size:12px;color:var(--ink-faint);margin-top:2px}
+.filechip .x{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:15px;padding:4px 6px}
+.filechip .x:hover{color:var(--seal)}
+.foot-note{font-size:12px;color:var(--ink-faint);line-height:1.6;margin-top:28px}
+.foot-note code{font-family:var(--mono);font-size:11px}
+
+/* ---- step 2: pipeline ---- */
+.pipe{border:1px solid var(--hairline)}
+.pipe .stage{display:grid;grid-template-columns:18px 1fr auto;gap:14px;align-items:center;
+  padding:16px 20px;border-top:1px solid var(--hairline);font-size:14px;color:var(--ink-faint)}
+.pipe .stage:first-child{border-top:none}
+.pipe .stage .ic{width:14px;height:14px;border-radius:9999px;border:1px solid var(--hairline);
+  display:grid;place-items:center;font-size:9px;line-height:1}
+.pipe .stage.run{color:var(--ink)}
+.pipe .stage.run .ic{border-color:var(--seal);border-right-color:transparent;animation:spin .8s linear infinite}
+.pipe .stage.done{color:var(--ink)}
+.pipe .stage.done .ic{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.pipe .stage.done .ic::after{content:"✓"}
+.pipe .stage.err .ic{border-color:var(--seal);color:var(--seal)}
+.pipe .stage.err .ic::after{content:"!"}
+.pipe .stage.err{color:var(--seal)}
+.pipe .stage .ms{font-family:var(--mono);font-size:11px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.pipe .stage.run .ic{animation:none}}
+
+/* token budget */
+.budget{border:1px solid var(--hairline);padding:20px;margin-top:20px}
+.bmeter{height:4px;background:var(--hairline);display:flex;margin:14px 0 12px}
+.bmeter i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.bmeter u{display:block;height:100%;background:var(--ink-faint);transition:width .25s}
+.bmeter.over i,.bmeter.over u{background:var(--seal)}
+.brow{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-soft);padding:3px 0}
+.brow b{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--ink);font-variant-numeric:tabular-nums}
+.brow.tot{border-top:1px solid var(--hairline);margin-top:6px;padding-top:8px}
+
+/* ---- step 3: review ---- */
+.cols{display:grid;grid-template-columns:1fr;gap:20px}
+@media(min-width:1000px){.cols.two{grid-template-columns:1fr 1fr}.cols.side{grid-template-columns:2fr 1fr}}
+.pad{padding:24px}
+.fields{display:flex;flex-direction:column;gap:18px}
+.f-ai .label-line::after{content:"auto-filled";font-size:10px;letter-spacing:.1em;white-space:nowrap;
+  color:var(--seal);text-transform:uppercase;font-weight:600;flex:none}
+.f-ai .input-line{border-left:2px solid var(--seal)}
+.f-edited .label-line::after{content:"you edited";font-size:10px;letter-spacing:.1em;white-space:nowrap;
+  color:var(--ok);text-transform:uppercase;font-weight:600;flex:none}
+.f-edited .input-line{border-left:2px solid var(--ok)}
+.f-empty .label-line::after{content:"not on your CV";font-size:10px;letter-spacing:.1em;white-space:nowrap;
+  color:var(--ink-faint);text-transform:uppercase;font-weight:600;flex:none}
+textarea.input-line{resize:vertical;line-height:1.55;font-family:var(--sans)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.expblock{padding-top:20px;margin-top:20px;border-top:1px solid var(--hairline)}
+.expblock:first-of-type{padding-top:0;margin-top:0;border-top:none}
+.exphead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.exphead p{margin:0;font-size:12px;color:var(--ink-soft);font-weight:500}
+.tinyx{background:none;border:none;color:var(--ink-faint);font-size:12px;cursor:pointer;font-family:var(--sans)}
+.tinyx:hover{color:var(--seal)}
+.langrow{display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.langrow .input-line{flex:1}
+.langrow select.input-line{flex:none;width:170px}
+
+/* confidence */
+.crow{display:grid;grid-template-columns:88px 1fr 40px;gap:12px;align-items:center;margin-bottom:11px}
+.crow .lb{font-size:12px;color:var(--ink-soft);text-transform:capitalize}
+.cbar{height:3px;background:var(--hairline)}
+.cbar i{display:block;height:100%;background:var(--ink)}
+.cbar i.mid{background:var(--pending)}
+.cbar i.low{background:var(--seal)}
+.crow .pc{font-family:var(--mono);font-size:11px;text-align:right;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.flag{border-left:2px solid var(--seal);padding:2px 0 2px 14px;margin-bottom:12px}
+.flag p{margin:0;font-size:13px;color:var(--ink);line-height:1.5}
+.flag span{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--seal);font-weight:600}
+.misslist{font-size:12px;color:var(--ink-faint);line-height:1.7;font-family:var(--mono)}
+.jsonbox{font-family:var(--mono);font-size:11.5px;line-height:1.65;white-space:pre-wrap;
+  overflow-wrap:anywhere;border:1px solid var(--hairline);padding:18px;margin:0;max-height:460px;overflow:auto;color:var(--ink-soft)}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--hairline);margin-bottom:20px}
+.tabs button{background:none;border:none;border-bottom:1px solid transparent;margin-bottom:-1px;
+  padding:0 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-faint);cursor:pointer;font-family:var(--sans)}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.actions{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:28px;flex-wrap:wrap}
+
+/* ---- step 4: profile ---- */
+.dash-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+.dash-head p{margin:0 0 4px;color:var(--ink-soft);font-size:14px}
+.dash-head h1{font-family:var(--display);font-weight:500;font-size:30px;margin:0;letter-spacing:.02em}
+.savedbar{border:1px solid var(--ok);color:var(--ok);padding:12px 16px;font-size:14px;margin-bottom:24px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.kvline{font-size:14px;color:var(--ink-soft);margin:0 0 8px}
+.kvline:last-child{margin-bottom:0}
+.kvline b{color:var(--ink-faint);font-weight:400}
+.explist > div{padding-top:20px;margin-top:20px;border-top:1px solid var(--hairline)}
+.explist > div:first-child{padding-top:0;margin-top:0;border-top:none}
+.explist .r{font-size:14px;font-weight:500;margin:0}
+.explist .c{font-size:12px;color:var(--ink-soft);margin:2px 0 0}
+.explist .p{font-size:12px;color:var(--ink-faint);margin:2px 0 0;font-variant-numeric:tabular-nums}
+.explist .d{font-size:14px;color:var(--ink-soft);margin:8px 0 0;line-height:1.6;white-space:pre-line}
+.langlist{display:flex;flex-direction:column;gap:9px}
+.langlist div{display:flex;justify-content:space-between;align-items:center}
+.langlist span.n{font-size:14px}
+.jlpt{display:flex;align-items:center;gap:12px}
+.jlpt .ring{width:56px;height:56px;border-radius:9999px;border:1px solid var(--seal);color:var(--seal);
+  display:grid;place-items:center;font-size:19px;font-weight:600;flex:none}
+.viewsw{display:flex;border:1px solid var(--hairline);margin-bottom:24px;width:fit-content}
+.viewsw button{padding:9px 18px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+  background:none;border:none;border-left:1px solid var(--hairline);color:var(--ink-soft);cursor:pointer;font-family:var(--sans)}
+.viewsw button:first-child{border-left:none}
+.viewsw button.on{background:var(--ink);color:var(--paper)}
+.dbtable{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11.5px}
+.dbtable th{text-align:left;font-weight:400;color:var(--ink-faint);padding:6px 12px 6px 0;
+  white-space:nowrap;vertical-align:top;border-top:1px solid var(--hairline);width:190px}
+.dbtable td{padding:6px 0;color:var(--ink);border-top:1px solid var(--hairline);overflow-wrap:anywhere}
+.dbtable tr:first-child th,.dbtable tr:first-child td{border-top:none}
+.blurblock{background:rgba(28,27,24,.08);filter:blur(4px)}
+
+/* ---- step 4: photographs ---- */
+.portrait-row{display:grid;grid-template-columns:150px 1fr;gap:26px;align-items:start}
+@media(max-width:620px){.portrait-row{grid-template-columns:1fr}}
+/* 30x40mm is the Japanese 証明写真 size — a 3:4 portrait, not a square crop. */
+.portrait-frame{width:150px;aspect-ratio:3/4;border:1px solid var(--hairline);background:rgba(28,27,24,.02);
+  display:grid;place-items:center;overflow:hidden;position:relative}
+.portrait-frame span{font-size:11px;letter-spacing:.1em;color:var(--ink-faint)}
+.portrait-frame.draggable{cursor:grab}
+.portrait-frame.dragging{cursor:grabbing}
+.framehint{position:absolute;left:0;right:0;bottom:0;padding:7px 4px;text-align:center;
+  background:rgba(28,27,24,.62);color:#fff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  pointer-events:none;transition:opacity .15s}
+.portrait-frame.dragging .framehint{opacity:0}
+.portrait-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.portrait-help p{margin:0 0 10px;font-size:13px;color:var(--ink-soft);line-height:1.6}
+.portrait-help ul{margin:0 0 16px;padding-left:18px}
+.portrait-help li{font-size:13px;color:var(--ink-soft);margin-bottom:4px;line-height:1.55}
+.btnpair{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.crop-range{width:150px;accent-color:var(--ink);cursor:pointer}
+
+/* verification */
+.vrow{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+.vrow .vtext{flex:1;min-width:240px}
+.vrow p{margin:0 0 10px;font-size:13px;color:var(--ink-soft);line-height:1.6}
+.vrow ul{margin:0 0 16px;padding-left:18px}
+.vrow li{font-size:13px;color:var(--ink-soft);margin-bottom:4px;line-height:1.55}
+.vstate{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;padding-bottom:2px}
+.vstate.unverified{color:var(--ink-faint);border-bottom:1px solid var(--hairline)}
+.vstate.pending{color:var(--pending);border-bottom:1.5px solid var(--pending)}
+.vstate.verified{color:var(--ok);border-bottom:1.5px solid var(--ok)}
+.vstate.failed{color:var(--seal);border-bottom:1.5px solid var(--seal)}
+.vspin{width:11px;height:11px;border-radius:9999px;border:1px solid currentColor;
+  border-right-color:transparent;animation:spin .8s linear infinite;flex:none}
+/* the badge that follows the profile around */
+.vbadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.06em;color:var(--ok);padding-bottom:2px;
+  border-bottom:1.5px solid var(--ok);white-space:nowrap}
+.vbadge svg{flex:none}
+.casual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.casual{border:1px solid var(--hairline);display:flex;flex-direction:column}
+.casual .shot{aspect-ratio:4/3;background:rgba(28,27,24,.02);display:grid;place-items:center;overflow:hidden;position:relative}
+.casual .shot img{width:100%;height:100%;object-fit:cover;display:block}
+.casual .shot .plus{font-size:22px;color:var(--ink-faint);line-height:1}
+.casual .shot .hint{position:absolute;bottom:10px;font-size:11px;letter-spacing:.08em;color:var(--ink-faint)}
+.casual label.pick{cursor:pointer}
+.casual label.pick:hover .shot{background:rgba(166,51,43,.04)}
+.casual .cap{border-top:1px solid var(--hairline)}
+.casual .cap input{width:100%;border:none;background:none;padding:10px 12px;font-size:12px;
+  color:var(--ink);outline:none;font-family:var(--sans)}
+.casual .cap input::placeholder{color:var(--ink-faint)}
+.casual .drop-x{position:absolute;top:8px;right:8px;width:22px;height:22px;border-radius:9999px;
+  border:none;background:rgba(250,248,244,.92);color:var(--ink-soft);cursor:pointer;font-size:12px;line-height:1;
+  display:grid;place-items:center}
+.casual .drop-x:hover{color:var(--seal)}
+
+/* personality panel — the casual photographs, wherever they are shown */
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.people figure{margin:0}
+.people img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border:1px solid var(--hairline)}
+.people figcaption{font-size:12px;color:var(--ink-soft);margin-top:7px;line-height:1.5}
+
+/* ============================================================
+   履歴書 / 職務経歴書 — the Japanese documents.
+   Not a translation of the page above: a rirekisho is a ruled
+   form with a fixed row order, and a shokumu keirekisho is a
+   separate prose document. Both are dense bordered grids, so
+   this is the one place the hairline system goes fully ruled.
+   ============================================================ */
+.jdoc{--jline:#CFC9BA;font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',Meiryo,var(--sans);
+  border:1px solid var(--jline);background:var(--paper);padding:28px;margin-bottom:24px;font-size:13px;line-height:1.75}
+.jdoc h2{font-family:inherit;font-weight:600;font-size:20px;letter-spacing:.35em;margin:0;text-align:center}
+.jdoc .jdate{text-align:right;font-size:12px;color:var(--ink-soft);margin:6px 0 18px}
+.jdoc .jwhat{text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-faint);margin:8px 0 0}
+.jdoc h3{font-size:13px;font-weight:600;margin:26px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--ink);letter-spacing:.08em}
+.jdoc h3:first-of-type{margin-top:0}
+.jgrid{width:100%;border-collapse:collapse;table-layout:fixed}
+.jgrid th,.jgrid td{border:1px solid var(--jline);padding:8px 10px;vertical-align:middle;text-align:left;font-weight:400}
+.jgrid th{background:rgba(28,27,24,.035);color:var(--ink-soft);font-size:12px;width:104px;letter-spacing:.06em}
+.jgrid td.name{font-size:17px;letter-spacing:.06em}
+.jgrid td.kana{font-size:12px;color:var(--ink-soft);letter-spacing:.12em}
+.jgrid td.photo{width:110px;text-align:center;color:var(--ink-faint);font-size:11px;line-height:1.5;padding:0}
+.jgrid td.photo div{height:132px;display:grid;place-items:center}
+.jgrid td.photo img{width:99px;height:132px;object-fit:cover;display:block;margin:0 auto}
+
+/* A 履歴書 is printed and handed over. Give it a clean A4 page. */
+@media print{
+  nav.top,.rail,.viewsw,.jnote,.jfill,.jbar{display:none !important}
+  .jin{background:none !important;box-shadow:none !important}
+  .jin::placeholder{color:transparent}
+  main{padding:0;max-width:none}
+  body{background:#fff}
+  .jdoc{border:none;padding:0;margin:0 0 18mm;page-break-inside:avoid}
+  .jdoc .jwhat{display:none}
+  .jdoc + .jdoc{page-break-before:always}
+  .jgrid th,.jgrid td,.jhist th,.jhist td,.jdoc .jblock{border-color:#999}
+  .jdoc h3{border-bottom-color:#000}
+}
+.jhist{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:4px}
+.jhist th,.jhist td{border:1px solid var(--jline);padding:6px 10px;font-weight:400;vertical-align:top}
+.jhist th{background:rgba(28,27,24,.035);color:var(--ink-soft);font-size:12px;text-align:center;letter-spacing:.06em}
+.jhist th.y,.jhist td.y{width:64px;text-align:center;font-variant-numeric:tabular-nums}
+.jhist th.m,.jhist td.m{width:48px;text-align:center;font-variant-numeric:tabular-nums}
+.jhist td.c{text-align:center;letter-spacing:.4em}
+.jhist td.r{text-align:right;letter-spacing:.3em}
+/* A 履歴書 is a form, so the blanks behave like one. Fields sit flush in the
+   cell and only show themselves when empty or focused. */
+.jin{border:none;background:none;font:inherit;color:inherit;width:100%;padding:3px 0;outline:none}
+.jin::placeholder{color:var(--ink-faint);font-size:11px}
+.jin:placeholder-shown,.jin.empty{background:rgba(166,51,43,.055);box-shadow:0 0 0 4px rgba(166,51,43,.055)}
+.jin:focus{background:rgba(28,27,24,.06);box-shadow:0 0 0 4px rgba(28,27,24,.06)}
+.jin.narrow{width:auto;min-width:56px}
+.jin.tiny{width:100%;text-align:center;padding:0}
+select.jin{cursor:pointer;-webkit-appearance:none;appearance:none}
+.jfill{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1px solid var(--seal);
+  padding:12px 16px;margin-bottom:18px;font-size:12px;line-height:1.7;color:var(--ink)}
+.jfill .grow{flex:1;min-width:240px}
+.jfill b{font-weight:600}
+.jsaved{color:var(--ok);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.jdoc .jblock{border:1px solid var(--jline);padding:14px 16px;margin-bottom:12px}
+.jdoc .jblock .co{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px}
+.jdoc .jblock .co b{font-size:14px;font-weight:600}
+.jdoc .jblock .co span{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.jdoc .jblock .biz{font-size:12px;color:var(--ink-soft);margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--jline)}
+.jdoc .jblock h4{font-size:12px;font-weight:600;color:var(--ink-soft);margin:10px 0 4px;letter-spacing:.06em}
+.jdoc .jblock ul{margin:0;padding-left:18px}
+.jdoc .jblock li{margin-bottom:3px}
+.jdoc p.body{margin:0;text-align:justify}
+.jnote{font-size:12px;color:var(--ink-soft);line-height:1.7;border-left:2px solid var(--seal);padding-left:14px;margin:0 0 24px}
+.jbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+.jload{border:1px solid var(--hairline);padding:40px 24px;text-align:center;color:var(--ink-soft);font-size:14px}
+.jload .sp{width:16px;height:16px;margin:0 auto 14px;border-radius:9999px;border:1px solid var(--hairline);
+  border-right-color:transparent;animation:spin .8s linear infinite}
+
+/* ---- modal (Drive picker) ---- */
+.scrim{position:fixed;inset:0;background:rgba(28,27,24,.32);display:grid;place-items:center;z-index:100;padding:24px}
+.modal{background:var(--paper);border:1px solid var(--hairline);max-width:520px;width:100%;padding:28px}
+.modal h3{font-family:var(--display);font-weight:500;font-size:18px;margin:0 0 4px;letter-spacing:.02em}
+/* the provider's hosted flow, embedded */
+.modal.verifymodal{max-width:520px;width:100%}
+.verifyhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
+.verifymodal iframe{width:100%;height:min(620px,70vh);border:1px solid var(--hairline);display:block;background:var(--paper)}
+.modal .sub{font-size:13px;color:var(--ink-soft);margin:0 0 22px}
+.drivefile{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--hairline);
+  background:none;border-left:none;border-right:none;border-bottom:none;width:100%;text-align:left;cursor:pointer;font-family:var(--sans)}
+.drivefile:hover .fn{color:var(--seal)}
+.drivefile .fn{font-size:14px;flex:1}
+.drivefile .fs{font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
+.drivefile:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---- key status / dev drawer ---- */
+.keybar{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.keybar .dot{width:6px;height:6px;border-radius:9999px;background:var(--ink-faint);flex:none}
+.keybar .dot.ok{background:var(--ok)}
+.keybar .dot.demo{background:var(--pending)}
+.drawer{border:1px solid var(--hairline);margin-top:28px}
+.drawer summary{padding:14px 20px;cursor:pointer;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-faint);list-style:none}
+.drawer summary::-webkit-details-marker{display:none}
+.drawer summary::before{content:"+ ";color:var(--ink-faint)}
+.drawer[open] summary::before{content:"– "}
+.drawer .body{padding:0 20px 20px;display:flex;flex-direction:column;gap:14px}
+.errbox{border-left:2px solid var(--seal);padding:4px 0 4px 16px;margin-bottom:20px}
+.errbox b{display:block;font-size:14px;margin-bottom:4px}
+.errbox p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.6}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     Navbar — Navbar.tsx
+     ============================================================ -->
+<nav class="top">
+  <div class="inner">
+    <a class="wordmark" href="#">AfriTalent</a>
+    <div class="navlinks">
+      <a href="#">Talents</a>
+      <a href="#">Jobs</a>
+      <a href="#">Contact</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="langsw">
+        <button data-lang="ja">JA</button>
+        <button data-lang="en" class="on">EN</button>
+        <button data-lang="fr">FR</button>
+      </div>
+      <div class="avatar-line" style="width:32px;height:32px;font-size:12px" id="navavatar">AN</div>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- step rail -->
+<div class="rail" id="rail">
+  <div class="st on" data-r="1"><span class="n">1</span><span class="lb">Upload</span></div>
+  <div class="st" data-r="2"><span class="n">2</span><span class="lb">Extract</span></div>
+  <div class="st" data-r="3"><span class="n">3</span><span class="lb">Review</span></div>
+  <div class="st" data-r="4"><span class="n">4</span><span class="lb">Identity</span></div>
+  <div class="st" data-r="5"><span class="n">5</span><span class="lb">Profile</span></div>
+</div>
+
+<!-- ============================================================
+     STEP 1 — Gate B: build profile. Three input methods, exactly
+     as the onboarding flowchart specifies: CV upload, import,
+     guided manual fill.
+     ============================================================ -->
+<section id="step1" class="narrow">
+  <h1 class="page">Build your profile</h1>
+  <p class="lede">Upload your CV and we will fill this in for you. Nothing is published until
+    you have read it back and corrected anything we got wrong.</p>
+
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload your CV">
+    <div class="mark" aria-hidden="true">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M12 16V4M12 4l-4.5 4.5M12 4l4.5 4.5"/><path d="M4 15v3.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V15"/>
+      </svg>
+    </div>
+    <h2>Drag your CV here</h2>
+    <p>or choose a file from your computer</p>
+    <span class="btn-line">Choose a file</span>
+    <div class="fmt">PDF · DOCX · TXT · PNG · JPG · up to 8 MB</div>
+  </div>
+  <input type="file" id="file" class="hidden" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg">
+
+  <div id="filebox"></div>
+
+  <div class="orrule">or bring it from</div>
+
+  <div class="sources">
+    <button class="src" id="src-drive">
+      <span class="ic" aria-hidden="true">
+        <svg viewBox="0 0 87 78" width="22" height="20">
+          <path d="M29 0 0 50h29l29-50z" fill="#1C1B18" opacity=".62"/>
+          <path d="M58 0H29l29 50h29z" fill="#1C1B18" opacity=".82"/>
+          <path d="M14.5 53 0 78h58L72.5 53z" fill="#1C1B18" opacity=".45"/>
+        </svg>
+      </span>
+      <span class="tx"><b>Google Drive</b><span>Choose the CV you keep there</span></span>
+    </button>
+
+    <button class="src" id="src-paste">
+      <span class="ic" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="5" y="3" width="14" height="18"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/>
+        </svg>
+      </span>
+      <span class="tx"><b>Paste the text</b><span>Straight from LinkedIn or a doc</span></span>
+    </button>
+
+    <button class="src" id="src-manual">
+      <span class="ic" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M4 20h16"/><path d="M15.5 4.5a2.1 2.1 0 0 1 3 3L9 17l-4 1 1-4z"/>
+        </svg>
+      </span>
+      <span class="tx"><b>Fill it in myself</b><span>Type it in by hand instead</span></span>
+    </button>
+
+    <button class="src" id="src-import" disabled title="Not wired up in this demo">
+      <span class="ic" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="3" y="3" width="18" height="18"/><path d="M7.5 10.5v7M7.5 7v.01M12 17.5v-7M12 13c0-2 4.5-2.4 4.5 .6v3.9"/>
+        </svg>
+      </span>
+      <span class="tx"><b>LinkedIn / GitHub</b><span>Not available yet</span></span>
+    </button>
+  </div>
+
+  <div id="pastebox" class="hidden" style="margin-top:22px">
+    <label class="label-line" for="pastearea">Paste your CV text</label>
+    <textarea class="input-line" id="pastearea" rows="9" placeholder="Paste everything — headings, dates, bullets. Formatting does not matter."></textarea>
+    <div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+      <button class="btn-line" id="pasteuse">Use this text</button>
+      <button class="btn-quiet" id="pastecancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="actions" style="justify-content:flex-end">
+    <button class="btn-line" id="go" disabled>Extract my profile</button>
+  </div>
+
+  <p class="foot-note">
+    Your CV is read once to fill in your profile, then it is yours to edit. Nothing is shown to a
+    company until you have checked it and published it, and you can change or remove any of it later.
+    <a href="#" id="usesample" style="color:var(--seal)">Try it with a sample CV</a>.
+  </p>
+
+  <details class="drawer hidden" id="devdrawer">
+    <summary>Developer settings</summary>
+    <div class="body">
+      <div class="keybar" id="keybar"><span class="dot"></span><span id="keytext">checking key…</span></div>
+      <div>
+        <label class="label-line" for="key">API key</label>
+        <input class="input-line" type="password" id="key" placeholder="gsk_…" autocomplete="off" style="font-family:var(--mono);font-size:13px">
+        <p class="foot-note" style="margin-top:8px">Read automatically from <code>config.js</code>. Typing one here overrides it for this tab and is remembered in <code>localStorage</code>.</p>
+      </div>
+      <div class="row2">
+        <div>
+          <label class="label-line" for="model">Model</label>
+          <select class="input-line" id="model">
+            <option value="gpt-oss-120b">gpt-oss-120b</option>
+            <option value="gemma-4-31b">gemma-4-31b</option>
+          </select>
+        </div>
+        <div>
+          <label class="label-line" for="tpm">Tokens per minute</label>
+          <input class="input-line" type="number" id="tpm" value="30000" min="2000" max="500000" step="1000" style="font-family:var(--mono)">
+        </div>
+      </div>
+      <div>
+        <label class="label-line" for="effort">Reasoning effort</label>
+        <select class="input-line" id="effort">
+          <option value="low">low · leaves the budget for the JSON</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+        </select>
+        <p class="foot-note" style="margin-top:8px">gpt-oss reasons before it answers, and the reasoning shares
+          the output ceiling with the JSON. Extraction is transcription, so <code>low</code> is the right setting.</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============================================================
+     STEP 2 — extraction in progress
+     ============================================================ -->
+<section id="step2" class="narrow hidden">
+  <h1 class="page">Reading your CV</h1>
+  <p class="lede">Reading a CV properly takes fifteen to thirty seconds — the model works
+    through the whole document before it answers. You will get to check everything before
+    any of it is saved.</p>
+
+  <div class="pipe" id="pipe">
+    <div class="stage" data-s="read"><span class="ic"></span><span>Opening your file</span><span class="ms"></span></div>
+    <div class="stage" data-s="text"><span class="ic"></span><span>Reading the text</span><span class="ms"></span></div>
+    <div class="stage" data-s="llm"><span class="ic"></span><span>Picking out your details</span><span class="ms"></span></div>
+    <div class="stage" data-s="valid"><span class="ic"></span><span>Checking it over</span><span class="ms"></span></div>
+    <div class="stage" data-s="map"><span class="ic"></span><span>Filling in your profile</span><span class="ms"></span></div>
+  </div>
+
+  <div id="errslot" style="margin-top:28px"></div>
+</section>
+
+<!-- ============================================================
+     STEP 3 — review and correct. Field set mirrors
+     TalentDashboard.tsx exactly, so what you fix here is what
+     the app saves.
+     ============================================================ -->
+<section id="step3" class="hidden">
+  <h1 class="page" id="r-title">Check what we found</h1>
+  <p class="lede" id="r-lede">Everything marked <b style="color:var(--seal);font-weight:600">auto-filled</b> came from your CV.
+    Change anything that is not right.</p>
+
+  <div class="tabs hidden" id="rtabs">
+    <button data-t="form" class="on">Your profile</button>
+    <button data-t="json">Extracted JSON · dev</button>
+    <button data-t="src">CV text · dev</button>
+  </div>
+
+  <div id="rpane-form">
+    <div class="cols side">
+      <div class="stack">
+        <section class="line-card pad">
+          <h2 class="sect-h">Basic info</h2>
+          <div class="fields" id="f-basic"></div>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">About</h2>
+          <div class="fields" id="f-bio"></div>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">Skills</h2>
+          <div class="fields" id="f-skills"></div>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">Experience</h2>
+          <div id="f-exp"></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="line-card pad">
+          <h2 class="sect-h">How sure we are</h2>
+          <div id="f-conf"></div>
+          <p class="foot-note" style="margin-top:14px" id="f-srclang"></p>
+        </section>
+        <section class="line-card pad" id="f-warnwrap">
+          <h2 class="sect-h">Worth a look</h2>
+          <div id="f-warn"></div>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">Education</h2>
+          <div class="fields" id="f-edu"></div>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">Languages</h2>
+          <div id="f-lang"></div>
+          <button class="btn-line-ghost" id="addlang" style="margin-top:14px">+ Add</button>
+        </section>
+        <section class="line-card pad">
+          <h2 class="sect-h">Additional info</h2>
+          <div class="fields" id="f-extra"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-quiet" id="startover">Start over</button>
+      <button class="btn-line" id="publish">This is right — build my profile</button>
+    </div>
+  </div>
+
+  <div id="rpane-json" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+      <span class="foot-note" style="margin:0" id="jsonmeta">—</span>
+      <span style="display:flex;gap:18px">
+        <button class="btn-line-ghost" id="copyjson">Copy</button>
+        <button class="btn-line-ghost" id="dljson">Download</button>
+      </span>
+    </div>
+    <pre class="jsonbox" id="jsonout">{}</pre>
+  <div class="budget hidden" id="budget">
+    <h4 class="sect-h" style="margin:0;display:flex;justify-content:space-between">
+      <span>Token budget</span><span id="budgetstate" style="letter-spacing:.04em"></span>
+    </h4>
+    <div class="bmeter"><i id="bfill"></i><u id="bout"></u></div>
+    <div class="brow"><span>prompt</span><b id="bin">—</b></div>
+    <div class="brow"><span>reserved for output</span><b id="bmax">—</b></div>
+    <div class="brow tot"><span>request total</span><b id="btot">—</b></div>
+  </div>
+
+  </div>
+
+  <div id="rpane-src" class="hidden">
+    <p class="foot-note" style="margin:0 0 14px" id="srcmeta">—</p>
+    <pre class="jsonbox" id="srcout">—</pre>
+  </div>
+</section>
+
+<!-- ============================================================
+     STEP 4 — photographs.
+     A Japanese application expects a 証明写真 on the 履歴書, which is a
+     specific thing: 30x40mm, plain background, shoulders up. The casual
+     photographs are the opposite — they are there because 人柄 carries
+     real weight in Japanese hiring, and a CV cannot show it.
+     ============================================================ -->
+<section id="step4" class="narrow hidden">
+  <h1 class="page">Photographs and identity</h1>
+  <p class="lede">Japanese employers expect a formal photograph on your Japanese CV, they pay attention
+    to the person behind it, and they trust a profile more when the name on it has been checked.</p>
+
+  <section class="line-card pad" style="margin-bottom:20px">
+    <h2 class="sect-h">Passport photograph</h2>
+    <div class="portrait-row">
+      <div>
+        <div class="portrait-frame" id="pframe">
+          <span id="pempty">30 × 40 mm</span>
+          <img id="pimg" alt="" class="hidden" draggable="false">
+          <span class="framehint hidden" id="phint">Drag to move your face</span>
+        </div>
+        <div id="pcropwrap" class="hidden">
+          <label class="label-line" style="margin-top:14px" for="pcrop" id="pcroplabel">Where your face sits in the frame</label>
+          <input type="range" id="pcrop" min="0" max="100" value="40" class="crop-range"
+                 aria-label="Move the photograph up or down inside the frame">
+          <p class="foot-note" style="margin-top:6px">Drag the photo, or use this slider. Japanese
+            document photos want the whole head with a little space above it.</p>
+        </div>
+      </div>
+      <div class="portrait-help">
+        <p>This goes straight onto your Japanese CV. What is expected there is narrow:</p>
+        <ul>
+          <li>Head and shoulders, facing forward, taken in the last three months</li>
+          <li>Plain pale background, no hat, no sunglasses</li>
+          <li>A business suit is usual; a neutral expression is normal, a broad smile is not</li>
+        </ul>
+        <div class="btnpair">
+          <label class="btn-line sm">
+            Choose a photo
+            <input type="file" id="pfile" accept="image/*" class="hidden">
+          </label>
+          <button class="btn-line-ghost hidden" id="premove">Remove</button>
+        </div>
+        <p class="foot-note" id="perr" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="line-card pad">
+    <h2 class="sect-h">A few casual photographs</h2>
+    <p class="foot-note" style="margin:-6px 0 18px">Up to three. At work, at something you are good at,
+      with people you like. A short caption does more than the photograph alone — say what is happening.</p>
+    <div class="casual-grid" id="casualgrid"></div>
+    <p class="foot-note" id="cerr" style="margin-top:12px"></p>
+  </section>
+
+  <section class="line-card pad" style="margin-top:20px" id="verifycard"></section>
+
+  <div class="actions">
+    <button class="btn-quiet" id="photoskip">Skip for now</button>
+    <button class="btn-line" id="photodone">Continue</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     STEP 5 — the profile. Left view is TalentDashboard.tsx,
+     right view is TalentDetailPage.tsx as a company sees it.
+     ============================================================ -->
+<section id="step5" class="hidden">
+  <div class="viewsw" id="viewsw">
+    <button data-v="me" class="on">My dashboard</button>
+    <button data-v="company">As a company sees it</button>
+    <button data-v="ja">Japanese CV</button>
+    <button data-v="db" class="hidden" id="dbview">Saved columns · dev</button>
+  </div>
+  <div id="profileview"></div>
+</section>
+
+</main>
+
+<div id="modalslot"></div>
+<script>
+/* ============================================================
+   1. Configuration
+   ------------------------------------------------------------
+   Key resolution order, first hit wins:
+     1. window.AFRITALENT_CONFIG.GEMINI_API_KEY     (config.js)
+     2. localStorage 'afritalent_llm_key'           (dev drawer)
+     3. none -> demo mode, using the bundled fixture
+   ============================================================ */
+const CFG = window.AFRITALENT_CONFIG || {};
+// Everything a talent does not need to see — the key, the model, the raw JSON,
+// the database columns — is behind ?dev=1 rather than deleted, so the plumbing
+// is still inspectable without putting it in front of the person uploading a CV.
+const DEV = new URLSearchParams(location.search).get('dev') === '1';
+
+/* Google Gemini, over its OpenAI-compatible endpoint. One provider, no
+   fallbacks: a second path that is never exercised is a second path that is
+   quietly broken when you reach for it. */
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions';
+// gemini-2.5-flash is retired for new keys, and 3.7-flash spends far longer
+// thinking for no better extraction (21s against 5s on a one-line prompt).
+// 3.6-flash is what the API itself recommends when it turns 2.5 away.
+const API_MODELS = ['gemini-3.6-flash', 'gemini-3.7-flash', 'gemini-3-flash-preview'];
+// A full CV takes 15-25 seconds because the model thinks first. Long enough to
+// look broken, so the stage reports elapsed time; and long enough that a
+// request which never returns has to be cut off rather than hung on.
+const API_TIMEOUT_MS = 120000;
+const API_TPM = 250000;   // check yours in AI Studio; only used to size requests
+const LS_KEY = 'afritalent_llm_key';
+const $ = id => document.getElementById(id);
+
+function resolveKey(){
+  const typed = ($('key').value || '').trim();
+  if (typed) return { key: typed, from: 'this tab' };
+  const stored = (localStorage.getItem(LS_KEY) || '').trim();
+  if (stored) return { key: stored, from: 'localStorage' };
+  const cfg = (CFG.GEMINI_API_KEY || '').trim();
+  if (cfg) return { key: cfg, from: 'config.js' };
+  return { key: '', from: null };
+}
+
+function paintKeyBar(){
+  const { key, from } = resolveKey();
+  const dot = $('keybar').querySelector('.dot');
+  if (key) {
+    dot.className = 'dot ok';
+    $('keytext').textContent = 'Gemini key loaded from ' + from;
+  } else {
+    dot.className = 'dot demo';
+    $('keytext').textContent = 'No key — demo mode';
+  }
+}
+
+/* ============================================================
+   2. Schema — shared verbatim with supabase/functions/parse-cv.
+   Strict json_schema needs every property in `required`
+   and additionalProperties:false at every level, so optional
+   values are type unions with "null".
+
+   Descriptions are deliberately dropped: every schema token is
+   charged against the tokens-per-minute budget and the system
+   prompt already carries the extraction rules.
+   ============================================================ */
+const S   = () => ({ type: 'string' });
+const SN  = () => ({ type: ['string','null'] });
+const IN_ = () => ({ type: ['integer','null'] });
+const NN  = () => ({ type: ['number','null'] });
+const BN  = () => ({ type: ['boolean','null'] });
+const ARR = i  => ({ type: 'array', items: i });
+const obj = p  => ({ type: 'object', properties: p, required: Object.keys(p), additionalProperties: false });
+
+const CV_SCHEMA = obj({
+  candidate: obj({
+    full_name: S(), headline: SN(), summary: SN(),
+    email: SN(), phone: SN(), links: ARR(S()),
+    city: SN(), country: SN(), country_code: SN(),
+    date_of_birth: SN(),
+    gender: { type: ['string','null'], enum: ['male','female','other',null] },
+    nationality: SN(), nationality_code: SN(),
+    address_line: SN(), postal_code: SN(),
+  }),
+  languages: ARR(obj({
+    language: S(),
+    cefr: { type: ['string','null'], enum: ['A1','A2','B1','B2','C1','C2',null] },
+    jlpt: { type: ['string','null'], enum: ['N1','N2','N3','N4','N5',null] },
+    is_native: BN(),
+  })),
+  education: ARR(obj({
+    institution: S(), degree: SN(), field_of_study: SN(),
+    start_year: IN_(), end_year: IN_(), is_ongoing: BN(),
+  })),
+  experience: ARR(obj({
+    employer: S(), title: S(),
+    employment_type: { type: 'string', enum: ['full_time','part_time','contract','freelance','internship','volunteer','other'] },
+    start_date: SN(), end_date: SN(), is_current: BN(),
+    summary: SN(), achievements: ARR(S()), scale_note: SN(),
+  })),
+  skills: ARR(obj({ name: S(), canonical: S() })),
+  certifications: ARR(obj({ name: S(), year: IN_() })),
+  projects: ARR(obj({ name: S(), description: SN(), url: SN() })),
+  work_preferences: obj({
+    open_to_remote: BN(), open_to_relocate: BN(),
+    target_countries: ARR(S()), notice_period: SN(), desired_salary: SN(),
+  }),
+  derived: obj({
+    total_years_experience: NN(),
+    seniority: { type: ['string','null'], enum: ['intern','junior','mid','senior','lead','principal',null] },
+    primary_field: SN(),
+    japanese_level: { type: ['string','null'], enum: ['N1','N2','N3','N4','N5','none',null] },
+    has_degree: BN(),
+    career_gaps: ARR(obj({ from: S(), to: S(), months: { type: 'integer' } })),
+  }),
+  extraction_meta: obj({
+    source_language: S(),
+    confidence: obj({ identity: NN(), experience: NN(), education: NN(), skills: NN() }),
+    missing_fields: ARR(S()), warnings: ARR(S()),
+  }),
+});
+
+/* Gemini rejects "very large or deeply nested" schemas without naming a
+   number, so this stays lean on principle. Fields were dropped on one test: is
+   anything downstream reading them? given_name, utc_offset_hours, skill
+   proficiency and the rest were extracted and then never looked at. */
+const SCHEMA_CHARS = JSON.stringify(CV_SCHEMA).length;
+
+const SYSTEM_PROMPT = `You extract structured data from CVs for a platform matching African professionals with Japanese companies.
+
+WRITE THE OUTPUT IN ENGLISH. CVs arrive in French, Japanese and other languages; the profile is always English. Translate every piece of prose you produce — headline, summary, job titles, role summaries, achievements, skill names, field labels, availability. Keep proper nouns as they are written: people, employers, schools, cities, qualifications. Record the document's own language in extraction_meta.source_language.
+
+GROUNDING
+1. Extract only what the document supports. Never invent an employer, date, qualification or skill.
+2. Absent values are null, and their dotted path goes in extraction_meta.missing_fields.
+3. headline and summary may be composed by you from the CV's content. Everything else is grounded in the text.
+4. date_of_birth, gender, nationality, address_line and postal_code are transcribed, never deduced: no gender from a name or photograph, no birth date worked back from an age. nationality_code is the exception — it is the ISO 3166-1 alpha-2 code for whatever nationality is stated, so "Ghanaian" and "ガーナ" both give GH. Nationality and country of residence are different questions; record each where it belongs.
+
+SHAPE
+5. Dates are YYYY-MM. A year alone becomes month 01. A current role has end_date null and is_current true.
+6. Deduplicate skills hard: ReactJS, React.js and React are one entry, canonical "React". Include skills evident in the work history but absent from any skills list.
+7. Every field with a list of allowed values must use one of them exactly — "other" where nothing fits, or null where permitted. An invented value loses the whole extraction.
+8. Order experience and education most recent first. total_years_experience counts professional work only: exclude internships, volunteering, and time where two roles overlapped. career_gaps lists unexplained gaps over six months. phone is E.164 where the country is clear.
+
+JUDGEMENT
+9. Confidence scores are your honest assessment. Score dates low when they are ambiguous — a confident wrong answer is worse than a flagged uncertain one.
+10. Warn about anything a reviewer should check: overlapping employment, unexplained gaps, inconsistent dates, unreadable sections, or a document that is not a CV.
+
+Return only the JSON object.`;
+
+/* ============================================================
+   3. State
+   ============================================================ */
+let FILE = null;        // File, or a {name,size} stand-in for pasted/sample text
+let TEXT = '';          // extracted CV text
+let RESULT = null;      // raw extraction JSON
+let PROFILE = null;     // RESULT mapped into the app's profile shape
+let TOUCHED = new Set();// field keys the human corrected
+let USED_FIXTURE = false;
+let SPLIT = false;      // true when the CV needed two passes to come back whole
+let MODE = 'review';    // 'review' after a parse, 'edit' when reopened from the profile
+let PVIEW = 'me';       // which of the three profile views is showing
+let JUST_SAVED = false; // drives the green confirmation bar, same as the dashboard
+let SNAPSHOT = null;    // pre-edit copy, so Cancel really cancels
+let JA = null;          // 履歴書 data, generated on demand and kept
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const now = () => performance.now();
+
+if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ---- step navigation ---- */
+function goStep(n){
+  [1,2,3,4,5].forEach(i => $('step'+i).classList.toggle('hidden', i !== n));
+  document.querySelectorAll('#rail .st').forEach(el => {
+    const r = +el.dataset.r;
+    el.className = 'st' + (r === n ? ' on' : r < n ? ' done' : '');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ============================================================
+   4. File intake — drag and drop, browse, Google Drive, paste
+   ============================================================ */
+const drop = $('drop');
+drop.addEventListener('click', () => $('file').click());
+drop.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file').click(); }
+});
+['dragenter','dragover'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault(); drop.classList.add('over');
+}));
+['dragleave','dragend'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('over')));
+drop.addEventListener('drop', e => {
+  e.preventDefault(); drop.classList.remove('over');
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+});
+// A file dropped anywhere else on the page should not replace the page.
+['dragover','drop'].forEach(ev => window.addEventListener(ev, e => {
+  if (!drop.contains(e.target)) e.preventDefault();
+}));
+$('file').addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+
+const MAX_BYTES = 8 * 1024 * 1024;
+const fmtSize = n => n < 1024 ? n + ' B' : n < 1024*1024 ? (n/1024).toFixed(n < 10240 ? 1 : 0) + ' KB' : (n/1048576).toFixed(1) + ' MB';
+
+function setFile(f, presetText){
+  if (f.size > MAX_BYTES) {
+    $('filebox').innerHTML = '<div class="errbox" style="margin-top:20px"><b>That file is over 8 MB</b>' +
+      '<p>Export a smaller PDF, or paste the text instead.</p></div>';
+    return;
+  }
+  FILE = f;
+  TEXT = presetText || '';
+  USED_FIXTURE = false;
+  $('filebox').innerHTML =
+    '<div class="filechip"><div class="nm">' + esc(f.name) +
+    '<span>' + fmtSize(f.size) + (f.origin ? ' · from ' + esc(f.origin) : '') + '</span></div>' +
+    '<button class="x" id="rmfile" aria-label="Remove file">✕</button></div>';
+  $('rmfile').addEventListener('click', clearFile);
+  $('go').disabled = false;
+  $('pastebox').classList.add('hidden');
+}
+
+function clearFile(){
+  FILE = null; TEXT = ''; USED_FIXTURE = false;
+  $('filebox').innerHTML = '';
+  $('go').disabled = true;
+  $('file').value = '';
+}
+
+/* ---- Google Drive ----
+   With GOOGLE_API_KEY + GOOGLE_CLIENT_ID in config.js this opens the real
+   Google Picker. Without them it opens a local stand-in so the flow can
+   still be walked end to end — clearly labelled, never pretending. */
+$('src-drive').addEventListener('click', () => {
+  if (CFG.GOOGLE_API_KEY && CFG.GOOGLE_CLIENT_ID) openRealDrive();
+  else openDemoDrive();
+});
+
+/* The bundled corpus. Each one is a different shape of CV — see
+   sample-cvs/README.md for what each is meant to exercise. */
+const SAMPLE_FILES = [
+  ['amara-nwosu-cv.pdf', 'PDF'],
+  ['amara-nwosu-cv.docx', 'DOCX'],
+  ['chidi-okonkwo-cv.pdf', 'PDF'],
+  ['fatoumata-diallo-cv.pdf', 'PDF · français'],
+  ['kwame-asante-cv.docx', 'DOCX · 日本語'],
+  ['grace-achieng-cv.docx', 'DOCX'],
+  ['selamawit-bekele-cv.pdf', 'PDF'],
+];
+
+function closeModal(){ $('modalslot').innerHTML = ''; }
+
+function openDemoDrive(){
+  $('modalslot').innerHTML =
+    '<div class="scrim" id="scrim"><div class="modal" role="dialog" aria-modal="true" aria-label="Google Drive">' +
+      '<h3>Google Drive</h3>' +
+      '<p class="sub">Demo picker, showing the bundled sample CVs. ' +
+      'Add <code style="font-family:var(--mono)">GOOGLE_API_KEY</code> and ' +
+      '<code style="font-family:var(--mono)">GOOGLE_CLIENT_ID</code> to <code style="font-family:var(--mono)">config.js</code> ' +
+      'and this button opens the real Google Picker against your account.</p>' +
+      SAMPLE_FILES.map(f =>
+        '<button class="drivefile" data-f="sample-cvs/' + f[0] + '" data-n="' + f[0] + '">' +
+        '<span class="fn">' + f[0] + '</span><span class="fs">' + f[1] + '</span></button>').join('') +
+      '<div style="margin-top:24px;display:flex;justify-content:flex-end">' +
+        '<button class="btn-quiet" id="drivecancel">Cancel</button></div>' +
+    '</div></div>';
+  $('drivecancel').addEventListener('click', closeModal);
+  $('scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeModal(); });
+  document.querySelectorAll('.drivefile').forEach(b => b.addEventListener('click', async () => {
+    const path = b.dataset.f, name = b.dataset.n;
+    b.querySelector('.fs').textContent = '···';
+    try {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const blob = await res.blob();
+      const f = new File([blob], name, { type: blob.type });
+      f.origin = 'Google Drive';
+      closeModal();
+      setFile(f);
+    } catch (err) {
+      b.querySelector('.fs').textContent = 'unreadable';
+      b.disabled = true;
+    }
+  }));
+}
+
+async function openRealDrive(){
+  $('modalslot').innerHTML =
+    '<div class="scrim" id="scrim"><div class="modal"><h3>Google Drive</h3>' +
+    '<p class="sub" id="drivestatus">Opening the Google Picker…</p></div></div>';
+  try {
+    await loadScript('https://accounts.google.com/gsi/client');
+    await loadScript('https://apis.google.com/js/api.js');
+    await new Promise(r => gapi.load('picker', r));
+    const token = await new Promise((resolve, reject) => {
+      google.accounts.oauth2.initTokenClient({
+        client_id: CFG.GOOGLE_CLIENT_ID,
+        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        callback: r => r.access_token ? resolve(r.access_token) : reject(new Error('no token')),
+        error_callback: e => reject(new Error(e.type || 'auth cancelled')),
+      }).requestAccessToken();
+    });
+    closeModal();
+    const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+      .setMimeTypes('application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain');
+    new google.picker.PickerBuilder()
+      .setOAuthToken(token).setDeveloperKey(CFG.GOOGLE_API_KEY).addView(view)
+      .setCallback(async data => {
+        if (data.action !== google.picker.Action.PICKED) return;
+        const doc = data.docs[0];
+        const res = await fetch('https://www.googleapis.com/drive/v3/files/' + doc.id + '?alt=media',
+          { headers: { Authorization: 'Bearer ' + token } });
+        const blob = await res.blob();
+        const f = new File([blob], doc.name, { type: blob.type || doc.mimeType });
+        f.origin = 'Google Drive';
+        setFile(f);
+      }).build().setVisible(true);
+  } catch (err) {
+    const s = $('drivestatus');
+    if (s) s.textContent = 'Google Drive could not be opened: ' + err.message +
+      '. Check the API key, client ID and authorised origin in config.js.';
+    setTimeout(closeModal, 4200);
+  }
+}
+
+function loadScript(src){
+  return new Promise((resolve, reject) => {
+    if (document.querySelector('script[src="' + src + '"]')) return resolve();
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error('could not load ' + src));
+    document.head.appendChild(s);
+  });
+}
+
+/* ---- paste ---- */
+$('src-paste').addEventListener('click', () => {
+  $('pastebox').classList.remove('hidden');
+  $('pastearea').focus();
+});
+$('pastecancel').addEventListener('click', () => $('pastebox').classList.add('hidden'));
+$('pasteuse').addEventListener('click', () => {
+  const txt = $('pastearea').value.trim();
+  if (txt.replace(/\s/g,'').length < 80) {
+    $('pastearea').style.borderColor = 'var(--seal)';
+    return;
+  }
+  setFile({ name: 'pasted-text.txt', size: txt.length, origin: 'pasted' }, txt);
+});
+
+/* ---- manual fill: skip the parse, open the review form empty ---- */
+$('src-manual').addEventListener('click', () => {
+  RESULT = emptyExtraction();
+  TEXT = '';
+  USED_FIXTURE = false;
+  PROFILE = cvToProfile(RESULT);
+  TOUCHED = new Set();
+  renderReview([]);
+  goStep(3);
+});
+
+/* ---- sample ---- */
+$('usesample').addEventListener('click', async e => {
+  e.preventDefault();
+  try {
+    const res = await fetch('sample-cvs/amara-nwosu-cv.pdf');
+    if (!res.ok) throw new Error();
+    const blob = await res.blob();
+    const f = new File([blob], 'amara-nwosu-cv.pdf', { type: 'application/pdf' });
+    f.origin = 'sample';
+    setFile(f);
+  } catch (_) {
+    setFile({ name: 'amara-nwosu-cv.txt', size: SAMPLE_CV.length, origin: 'sample' }, SAMPLE_CV);
+  }
+});
+
+/* ============================================================
+   5. Text extraction — pdf.js / mammoth / tesseract
+   ============================================================ */
+async function extractText(file){
+  if (TEXT) return TEXT;
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  if (ext === 'txt') return await file.text();
+  if (ext === 'docx') {
+    const r = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+    return r.value;
+  }
+  if (ext === 'pdf') {
+    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+    const pages = [];
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const tc = await (await pdf.getPage(p)).getTextContent();
+      pages.push(tc.items.map(i => i.str).join(' '));
+    }
+    const joined = pages.join('\n\n').trim();
+    // Almost no text layer means it is a scan. The extraction models are
+    // text-only, so this has to go through OCR first.
+    if (joined.replace(/\s/g,'').length > 120) return joined;
+    throw new Error('SCANNED_PDF');
+  }
+  if (['png','jpg','jpeg'].includes(ext)) {
+    const w = await Tesseract.createWorker('eng');
+    const { data } = await w.recognize(file);
+    await w.terminate();
+    return data.text;
+  }
+  throw new Error('Unsupported file type: .' + ext);
+}
+
+/* ============================================================
+   6. Token budgeting
+   The tokens-per-minute limit counts the WHOLE request: prompt
+   tokens PLUS whatever is reserved in max_completion_tokens. Gemini's
+   free tier is generous enough that this rarely binds, but the sizing
+   keeps a long CV from reserving more than an account allows.
+   ============================================================ */
+const TOK = s => Math.ceil(s.length / 3.7);
+const SCHEMA_TOK = TOK(JSON.stringify(CV_SCHEMA));
+const SYS_TOK = TOK(SYSTEM_PROMPT);
+// A full extraction of a dense CV is ~2,800 tokens of JSON before the model
+// has thought about anything, so reserving less than MIN_OUT guarantees a
+// truncated object and a schema-validation failure.
+const OVERHEAD = 120, MIN_OUT = 3000, MAX_OUT = 8000, SAFETY = 250;
+
+function plan(text, tpmLimit, schema){
+  const budget = tpmLimit - SAFETY;
+  const fixed = SYS_TOK + (schema && schema !== CV_SCHEMA ? TOK(JSON.stringify(schema)) : SCHEMA_TOK) + OVERHEAD;
+  const roomForText = Math.max(0, budget - fixed - MIN_OUT);
+  let body = text, truncated = false;
+  if (TOK(body) > roomForText) { body = body.slice(0, Math.floor(roomForText * 3.7)); truncated = true; }
+  const promptTok = fixed + TOK(body);
+  const maxOut = Math.max(MIN_OUT, Math.min(MAX_OUT, budget - promptTok));
+  return { body, truncated, promptTok, maxOut, total: promptTok + maxOut, fits: promptTok + maxOut <= tpmLimit };
+}
+
+function paintBudget(text){
+  const box = $('budget');
+  if (!text) { box.classList.add('hidden'); return null; }
+  const tpm = Math.max(2000, +$('tpm').value || API_TPM);
+  const p = plan(text, tpm);
+  box.classList.remove('hidden');
+  $('bin').textContent  = p.promptTok.toLocaleString();
+  $('bmax').textContent = p.maxOut.toLocaleString();
+  $('btot').textContent = p.total.toLocaleString() + ' / ' + tpm.toLocaleString();
+  $('bfill').style.width = Math.min(100, p.promptTok / tpm * 100) + '%';
+  $('bout').style.width  = Math.min(100 - (p.promptTok / tpm * 100), p.maxOut / tpm * 100) + '%';
+  box.querySelector('.bmeter').className = 'bmeter' + (p.fits ? '' : ' over');
+  $('budgetstate').textContent = p.truncated ? 'CV trimmed to fit' : (p.fits ? 'fits' : 'over limit');
+  $('budgetstate').style.color = p.fits ? 'var(--ink-soft)' : 'var(--seal)';
+  return p;
+}
+$('tpm').addEventListener('input', () => paintBudget(TEXT));
+
+/* ============================================================
+   7. Gemini call
+   ============================================================ */
+/* The API validates the finished object, and rejects the whole extraction if a
+   single enum lands outside its list. That is a different failure from running
+   out of output tokens and needs a different remedy: at temperature 0 a plain
+   retry produces the identical answer, so the prompt has to change. One
+   corrective pass, then give up. */
+const VALUE_ERROR = /value must be one of|does not validate with .*\/enum/i;
+
+/* The schema has a natural seam: who someone is (small, and roughly the same
+   size for everybody) and what they have done (unbounded — a thirteen-year
+   career with six employers produces several times the JSON of a three-year
+   one). A long senior CV can exceed the output ceiling as a whole while each
+   half fits comfortably, so when the object comes back truncated, ask twice
+   and stitch the answers together. */
+const SPLIT_A = ['candidate', 'languages', 'education', 'certifications',
+                 'work_preferences', 'derived', 'extraction_meta'];
+const SPLIT_B = ['experience', 'skills', 'projects'];
+
+function subSchema(keys){
+  const props = {};
+  keys.forEach(k => { props[k] = CV_SCHEMA.properties[k]; });
+  return obj(props);
+}
+
+const TRUNCATED = e =>
+  e.code === 'truncated_output' ||
+  (e.status === 400 && /missing propert/i.test(e.message || ''));
+
+async function callLlm(text, key, model, tpmLimit, effort, onProgress){
+  try {
+    return await llmOnce(text, key, model, tpmLimit, effort, '');
+  } catch (e) {
+    if (TRUNCATED(e)) return await callLlmSplit(text, key, model, tpmLimit, effort, onProgress);
+    if (e.status !== 400 || !VALUE_ERROR.test(e.message || '')) throw e;
+    const field = (/'(\/[^']+)'/.exec(e.message || '') || [])[1] || '';
+    const out = await llmOnce(text, key, model, tpmLimit, effort,
+      'Your previous answer was rejected. ' + (field ? field + ' ' : 'A field ') +
+      'used a value outside its allowed list. Every field with a list of allowed ' +
+      'values must use one of them exactly — use "other" where nothing fits, or ' +
+      'null where the field permits it. Return the whole object again.');
+    out.retried = true;
+    return out;
+  }
+}
+
+/** Two passes over the same CV, each asked for a different half of the object. */
+async function callLlmSplit(text, key, model, tpmLimit, effort, onProgress){
+  const say = m => { if (onProgress) onProgress(m); };
+  const note = 'This CV is long. Return only the parts of the object the schema asks for here.';
+
+  say('too long for one pass — splitting');
+  const a = await llmOnce(text, key, model, tpmLimit, effort, note, subSchema(SPLIT_A));
+
+  // On a small tokens-per-minute allowance the two passes will not both fit in
+  // the same minute. That is worth waiting out rather than failing on.
+  let b;
+  say('second pass');
+  try {
+    b = await llmOnce(text, key, model, tpmLimit, effort, note, subSchema(SPLIT_B));
+  } catch (e) {
+    if (e.status !== 429 || !e.retryAfter || e.retryAfter > 90) throw e;
+    for (let left = e.retryAfter; left > 0; left--) {
+      say('waiting ' + left + 's for the next minute of budget');
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    say('second pass');
+    b = await llmOnce(text, key, model, tpmLimit, effort, note, subSchema(SPLIT_B));
+  }
+
+  return {
+    json: { ...a.json, ...b.json },
+    usage: {
+      total_tokens: (a.usage.total_tokens || 0) + (b.usage.total_tokens || 0),
+      completion_tokens: (a.usage.completion_tokens || 0) + (b.usage.completion_tokens || 0),
+    },
+    split: true,
+  };
+}
+
+async function llmOnce(text, key, model, tpmLimit, effort, nudge, schema){
+  schema = schema || CV_SCHEMA;
+  const p = plan(text, tpmLimit, schema);
+  // Gemini thinks before it answers, and those thinking tokens come out of
+  // max_completion_tokens. Left high they starve the JSON and the object stops
+  // partway through, which the API then rejects as not matching the schema.
+  // Low effort is plenty for extraction: the work is reading and transcribing.
+  const cancel = new AbortController();
+  const deadline = setTimeout(() => cancel.abort(), API_TIMEOUT_MS);
+  let r;
+  try {
+    r = await fetch(API_URL, {
+    signal: cancel.signal,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+    body: JSON.stringify({
+      model, temperature: 0, max_completion_tokens: p.maxOut,
+      reasoning_effort: effort || 'low',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: 'Extract this CV.\n\n<cv>\n' + p.body + '\n</cv>' +
+            (nudge ? '\n\n' + nudge : '') },
+      ],
+      response_format: { type: 'json_schema', json_schema: { name: 'cv_extraction', strict: true, schema } },
+    }),
+    });
+  } catch (e) {
+    throw Object.assign(new Error(e.name === 'AbortError'
+      ? 'No answer after ' + Math.round(API_TIMEOUT_MS / 1000) + ' seconds.'
+      : e.message), { status: e.name === 'AbortError' ? 504 : 0 });
+  } finally {
+    clearTimeout(deadline);
+  }
+  if (!r.ok) {
+    const err = await readError(r);
+    const e = new Error(err.message);
+    e.status = r.status; e.code = err.code;
+    e.failed = err.failed_generation;
+    e.retryAfter = parseWait(err.message);   // the split waits on this
+    e.plan = p;
+    throw e;
+  }
+  const j = await r.json();
+  const choice = j.choices[0];
+  if (choice.finish_reason === 'length') {
+    const e = new Error('The JSON came back incomplete.');
+    e.code = 'truncated_output';
+    throw e;
+  }
+  return { json: JSON.parse(choice.message.content), usage: j.usage || {} };
+}
+
+/* ---- post-schema checks the model cannot guarantee ---- */
+/* Two audiences, one function. A talent needs to be told their dates run
+   backwards; nobody outside this file needs to read "experience[2].start_date
+   is not YYYY-MM". Everything machine-shaped is marked dev and stays behind
+   ?dev=1 — the same rule as the JSON and CV-text tabs. */
+function validate(d){
+  const p = [];
+  const note = text => p.push({ text, dev: false });
+  const diag = text => p.push({ text, dev: true });
+
+  if (!d.candidate || !d.candidate.full_name) note('We could not find your name on the CV.');
+
+  (d.experience || []).forEach((e, i) => {
+    const who = [e.title, e.employer].filter(Boolean).join(' at ') || ('role ' + (i + 1));
+    if (e.start_date && e.end_date && e.end_date < e.start_date) {
+      note('The dates for ' + who + ' end before they begin.');
+    }
+    if (e.start_date && !/^\d{4}-\d{2}$/.test(e.start_date)) {
+      diag('experience[' + i + '].start_date is not YYYY-MM: ' + e.start_date);
+    }
+  });
+
+  // Duplicates are collapsed before they reach the profile, so this is a note
+  // about the model rather than something the talent has to act on.
+  const seen = new Set();
+  (d.skills || []).forEach(s => {
+    const k = String(s.canonical || s.name || '').toLowerCase();
+    if (k && seen.has(k)) diag('Duplicate skill after normalisation: ' + s.canonical);
+    seen.add(k);
+  });
+  return p;
+}
+
+function stage(name, state, ms){
+  const el = document.querySelector('.stage[data-s="' + name + '"]');
+  if (!el) return;
+  el.className = 'stage ' + (state || '');
+  el.querySelector('.ms').textContent = ms == null ? '' : (ms < 1000 ? Math.round(ms) + 'ms' : (ms/1000).toFixed(1) + 's');
+}
+function resetStages(){ ['read','text','llm','valid','map'].forEach(s => stage(s, '', null)); }
+
+function showError(title, msg, action){
+  $('errslot').innerHTML = '<div class="errbox"><b>' + esc(title) + '</b><p>' + msg + '</p>' +
+    (action ? '<p style="margin-top:14px"><button class="btn-line sm" id="fixit">' + esc(action.label) + '</button></p>' : '') +
+    '</div><div style="margin-top:20px"><button class="btn-quiet" id="backup">Back</button></div>';
+  $('backup').addEventListener('click', () => goStep(1));
+  if (action) {
+    const btn = $('fixit');
+    btn.addEventListener('click', action.run);
+    if (action.countdown) {
+      let left = action.countdown;
+      btn.disabled = true;
+      const tick = setInterval(() => {
+        left -= 1;
+        if (!document.body.contains(btn)) return clearInterval(tick);
+        if (left <= 0) { clearInterval(tick); btn.disabled = false; btn.textContent = 'Try again'; }
+        else btn.textContent = 'Retry in ' + left + 's';
+      }, 1000);
+    }
+  }
+}
+
+/* ============================================================
+   8. Run
+   ============================================================ */
+$('go').addEventListener('click', async () => {
+  const { key } = resolveKey();
+  goStep(2);
+  $('errslot').innerHTML = '';
+  resetStages();
+  let t0;
+
+  try {
+    stage('read','run'); t0 = now();
+    await new Promise(r => setTimeout(r, 140));
+    stage('read','done', now() - t0);
+
+    stage('text','run'); t0 = now();
+    try {
+      if (!TEXT) TEXT = await extractText(FILE);
+    } catch (e) {
+      if (e.message === 'SCANNED_PDF') {
+        stage('text','err', now() - t0);
+        showError('This PDF has no text layer',
+          'It is a scan or an image-only export, and the extraction models are text-only. ' +
+          'Export the page as PNG and drop that in — the demo runs Tesseract on images. ' +
+          'In production this returns <code style="font-family:var(--mono)">needs_ocr</code> and the client routes it to an OCR pass.');
+        return;
+      }
+      throw e;
+    }
+    if (!TEXT || TEXT.replace(/\s/g,'').length < 80) {
+      stage('text','err', now() - t0);
+      showError('Almost no text in that file',
+        'It opened, but there was almost no text in it. Try a different export, or paste the text instead.');
+      return;
+    }
+    stage('text','done', now() - t0);
+    $('srcout').textContent = TEXT;
+    $('srcmeta').textContent = TEXT.length.toLocaleString() + ' characters extracted from ' + (FILE ? FILE.name : 'input');
+    paintBudget(TEXT);
+
+    /* ---- extract ---- */
+    stage('llm','run'); t0 = now();
+    let usage = {}, llmMs = 0;
+
+    if (key) {
+      // This step takes 15-25 seconds. Without a moving number it reads as a
+      // hang, and the honest thing to show is how long it has actually been.
+      const label = document.querySelector('.stage[data-s="llm"] span:nth-child(2)');
+      const base = label ? label.textContent : '';
+      const started = now();
+      let note = '';
+      const ticking = setInterval(() => {
+        if (!label) return;
+        const secs = Math.round((now() - started) / 1000);
+        label.textContent = base + (note ? ' — ' + note : '') + (secs >= 3 ? ' · ' + secs + 's' : '');
+      }, 1000);
+      let out;
+      try {
+        out = await callLlm(TEXT, key, $('model').value,
+          Math.max(2000, +$('tpm').value || API_TPM), $('effort').value,
+          msg => { note = msg; });
+      } finally {
+        clearInterval(ticking);
+        if (label) label.textContent = base;
+      }
+      SPLIT = !!out.split;
+      RESULT = out.json; usage = out.usage;
+      llmMs = now() - t0;
+      USED_FIXTURE = false;
+    } else {
+      // Demo mode. The fixture is a real extraction of the bundled sample CV,
+      // so it is only honest to use it for that document.
+      if (!looksLikeSample(TEXT)) {
+        stage('llm','err', now() - t0);
+        showError('No API key',
+          'Demo mode can only replay the bundled sample CV, and this is a different document — ' +
+          'showing you a canned result for it would be misleading. Put a key in ' +
+          '<code style="font-family:var(--mono)">config.js</code> (or the developer drawer) and run it again.',
+          { label: 'Use the sample CV instead', run: () => { goStep(1); $('usesample').click(); } });
+        return;
+      }
+      await new Promise(r => setTimeout(r, 900));
+      RESULT = JSON.parse(JSON.stringify(FIXTURE));
+      llmMs = now() - t0;
+      USED_FIXTURE = true;
+    }
+    stage('llm','done', llmMs);
+
+    stage('valid','run'); t0 = now();
+    const problems = validate(RESULT);
+    stage('valid', problems.some(x => !x.dev) ? 'err' : 'done', now() - t0);
+
+    stage('map','run'); t0 = now();
+    PROFILE = cvToProfile(RESULT);
+    TOUCHED = new Set();
+    stage('map','done', now() - t0);
+
+    $('jsonout').textContent = JSON.stringify(RESULT, null, 2);
+    const tps = usage.completion_tokens ? Math.round(usage.completion_tokens / (llmMs/1000)) : null;
+    $('jsonmeta').textContent = USED_FIXTURE
+      ? 'Demo mode — bundled fixture, no API call made'
+      : [usage.total_tokens ? usage.total_tokens + ' tokens' : null,
+         Math.round(llmMs) + 'ms', tps ? tps + ' tok/s' : null,
+         $('model').value, SPLIT ? 'two passes' : null].filter(Boolean).join(' · ');
+
+    renderReview(problems);
+    await new Promise(r => setTimeout(r, 350));
+    goStep(3);
+
+  } catch (e) {
+    ['read','text','llm','valid','map'].forEach(s => {
+      const el = document.querySelector('.stage[data-s="' + s + '"]');
+      if (el && el.classList.contains('run')) stage(s, 'err', null);
+    });
+    // 429 covers two different problems and the remedies are opposite:
+    // a single request larger than the whole limit needs a smaller request,
+    // whereas a limit already spent this minute just needs the minute to turn over.
+    const m = /Limit (\d+),(?:\s*Used (\d+),)?\s*Requested (\d+)/i.exec(e.message || '');
+    const wait = parseWait(e.message);
+    // Auth failures are not extraction failures, and a bare status code
+    // tells nobody anything. Name them before anything else.
+    if (e.status === 401 || e.status === 403 || e.status === 402) {
+      showError('The API key was not accepted',
+        'The key was rejected before any extraction happened' +
+        (e.message && !/^HTTP /.test(e.message) ? ': “' + esc(e.message) + '”' : '') + '. ' +
+        'Check it was copied whole — current Gemini keys start with ' +
+        '<code style="font-family:var(--mono)">AQ.</code>, older ones with <code style="font-family:var(--mono)">AIza</code> — ' +
+        'that it has not been revoked, and that the ' +
+        'Generative Language API is enabled on the project it belongs to. Keys are at ' +
+        '<a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" style="color:var(--seal)">aistudio.google.com/apikey</a>.');
+      return;
+    }
+
+    // Requests and tokens are capped per minute, and tokens per hour and day.
+    // The wording is nearly identical and the remedies are far apart, so read
+    // which one it was.
+    const perDay = /per day|\(TPD\)/i.test(e.message || '');
+    if (e.status === 413 || e.status === 429 || e.code === 'rate_limit_exceeded') {
+      const limit = m ? +m[1] : null, used = m && m[2] ? +m[2] : 0, asked = m ? +m[3] : null;
+      if (perDay) {
+        showError('Today\'s token allowance is used up',
+          (limit ? 'Your account allows ' + limit.toLocaleString() + ' tokens a day and ' +
+                   used.toLocaleString() + ' have gone. ' : '') +
+          'This is the daily cap, not the per-minute one, so waiting a moment will not help — ' +
+          (wait ? 'it frees up in about ' + formatWait(wait) + '. ' : 'it resets on a rolling window. ') +
+          'A paid tier lifts it.',
+          { label: 'Try again', run: () => $('go').click() });
+      } else if (limit && asked && asked > limit) {
+        showError('This request is bigger than your whole minute',
+          'Your account allows ' + limit.toLocaleString() + ' tokens per minute and this request needs ' +
+          asked.toLocaleString() + ' — reserved output counts as well as the prompt, so it cannot fit however long you wait. ' +
+          'Raise the limit to your account\'s real ceiling, or shorten your CV.',
+          { label: 'Set the limit to ' + limit.toLocaleString() + ' and retry',
+            run: () => { $('tpm').value = limit; $('go').click(); } });
+      } else {
+        showError('This minute\'s budget is spent',
+          (used ? used.toLocaleString() + ' of your ' + limit.toLocaleString() + ' tokens have already gone this minute. ' : '') +
+          'The allowance refills every minute — nothing is wrong with your CV.',
+          { label: wait && wait < 180 ? 'Retry in ' + wait + 's' : 'Try again',
+            countdown: wait && wait < 180 ? wait : 0, run: () => $('go').click() });
+      }
+    } else if (e.status === 400 && VALUE_ERROR.test(e.message || '')) {
+      // Survived the corrective retry, so it is not a one-off slip.
+      const field = (/'(\/[^']+)'/.exec(e.message || '') || [])[1];
+      showError('The model returned a value that is not allowed',
+        (field ? '<code style="font-family:var(--mono)">' + esc(field) + '</code> ' : 'A field ') +
+        'came back outside its permitted list, and a corrective retry did not fix it. ' +
+        'This is a prompt or schema problem rather than anything wrong with your CV.',
+        { label: 'Try again', run: () => $('go').click() });
+    } else if (e.code === 'truncated_output' || e.code === 'json_validate_failed' ||
+               /does not match the expected schema/i.test(e.message || '')) {
+      // The API validates the finished object, so a generation that stopped early
+      // surfaces as a schema error naming the properties that never arrived —
+      // always the last ones in the object. It is truncation, not a bad prompt.
+      const missing = (/missing propert(?:y|ies): (.+)$/i.exec(e.message || '') || [])[1];
+      const got = e.failed ? e.failed.length.toLocaleString() + ' characters of JSON came back before it stopped. ' : '';
+      showError('The model stopped before finishing the JSON',
+        got + (missing ? 'It never wrote ' + esc(missing) + ' — the tail of the object. ' : '') +
+        'That is an output budget problem, not a prompt problem: reasoning tokens and the JSON share ' +
+        'one ceiling. Reasoning effort is already set to low; the next lever is a larger output ' +
+        'reservation, which means a higher tokens-per-minute limit.',
+        { label: 'Retry', run: () => $('go').click() });
+    } else if (e.status === 504) {
+      showError('The model did not answer in time',
+        'Reading a CV usually takes fifteen to thirty seconds, and this one passed two minutes with ' +
+        'nothing back. That is normally the service being briefly slow rather than anything wrong with ' +
+        'your CV — running it again is the right first move.',
+        { label: 'Try again', run: () => $('go').click() });
+    } else if (/Failed to fetch/i.test(e.message)) {
+      showError('Could not reach the API',
+        'If you opened this file straight from disk the browser blocks the cross-origin request. Serve it over http instead: ' +
+        '<code style="font-family:var(--mono)">python3 -m http.server</code> in this folder, then open localhost:8000.');
+    } else {
+      showError('Extraction failed', esc(e.message));
+    }
+  }
+});
+
+/* Every provider nests its error message somewhere different: some under
+   `error.message`, some at the top level, some as bare text. Reading only one
+   shape turns a useful sentence — "Payment required, visit your billing tab" —
+   into a bare status code. */
+async function readError(r){
+  let body = null, text = '';
+  try { text = await r.text(); } catch (_) {}
+  try { body = JSON.parse(text); } catch (_) {}
+  const err = (body && body.error && typeof body.error === 'object') ? body.error : (body || {});
+  const message = err.message || err.detail || (typeof err === 'string' ? err : '') ||
+                  (body && typeof body.message === 'string' ? body.message : '') ||
+                  text.slice(0, 300) || ('HTTP ' + r.status);
+  return { message, code: err.code || err.type || '', failed_generation: err.failed_generation || '' };
+}
+
+/* Providers write the wait two different ways: "28.3725s" for short ones and
+   "5m33.07s" once it is over a minute. Reading only the first shape means the
+   long waits — the ones actually worth telling someone about — come out blank. */
+function parseWait(msg){
+  const m = /try again in ([0-9hms.]+)/i.exec(msg || '');
+  if (!m) return 0;
+  const h = /([\d.]+)h/.exec(m[1]), mi = /([\d.]+)m/.exec(m[1]), sec = /([\d.]+)s/.exec(m[1]);
+  return Math.ceil((h ? +h[1] * 3600 : 0) + (mi ? +mi[1] * 60 : 0) + (sec ? +sec[1] : 0));
+}
+
+/** "26 minutes" beats "1582 seconds", and beats "about a minute" when it isn't. */
+function formatWait(sec){
+  if (!sec) return '';
+  if (sec < 90) return Math.ceil(sec) + ' seconds';
+  if (sec < 5400) return Math.round(sec / 60) + ' minutes';
+  return Math.round(sec / 3600) + ' hours';
+}
+
+function looksLikeSample(t){
+  return /AMARA\s+CHINELO\s+NWOSU/i.test(t);
+}
+
+/* ============================================================
+   9. cvToProfile — the extraction JSON in the app's own shape.
+   Column names below are the real ones from
+   supabase/migrations/20260720142809_init_schema.sql.
+   ============================================================ */
+/* A hand-written country table only ever covers the countries somebody thought
+   of. The browser already knows all of them in both languages, and a flag is
+   computable from any ISO code, so nothing here needs maintaining when the next
+   nationality turns up. */
+function displayNames(locale, type){
+  try { return new Intl.DisplayNames([locale], { type }); } catch (_) { return null; }
+}
+const REGION_EN = displayNames('en', 'region');
+const REGION_JA = displayNames('ja', 'region');
+const LANG_EN = displayNames('en', 'language');
+
+const isCode = c => /^[A-Za-z]{2}$/.test(String(c || ''));
+
+function countryName(code, region){
+  if (!isCode(code) || !region) return '';
+  try {
+    const n = region.of(code.toUpperCase());
+    return n === code.toUpperCase() ? '' : n;   // unknown codes echo back
+  } catch (_) { return ''; }
+}
+
+/** Regional indicator letters: 🇰🇪 from "KE", for any real country. Any two
+ *  letters produce *a* glyph, so check the code is a country first — "XX"
+ *  otherwise renders as a placeholder box next to somebody's name. */
+function flagOf(code){
+  if (!isCode(code) || !countryName(code, REGION_EN)) return '';
+  return String.fromCodePoint(...[...code.toUpperCase()]
+    .map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65));
+}
+
+/** "en" -> English. Tolerates a model that answers "English" already. */
+function languageName(code){
+  const raw = String(code || '').trim();
+  if (!raw) return '—';
+  if (raw.length > 3) return raw;
+  try { const n = LANG_EN && LANG_EN.of(raw); return n && n !== raw ? n : raw; }
+  catch (_) { return raw; }
+}
+
+/** "2022-08" -> "August 2022". Nobody reads a date to themselves in ISO. */
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+function monthYear(v){
+  const m = /^(\d{4})-(\d{2})/.exec(String(v || ''));
+  if (!m) return String(v || '');
+  return (MONTH_NAMES[+m[2] - 1] ? MONTH_NAMES[+m[2] - 1] + ' ' : '') + m[1];
+}
+
+/** Initials for the avatar. A name written in kana or with bracketed romaji
+ *  should not produce "ク（" — prefer Latin letters when the name carries any. */
+function initialsFrom(name){
+  const latin = String(name || '').match(/[A-Za-z]+/g);
+  const parts = latin && latin.length ? latin
+    : String(name || '').split(/[\s・･,、]+/).filter(Boolean);
+  return parts.slice(0, 2).map(w => w[0] || '').join('').toUpperCase() || '??';
+}
+
+const FIELD_JA = { IT:'IT・エンジニアリング', Business:'ビジネス', Engineering:'工学', Data:'データ' };
+
+function toField(primary){
+  const p = (primary || '').toLowerCase();
+  if (/data|analy|machine learning|ml\b/.test(p)) return 'Data';
+  if (/business|product|market|sales|operations|finance/.test(p)) return 'Business';
+  if (/mechanic|civil|electric|chemical|hardware/.test(p)) return 'Engineering';
+  return 'IT';
+}
+
+function toLangLevel(l){
+  if (l.is_native) return 'Native';
+  if (l.jlpt) return ({ N1:'Fluent', N2:'Business', N3:'Conversational', N4:'Basic', N5:'Basic' })[l.jlpt] || 'Basic';
+  if (l.cefr) return ({ C2:'Native', C1:'Fluent', B2:'Business', B1:'Conversational', A2:'Basic', A1:'Basic' })[l.cefr] || 'Basic';
+  return 'Conversational';
+}
+
+const ym = s => s ? String(s).replace('-', '.') : '';
+
+function toPeriod(e){
+  const from = ym(e.start_date) || '?';
+  const to = e.is_current ? 'present' : (ym(e.end_date) || '?');
+  return from + ' – ' + to;
+}
+
+function toDescription(e){
+  const lines = [];
+  if (e.summary) lines.push(e.summary);
+  (e.achievements || []).forEach(a => lines.push('• ' + a));
+  if (e.scale_note) lines.push('• Scale: ' + e.scale_note);
+  return lines.join('\n');
+}
+
+function emptyExtraction(){
+  return {
+    candidate: { full_name:'', headline:null, summary:null, email:null, phone:null, links:[],
+                 city:null, country:null, country_code:null, date_of_birth:null, gender:null,
+                 nationality:null, nationality_code:null, address_line:null, postal_code:null },
+    languages: [], education: [], experience: [], skills: [], certifications: [], projects: [],
+    work_preferences: { open_to_remote:null, open_to_relocate:null, target_countries:[], notice_period:null, desired_salary:null },
+    derived: { total_years_experience:null, seniority:null, primary_field:null, japanese_level:null, has_degree:null, career_gaps:[] },
+    extraction_meta: { source_language:'—', confidence:{ identity:null, experience:null, education:null, skills:null },
+                       missing_fields:[], warnings:[] },
+  };
+}
+
+
+/** profiles.available_from is a date. Pull one out of the CV's prose if it is
+ *  actually there; otherwise leave it blank rather than guessing. */
+const MONTHS = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+function parseAvailability(txt){
+  if (!txt) return '';
+  const iso = /(\d{4})-(\d{2})-(\d{2})/.exec(txt);
+  if (iso) return iso[0];
+  const dmy = new RegExp('(\\d{1,2})\\s+(' + MONTHS.join('|') + ')\\w*\\s+(\\d{4})', 'i').exec(txt);
+  if (dmy) return dmy[3] + '-' + String(MONTHS.indexOf(dmy[2].toLowerCase()) + 1).padStart(2,'0') + '-' + dmy[1].padStart(2,'0');
+  const my = new RegExp('(' + MONTHS.join('|') + ')\\w*\\s+(\\d{4})', 'i').exec(txt);
+  if (my) return my[2] + '-' + String(MONTHS.indexOf(my[1].toLowerCase()) + 1).padStart(2,'0') + '-01';
+  return '';
+}
+
+function cvToProfile(d){
+  const c = d.candidate || {}, dv = d.derived || {}, wp = d.work_preferences || {};
+  // The highest formal qualification, not simply the first row: language
+  // schools and evening programmes routinely appear above the degree.
+  const edu = (d.education || []).find(e => e.degree && !e.is_ongoing)
+              || (d.education || [])[0] || {};
+  const inJapan = (c.country_code || '').toUpperCase() === 'JP';
+  const ai = new Set();
+  const set = (o, k, v) => { if (v !== null && v !== undefined && v !== '' && !(Array.isArray(v) && !v.length)) ai.add(k); o[k] = (v == null ? '' : v); };
+
+  const p = {};
+  set(p, 'nameEn', c.full_name);
+  p.nameJa = '';                                   // filled by the translate function on save
+  set(p, 'email', c.email);
+  set(p, 'headlineEn', c.headline);
+  p.headlineJa = '';
+  set(p, 'bioEn', c.summary);
+  p.bioJa = '';
+  // Where someone is from, not where they happen to be sitting. A Ghanaian
+  // working in Tokyo is Ghanaian on this platform; Tokyo is their residence,
+  // and that goes in residenceArea below.
+  const home = (c.nationality_code || c.country_code || '').toUpperCase();
+  set(p, 'country', countryName(home, REGION_EN) || c.nationality || c.country);
+  p.countryJa = countryName(home, REGION_JA);
+  p.flag = flagOf(home);
+  set(p, 'field', dv.primary_field ? toField(dv.primary_field) : '');
+  p.fieldJa = FIELD_JA[p.field] || '';
+  set(p, 'university', edu.institution);
+  p.universityJa = '';
+  set(p, 'faculty', edu.field_of_study);
+  p.facultyJa = '';
+  set(p, 'degree', edu.degree);
+  set(p, 'graduationYear', edu.end_year);
+  set(p, 'japaneseLevel', dv.japanese_level && dv.japanese_level !== 'none' ? dv.japanese_level : '');
+  // The prompt asks for deduplicated skills and mostly gets them, but "Google
+  // Analytics" and "GA4" both normalising to "Google Analytics" slips through.
+  // A profile listing a skill twice looks careless whatever the cause, so
+  // collapse them here as well. validate() still flags it for the reviewer.
+  const seenSkill = new Set();
+  set(p, 'skills', (d.skills || [])
+    .map(s => (s.canonical || s.name || '').trim())
+    .filter(name => {
+      const k = name.toLowerCase();
+      if (!k || seenSkill.has(k)) return false;
+      seenSkill.add(k);
+      return true;
+    }));
+  p.skillsJa = [];
+  // profiles.available_from is a `date` column, so the prose the CV gives
+  // ("two months' notice") only counts once it resolves to a real date.
+  set(p, 'availableFrom', parseAvailability(wp.notice_period));
+  p.availableFromJa = '';
+  p._noticeRaw = wp.notice_period || '';
+  p.openToWork = wp.open_to_remote !== false;
+  set(p, 'residenceArea', inJapan ? c.city : '');
+  set(p, 'devExperienceYears', dv.total_years_experience == null ? null : Math.round(dv.total_years_experience));
+  p.yearsInJapan = '';
+  p.hobbies = '';
+  p.videoUrl = '';                                 // no CV field maps to a 60-second intro video
+  p.pastClients = [];
+  set(p, 'languages', (d.languages || []).map(l => ({ name: l.language, level: toLangLevel(l) })));
+  set(p, 'experience', (d.experience || []).map(e => ({
+    company: e.employer || '', companyJa: '',
+    role: e.title || '', roleJa: '',
+    period: toPeriod(e),
+    descriptionEn: toDescription(e), descriptionJa: '',
+  })));
+
+  p.initials = initialsFrom(p.nameEn);
+  p.status = 'draft';
+  p._ai = ai;
+  p._seniority = dv.seniority || '';
+  p._certifications = d.certifications || [];
+  p._projects = d.projects || [];
+  p._prefs = wp;
+  p._gaps = dv.career_gaps || [];
+  return p;
+}
+
+/* ============================================================
+   10. Review form — the field set is TalentDashboard.tsx's,
+   so a correction made here is a correction to what gets saved.
+   ============================================================ */
+const JLPT = ['', 'N1','N2','N3','N4','N5'];
+const LANG_LEVELS = ['Native','Fluent','Business','Conversational','Basic'];
+
+function fstate(key){
+  if (TOUCHED.has(key)) return 'f-edited';
+  if (PROFILE._ai.has(key)) return 'f-ai';
+  return 'f-empty';
+}
+
+function fld(key, label, opts){
+  opts = opts || {};
+  const v = esc(PROFILE[key]);
+  const ph = opts.placeholder ? ' placeholder="' + esc(opts.placeholder) + '"' : '';
+  let control;
+  if (opts.type === 'textarea') {
+    control = '<textarea class="input-line" rows="' + (opts.rows || 4) + '" data-k="' + key + '"' + ph + '>' + v + '</textarea>';
+  } else if (opts.type === 'select') {
+    control = '<select class="input-line" data-k="' + key + '">' +
+      opts.options.map(o => '<option value="' + esc(o) + '"' + (String(PROFILE[key]) === String(o) ? ' selected' : '') + '>' +
+        (o === '' ? '—' : esc(o)) + '</option>').join('') + '</select>';
+  } else {
+    control = '<input class="input-line" data-k="' + key + '" value="' + v + '"' + ph +
+      (opts.type === 'number' ? ' type="number" min="0"' : '') + '>';
+  }
+  return '<div class="' + fstate(key) + '"><label class="label-line">' + esc(label) + '</label>' + control + '</div>';
+}
+
+function renderReview(problems){
+  /* basic */
+  $('f-basic').innerHTML =
+    fld('nameEn', 'Full name (English)') +
+    fld('headlineEn', 'Headline (English)') +
+    fld('email', 'Email address', { placeholder: 'your@email.com' }) +
+    fld('country', 'Country') +
+    fld('field', 'Field', { type: 'select', options: ['','IT','Business','Engineering','Data'] }) +
+    fld('japaneseLevel', 'Japanese level (JLPT)', { type: 'select', options: JLPT }) +
+    fld('availableFrom', 'Available from (YYYY-MM-DD)') +
+    (PROFILE._noticeRaw ? '<p class="foot-note" style="margin:-10px 0 0">Your CV says: “' +
+      esc(PROFILE._noticeRaw) + '”</p>' : '');
+
+  $('f-bio').innerHTML = fld('bioEn', 'About (English)', { type: 'textarea', rows: 6 }) +
+    '<p class="foot-note" style="margin:0">The Japanese versions are filled in on save by ' +
+    '<code>src/lib/translate.ts</code>, the same way the dashboard does it today.</p>';
+
+  $('f-skills').innerHTML = '<div class="' + fstate('skills') + '">' +
+    '<label class="label-line">Skills (English, comma-separated)</label>' +
+    '<textarea class="input-line" rows="3" data-k="skills" data-list="1">' +
+    esc((PROFILE.skills || []).join(', ')) + '</textarea></div>' +
+    '<p class="foot-note" style="margin:0">' + (PROFILE.skills || []).length +
+    ' skills found. Repeats like React and ReactJS were merged into one.</p>';
+
+  $('f-edu').innerHTML =
+    fld('university', 'University') +
+    fld('faculty', 'Faculty / Department') +
+    fld('degree', 'Degree') +
+    fld('graduationYear', 'Graduation year', { type: 'number' });
+
+  $('f-extra').innerHTML =
+    fld('residenceArea', 'Residence area (Japan)', { placeholder: 'Tokyo' }) +
+    '<div class="row2">' + fld('devExperienceYears', 'Years of dev experience', { type: 'number' }) +
+    fld('yearsInJapan', 'Years in Japan', { type: 'number' }) + '</div>' +
+    fld('hobbies', 'Hobbies & interests') +
+    fld('videoUrl', 'Intro video URL', { placeholder: 'https://' });
+
+  renderLangs();
+  renderExps();
+
+  /* confidence */
+  const cf = (RESULT.extraction_meta || {}).confidence || {};
+  $('f-conf').innerHTML = ['identity','experience','education','skills'].map(k => {
+    const v = cf[k] == null ? 0 : cf[k], pc = Math.round(v * 100);
+    const cls = v >= .8 ? '' : (v >= .55 ? 'mid' : 'low');
+    return '<div class="crow"><span class="lb">' + k + '</span>' +
+      '<span class="cbar"><i class="' + cls + '" style="width:' + pc + '%"></i></span>' +
+      '<span class="pc">' + (cf[k] == null ? '—' : pc + '%') + '</span></div>';
+  }).join('');
+  $('f-srclang').textContent = 'CV language: ' + languageName((RESULT.extraction_meta || {}).source_language) +
+    (USED_FIXTURE && DEV ? ' · demo mode, bundled fixture' : '');
+
+  /* warnings */
+  const meta = RESULT.extraction_meta || {};
+  const shown = (problems || []).filter(x => DEV || !x.dev);
+  const warns = [...(meta.warnings || []), ...shown.map(x => x.text)];
+  // career_gaps and the model's own warnings overlap: a gap it noticed usually
+  // appears in both, and showing it twice reads as two separate problems.
+  // Matching the literal "2022-08" is not enough — the warning is prose and
+  // says "August 2022" — so compare the years the two are talking about.
+  const gaps = ((RESULT.derived || {}).career_gaps || []).filter(g => {
+    const years = [g.from, g.to].map(v => String(v || '').slice(0, 4)).filter(Boolean);
+    return !years.length || !warns.some(w => years.every(y => String(w).includes(y)));
+  });
+  let wh = '';
+  warns.forEach(w => { wh += '<div class="flag"><span>check</span><p>' + esc(w) + '</p></div>'; });
+  gaps.forEach(g => {
+    wh += '<div class="flag"><span>check</span><p>Nothing listed between ' + esc(monthYear(g.from)) +
+      ' and ' + esc(monthYear(g.to)) + ' — ' + esc(g.months) + ' months.</p></div>';
+  });
+  // missing_fields are dotted schema paths. Each empty field already says
+  // "not on your CV" next to itself, so for a talent this list is both
+  // redundant and unreadable.
+  if (DEV && (meta.missing_fields || []).length) {
+    wh += '<p class="misslist" style="margin-top:14px">missing_fields · dev<br>' +
+      meta.missing_fields.map(esc).join('<br>') + '</p>';
+  }
+  if (!wh) wh = '<p class="foot-note" style="margin:0">Nothing looked odd.</p>';
+  $('f-warn').innerHTML = wh;
+}
+
+function renderLangs(){
+  $('f-lang').innerHTML = (PROFILE.languages || []).map((l, i) =>
+    '<div class="langrow"><input class="input-line" data-lang="' + i + '" data-p="name" value="' + esc(l.name) + '" placeholder="Language">' +
+    '<select class="input-line" data-lang="' + i + '" data-p="level">' +
+    LANG_LEVELS.map(lv => '<option' + (lv === l.level ? ' selected' : '') + '>' + lv + '</option>').join('') +
+    '</select><button class="tinyx" data-rmlang="' + i + '" aria-label="Remove">✕</button></div>').join('')
+    || '<p class="foot-note" style="margin:0">No languages found.</p>';
+}
+
+function renderExps(){
+  $('f-exp').innerHTML = (PROFILE.experience || []).map((e, i) =>
+    '<div class="expblock"><div class="exphead"><p>Experience ' + (i+1) + '</p>' +
+      '<button class="tinyx" data-rmexp="' + i + '">Remove</button></div>' +
+    '<div class="row2" style="margin-bottom:12px">' +
+      '<div><label class="label-line">Company</label><input class="input-line" data-exp="' + i + '" data-p="company" value="' + esc(e.company) + '"></div>' +
+      '<div><label class="label-line">Role</label><input class="input-line" data-exp="' + i + '" data-p="role" value="' + esc(e.role) + '"></div>' +
+    '</div>' +
+    '<div style="margin-bottom:12px"><label class="label-line">Period</label>' +
+      '<input class="input-line" data-exp="' + i + '" data-p="period" value="' + esc(e.period) + '" placeholder="2024.06 – 2024.09"></div>' +
+    '<div><label class="label-line">Description (English)</label>' +
+      '<textarea class="input-line" rows="5" data-exp="' + i + '" data-p="descriptionEn">' + esc(e.descriptionEn) + '</textarea></div>' +
+    '</div>').join('') || '<p class="foot-note" style="margin:0">No work history found.</p>';
+}
+
+/* one delegated handler covers every field in the review form */
+$('step3').addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.k) {
+    const k = t.dataset.k;
+    PROFILE[k] = t.dataset.list ? t.value.split(',').map(s => s.trim()).filter(Boolean) : t.value;
+    TOUCHED.add(k);
+    const wrap = t.closest('div');
+    if (wrap) wrap.className = 'f-edited';
+  } else if (t.dataset.exp !== undefined && t.dataset.p) {
+    PROFILE.experience[+t.dataset.exp][t.dataset.p] = t.value;
+    TOUCHED.add('experience');
+  } else if (t.dataset.lang !== undefined && t.dataset.p) {
+    PROFILE.languages[+t.dataset.lang][t.dataset.p] = t.value;
+    TOUCHED.add('languages');
+  }
+});
+$('step3').addEventListener('change', e => {
+  const t = e.target;
+  if (t.tagName === 'SELECT' && t.dataset.lang !== undefined) {
+    PROFILE.languages[+t.dataset.lang][t.dataset.p] = t.value;
+    TOUCHED.add('languages');
+  }
+});
+$('step3').addEventListener('click', e => {
+  const rl = e.target.dataset.rmlang, re_ = e.target.dataset.rmexp;
+  if (rl !== undefined) { PROFILE.languages.splice(+rl, 1); TOUCHED.add('languages'); renderLangs(); }
+  if (re_ !== undefined) { PROFILE.experience.splice(+re_, 1); TOUCHED.add('experience'); renderExps(); }
+});
+$('addlang').addEventListener('click', () => {
+  PROFILE.languages.push({ name: '', level: 'Conversational' });
+  TOUCHED.add('languages');
+  renderLangs();
+});
+
+/* review tabs */
+document.querySelectorAll('#rtabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#rtabs button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  ['form','json','src'].forEach(t => $('rpane-' + t).classList.toggle('hidden', t !== b.dataset.t));
+}));
+
+$('copyjson').addEventListener('click', async e => {
+  if (!RESULT) return;
+  try { await navigator.clipboard.writeText(JSON.stringify(RESULT, null, 2)); e.target.textContent = 'Copied'; }
+  catch (_) { e.target.textContent = 'Copy failed'; }
+  setTimeout(() => { e.target.textContent = 'Copy'; }, 1500);
+});
+$('dljson').addEventListener('click', () => {
+  if (!RESULT) return;
+  const b = new Blob([JSON.stringify(RESULT, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = ((RESULT.candidate || {}).full_name || 'cv').replace(/\s+/g,'-').toLowerCase() + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+});
+
+/* Step 3 is both the post-parse review and the profile edit form — the app
+   has one field set, so this page has one screen for it. Only the copy and
+   what the two buttons do change. */
+function setMode(mode){
+  MODE = mode;
+  const editing = mode === 'edit';
+  $('r-title').textContent = editing ? 'Edit your profile' : 'Check what we found';
+  $('r-lede').innerHTML = editing
+    ? 'Change anything you like. Nothing is saved until you press save.'
+    : 'Everything marked <b style="color:var(--seal);font-weight:600">auto-filled</b> came from your CV. ' +
+      'Change anything that is not right.';
+  $('publish').textContent = editing ? 'Save changes' : 'This is right — build my profile';
+  $('startover').textContent = editing ? 'Cancel' : 'Start over';
+  // The extraction tabs only mean something for a freshly parsed CV.
+  $('rtabs').classList.toggle('hidden', editing || !DEV);
+  if (editing) {
+    document.querySelector('#rtabs button[data-t="form"]').click();
+  }
+}
+
+/** PROFILE holds a Set, so a plain JSON round-trip would drop it. */
+function cloneProfile(p){
+  const c = Object.assign({}, p);
+  c._ai = new Set(p._ai);
+  c.skills = [...(p.skills || [])];
+  c.skillsJa = [...(p.skillsJa || [])];
+  c.pastClients = [...(p.pastClients || [])];
+  c.languages = (p.languages || []).map(l => Object.assign({}, l));
+  c.experience = (p.experience || []).map(e => Object.assign({}, e));
+  return c;
+}
+
+function startEdit(){
+  SNAPSHOT = { profile: cloneProfile(PROFILE), touched: new Set(TOUCHED) };
+  setMode('edit');
+  renderReview(validate(RESULT || {}));
+  goStep(3);
+}
+
+$('startover').addEventListener('click', () => {
+  if (MODE !== 'edit') JA = null;
+  if (MODE === 'edit') {
+    if (SNAPSHOT) { PROFILE = SNAPSHOT.profile; TOUCHED = SNAPSHOT.touched; SNAPSHOT = null; }
+    setMode('review');
+    JUST_SAVED = false;
+    renderProfile(PVIEW);
+    goStep(5);
+    return;
+  }
+  clearFile(); RESULT = null; PROFILE = null; TOUCHED = new Set();
+  PHOTOS = { portrait: null, portraitFile: null, portraitSrc: null, axis: null, crop: { x: 50, y: 40 }, casual: [] };
+  VERIFY = { status: 'unverified', provider: null, ref: null, at: null };
+  $('pastearea').value = '';
+  goStep(1);
+});
+
+$('publish').addEventListener('click', () => {
+  // The real save is AuthContext.updateProfile(); here it is the in-memory
+  // object, but the field set and the write path are the same ones.
+  PROFILE.initials = initialsFrom(PROFILE.nameEn);
+  $('navavatar').textContent = PROFILE.initials;
+  // Editing an approved profile sends it back for review — the
+  // guard_profile_status trigger does exactly this in the database.
+  if (MODE === 'edit' && PROFILE.status === 'approved') PROFILE.status = 'pending';
+  const wasEditing = MODE === 'edit';
+  SNAPSHOT = null;
+  JA = null;              // the Japanese documents no longer match — rebuild on demand
+  setMode('review');
+  JUST_SAVED = true;
+  // First time through, the photographs come next. Re-editing later goes
+  // straight back to the profile — the photographs are already there.
+  if (!wasEditing && !PHOTOS.portrait && !PHOTOS.casual.length) {
+    renderCasual();
+    paintPortrait();
+    renderVerify();
+    goStep(4);
+    return;
+  }
+  renderProfile(PVIEW);
+  goStep(5);
+});
+
+/* ============================================================
+   11. Profile — the same three views the app already has
+   ============================================================ */
+document.querySelectorAll('#viewsw button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#viewsw button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  PVIEW = b.dataset.v;
+  renderProfile(PVIEW);
+}));
+
+/* Buttons inside the rendered profile, wired by delegation because the
+   markup is rebuilt on every view change. */
+$('profileview').addEventListener('click', e => {
+  const act = e.target.closest('[data-act]');
+  if (!act) return;
+  if (act.dataset.act === 'edit') startEdit();
+  if (act.dataset.act === 'photos') { renderCasual(); paintPortrait(); renderVerify(); goStep(4); }
+  if (act.dataset.act === 'submit') {
+    PROFILE.status = 'pending';
+    JUST_SAVED = false;
+    renderProfile(PVIEW);
+  }
+});
+
+const or = (v, f) => (v === '' || v == null) ? f : v;
+const card = (title, inner) => '<section class="line-card pad"><h2 class="sect-h">' + title + '</h2>' + inner + '</section>';
+
+function avatar(size, initials){
+  const box = 'width:' + size + 'px;height:' + size + 'px';
+  if (PHOTOS.portrait) {
+    return '<img class="avatar-line" src="' + PHOTOS.portrait + '" alt="" style="' + box + ';object-fit:cover">';
+  }
+  return '<div class="avatar-line" style="' + box + ';font-size:' + Math.round(size/2.6) + 'px">' +
+    esc(initials) + '</div>';
+}
+
+function extraLines(p){
+  const rows = [];
+  if (p.residenceArea) rows.push(['Residence area', p.residenceArea]);
+  if (p.devExperienceYears !== '' && p.devExperienceYears != null) rows.push(['Years of dev experience', p.devExperienceYears]);
+  if (p.yearsInJapan !== '' && p.yearsInJapan != null) rows.push(['Years in Japan', p.yearsInJapan]);
+  if (p.hobbies) rows.push(['Hobbies & interests', p.hobbies]);
+  if (p.videoUrl) rows.push(['Intro video', p.videoUrl]);
+  if ((p.pastClients || []).length) rows.push(['Past clients', p.pastClients.join(', ')]);
+  if (!rows.length) return '';
+  return card('Additional info', rows.map(r =>
+    '<p class="kvline"><b>' + esc(r[0]) + ': </b>' + esc(r[1]) + '</p>').join(''));
+}
+
+function expListHtml(p){
+  return '<div class="explist">' + (p.experience || []).map(e =>
+    '<div><p class="r">' + esc(e.role) + '</p><p class="c">' + esc(e.company) + '</p>' +
+    '<p class="p">' + esc(e.period) + '</p>' +
+    (e.descriptionEn ? '<p class="d">' + esc(e.descriptionEn) + '</p>' : '') + '</div>').join('') + '</div>';
+}
+
+function langListHtml(p){
+  return '<div class="langlist">' + (p.languages || []).map(l =>
+    '<div><span class="n">' + esc(l.name) + '</span><span class="badge-line-ink">' + esc(l.level) + '</span></div>'
+  ).join('') + '</div>';
+}
+
+function eduHtml(p){
+  return '<p style="font-size:14px;font-weight:500;margin:0;line-height:1.35">' + esc(or(p.university, '—')) + '</p>' +
+    '<p style="font-size:12px;color:var(--ink-soft);margin:4px 0 0">' + esc(p.faculty) + '</p>' +
+    '<p style="font-size:12px;color:var(--ink-faint);margin:2px 0 0">' + esc(p.degree) +
+    (p.graduationYear ? ' · ' + esc(p.graduationYear) : '') + '</p>';
+}
+
+function jlptHtml(p, withLabel){
+  if (!p.japaneseLevel) return '<p class="foot-note" style="margin:0">Not stated on the CV.</p>';
+  const labels = { N1:'Highest level', N2:'Business proficient', N3:'Conversational', N4:'Basic', N5:'Basic' };
+  return '<div class="jlpt"><div class="ring">' + esc(p.japaneseLevel) + '</div><div>' +
+    '<p style="font-size:14px;margin:0">JLPT ' + esc(p.japaneseLevel) + '</p>' +
+    (withLabel ? '<p style="font-size:12px;color:var(--ink-faint);margin:2px 0 0">' + esc(labels[p.japaneseLevel] || '') + '</p>' : '') +
+    '</div></div>';
+}
+
+function renderProfile(view){
+  const p = PROFILE;
+  if (view === 'db') return renderDb(p);
+  if (view === 'ja') return renderJaView(p);
+
+  if (view === 'company') {
+    JUST_SAVED = false;
+    /* TalentDetailPage.tsx, company/admin branch */
+    $('profileview').innerHTML =
+      '<div class="narrow" style="max-width:900px;margin:0">' +
+      '<p class="foot-note" style="margin:0 0 20px">← Back to list</p>' +
+      '<div class="line-card" style="margin-bottom:20px"><div class="pad" style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">' +
+        avatar(88, p.initials) +
+        '<div style="flex:1;min-width:220px">' +
+          '<div style="display:flex;align-items:center;gap:12px;margin-bottom:4px;flex-wrap:wrap">' +
+            '<h1 class="display" style="font-size:28px;margin:0">' + esc(or(p.nameEn,'—')) + '</h1>' +
+            '<span style="font-size:24px;line-height:1">' + (p.flag || '') + '</span>' +
+            verifyBadge() + '</div>' +
+          '<p style="color:var(--ink-soft);font-size:15px;margin:0 0 16px">' +
+            esc([p.country, p.field].filter(Boolean).join(' · ')) + '</p>' +
+          '<div style="display:flex;gap:12px;flex-wrap:wrap">' +
+            (p.japaneseLevel ? '<span class="badge-line">' + esc(p.japaneseLevel) + '</span>' : '') +
+            (p.degree ? '<span class="badge-line-ink">' + esc(p.degree) + (p.graduationYear ? ' · ' + esc(p.graduationYear) : '') + '</span>' : '') +
+            (p.availableFrom ? '<span class="badge-line-ink">Available ' + esc(p.availableFrom) + '</span>' : '') +
+          '</div></div></div></div>' +
+      '<div class="cols side">' +
+        '<div class="stack">' +
+          card('About', '<p style="font-size:14px;line-height:1.7;margin:0">' + esc(or(p.bioEn,'—')) + '</p>') +
+          card('Skills', '<p style="font-size:14px;color:var(--ink-soft);margin:0;line-height:1.8">' +
+            esc((p.skills || []).join(' · ')) + '</p>') +
+          (PHOTOS.casual.length ? card('In person', peopleHtml()) : '') +
+          extraLines(p) +
+          ((p.experience || []).length ? card('Experience', expListHtml(p)) : '') +
+        '</div>' +
+        '<div class="stack">' +
+          ((p.languages || []).length ? card('Languages', langListHtml(p)) : '') +
+          card('Education', eduHtml(p)) +
+          card('Japanese level', jlptHtml(p, true)) +
+          '<div class="pad" style="border:1px solid var(--seal)">' +
+            '<p style="color:var(--ink-soft);font-size:14px;margin:0 0 16px;line-height:1.6">' +
+            'Interested in connecting with this talent? Reach out today.</p>' +
+            '<button class="btn-line" style="width:100%">Contact this talent</button></div>' +
+        '</div>' +
+      '</div></div>';
+    return;
+  }
+
+  /* TalentDashboard.tsx read view */
+  const corrections = TOUCHED.size;
+  const ST = {
+    draft: { label: 'Only you', color: 'var(--ink-faint)',
+      line: 'Nobody else can see this yet. Send it over and we will read it through before companies can find you — it takes about a day.',
+      cta: 'Send for review' },
+    pending: { label: 'Being read', color: 'var(--pending)',
+      line: 'We are reading your profile now. There is nothing else for you to do — we will let you know the moment it is live.' },
+    approved: { label: 'Live', color: 'var(--ok)',
+      line: 'Companies can find you and get in touch. Any edit you make goes back for a quick read before it appears.' },
+  };
+  const st = ST[p.status] || ST.draft;
+  $('profileview').innerHTML =
+    (JUST_SAVED ? '<div class="savedbar">✓ Profile saved successfully.</div>' : '') +
+    '<div class="dash-head"><div><p>Welcome back,</p>' +
+      '<h1>' + esc(or(p.nameEn,'—')) + ' ' + (p.flag || '') + '</h1></div>' +
+      '<button class="btn-line" data-act="edit">Edit Profile</button></div>' +
+    '<div class="cols side"><div class="stack">' +
+      '<div class="line-card pad"><div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">' +
+        avatar(80, p.initials) +
+        '<div><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+        '<h2 class="display" style="font-size:20px;margin:0">' + esc(or(p.nameEn,'—')) + '</h2>' +
+        verifyBadge() + '</div>' +
+        '<p style="color:var(--ink-soft);font-size:14px;margin:3px 0 0">' +
+          esc([p.country, p.field].filter(Boolean).join(' · ')) + '</p>' +
+        (p.email ? '<p style="color:var(--ink-faint);font-size:12px;margin:2px 0 0">' + esc(p.email) + '</p>' : '') +
+        '<div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap">' +
+          (p.japaneseLevel ? '<span class="badge-line">' + esc(p.japaneseLevel) + '</span>' : '') +
+          (p.availableFrom ? '<span class="badge-line-ink">Available ' + esc(p.availableFrom) + '</span>' : '') +
+        '</div></div></div></div>' +
+
+      '<section class="line-card pad">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap">' +
+          '<div style="display:flex;align-items:center;gap:10px">' +
+            '<h2 class="sect-h" style="margin:0">Who can see this</h2>' +
+            '<span style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;' +
+              'color:' + st.color + ';border-bottom:1.5px solid ' + st.color + ';padding-bottom:2px">' + st.label + '</span>' +
+          '</div>' +
+          (st.cta ? '<button class="btn-line sm" data-act="submit">' + st.cta + '</button>' : '') +
+        '</div>' +
+        '<p class="foot-note" style="margin:12px 0 0">' + st.line + '</p>' +
+      '</section>' +
+
+      card('About', '<p style="font-size:14px;color:var(--ink-soft);line-height:1.7;margin:0">' + esc(or(p.bioEn,'—')) + '</p>') +
+      card('Skills', '<p style="font-size:14px;color:var(--ink-soft);margin:0;line-height:1.8">' + esc((p.skills || []).join(' · ')) + '</p>') +
+      extraLines(p) +
+      ((p.experience || []).length ? card('Experience', expListHtml(p)) : '') +
+    '</div>' +
+    '<div class="stack">' +
+      card('Education', eduHtml(p)) +
+      ((p.languages || []).length ? card('Languages', langListHtml(p)) : '') +
+      card('Japanese level', jlptHtml(p, true)) +
+      card('Photographs and identity',
+        (PHOTOS.portrait
+          ? '<img src="' + PHOTOS.portrait + '" alt="" style="width:72px;aspect-ratio:3/4;object-fit:cover;' +
+            'border:1px solid var(--hairline);display:block;margin-bottom:12px">'
+          : '<p class="foot-note" style="margin:0 0 12px">No passport photo yet. Your Japanese CV will go ' +
+            'out with an empty photo box, which an employer in Japan will notice.</p>') +
+        '<p class="foot-note" style="margin:0 0 6px">' + PHOTOS.casual.length + ' of 3 casual photographs added.</p>' +
+        '<p class="foot-note" style="margin:0 0 14px">Identity: ' +
+          (VERIFY.status === 'verified' ? 'verified' : V_COPY[VERIFY.status].label.toLowerCase()) + '.</p>' +
+        '<button class="btn-line sm" style="width:100%" data-act="photos">' +
+        (PHOTOS.portrait || PHOTOS.casual.length || VERIFY.status !== 'unverified'
+          ? 'Photographs and identity' : 'Add photographs and verify') + '</button>') +
+      '<div class="line-card pad"><p class="foot-note" style="margin:0 0 14px">' +
+        'Built from ' + esc(FILE ? FILE.name : 'your input') + '. ' +
+        (corrections ? 'You changed ' + corrections + ' field' + (corrections === 1 ? '' : 's') + '.'
+                     : 'You kept it as it came out.') +
+      '</p><button class="btn-line" style="width:100%" data-act="edit">Edit Profile</button></div>' +
+    '</div></div>';
+}
+
+/* The Japanese documents are a second model call, so they are built the first
+   time they are asked for rather than on every extraction. */
+async function renderJaView(p){
+  if (JA) { $('profileview').innerHTML = renderJapanese(RESULT, JA, p); return; }
+
+  $('profileview').innerHTML =
+    '<div class="jload"><div class="sp"></div>Building your Japanese CV…' +
+    '<p class="foot-note" style="margin:10px 0 0">This is a second pass, asked only for the Japanese ' +
+    'wording, so it is much smaller than reading your CV was.</p></div>';
+
+  const { key } = resolveKey();
+  try {
+    if (key) {
+      JA = await callLlmJa(RESULT, key, $('model').value,
+        Math.max(2000, +$('tpm').value || API_TPM), $('effort').value);
+    } else {
+      if (!USED_FIXTURE) throw Object.assign(new Error('no_key'), { noKey: true });
+      await new Promise(r => setTimeout(r, 700));
+      JA = JSON.parse(JSON.stringify(JA_FIXTURE));
+    }
+    if (PVIEW === 'ja') $('profileview').innerHTML = renderJapanese(RESULT, JA, p);
+  } catch (e) {
+    if (PVIEW !== 'ja') return;
+    let title = 'Could not build the Japanese documents', body = esc(e.message), wait = 0;
+
+    if (e.noKey) {
+      title = 'Japanese documents need an API key';
+      body = 'Without a key this view can only replay the bundled sample, and this profile came from a different CV.';
+    } else if (e.status === 429 && /per day|\(TPD\)/i.test(e.message || '')) {
+      title = 'Today\'s token allowance is used up';
+      body = 'This is the daily cap rather than the per-minute one' +
+             (e.retryAfter ? ', and it frees up in about ' + formatWait(e.retryAfter) + '. ' : '. ') +
+             'Your profile is unaffected — only the Japanese documents need this.';
+    } else if (e.status === 429) {
+      // Two passes in one minute fit inside the 30,000-token free tier, so this
+      // is now unusual — a very long CV, or an account on a tighter allowance.
+      wait = e.retryAfter || 60;
+      title = 'One minute of budget is not enough for both passes';
+      body = 'Reading your CV already spent this minute\'s tokens, and the Japanese documents are a ' +
+             'second request. The budget refills shortly — nothing is lost, and your profile is unaffected.';
+    } else if (e.code === 'ja_budget') {
+      title = 'Not enough room in the token budget';
+      body = 'These documents need about ' + e.need.toLocaleString() + ' tokens in one request and the ' +
+             'configured limit is lower. Raise the tokens-per-minute limit to your account\'s real ceiling.';
+    }
+
+    $('profileview').innerHTML =
+      '<div class="errbox"><b>' + esc(title) + '</b><p>' + body + '</p>' +
+      '<p style="margin-top:14px"><button class="btn-line sm" id="jaretry"' + (wait ? ' disabled' : '') + '>' +
+      (wait ? 'Retry in ' + wait + 's' : 'Try again') + '</button></p></div>';
+
+    const btn = $('jaretry');
+    btn.addEventListener('click', () => { JA = null; renderJaView(PROFILE); });
+    if (wait) {
+      let left = wait;
+      const tick = setInterval(() => {
+        left -= 1;
+        if (!document.body.contains(btn)) return clearInterval(tick);
+        if (left <= 0) { clearInterval(tick); btn.disabled = false; btn.textContent = 'Try again'; }
+        else btn.textContent = 'Retry in ' + left + 's';
+      }, 1000);
+    }
+  }
+}
+
+function renderDb(p){
+  const arr = a => '{' + (a || []).map(x => '"' + x + '"').join(',') + '}';
+  const rows = [
+    ['name_en', p.nameEn], ['name_ja', p.nameJa || '(filled by translate on save)'],
+    ['email', p.email], ['country', p.country], ['country_ja', p.countryJa], ['flag', p.flag],
+    ['field', p.field], ['field_ja', p.fieldJa],
+    ['university_en', p.university], ['university_ja', p.universityJa],
+    ['faculty_en', p.faculty], ['faculty_ja', p.facultyJa],
+    ['degree', p.degree], ['graduation_year', p.graduationYear],
+    ['japanese_level', p.japaneseLevel], ['skills', arr(p.skills)], ['skills_ja', arr(p.skillsJa)],
+    ['headline_en', p.headlineEn], ['headline_ja', p.headlineJa],
+    ['bio_en', p.bioEn], ['bio_ja', p.bioJa],
+    ['available_from', p.availableFrom], ['available_from_ja', p.availableFromJa],
+    ['open_to_work', String(p.openToWork)],
+    ['residence_area', p.residenceArea], ['dev_experience_years', p.devExperienceYears],
+    ['years_in_japan', p.yearsInJapan], ['hobbies', p.hobbies], ['video_url', p.videoUrl],
+    ['past_clients', arr(p.pastClients)], ['status', p.status],
+    ['avatar_url', p.avatarUrl ? 'profile-images/<uid>/portrait.jpg' : ''],
+    ['verification_status', VERIFY.status],
+    ['verification_provider', VERIFY.provider], ['verification_ref', VERIFY.ref],
+    ['verified_at', VERIFY.at],
+  ];
+  $('profileview').innerHTML =
+    '<p class="lede">Exactly the columns that <code style="font-family:var(--mono)">profiles</code>, ' +
+    '<code style="font-family:var(--mono)">profile_languages</code> and ' +
+    '<code style="font-family:var(--mono)">profile_experiences</code> already have — ' +
+    'the extraction writes through the same <code style="font-family:var(--mono)">updateProfile()</code> path the dashboard uses. ' +
+    'Blank means your CV did not supply it.</p>' +
+    card('profiles', '<table class="dbtable">' + rows.map(r =>
+      '<tr><th>' + r[0] + '</th><td>' + (r[1] === '' || r[1] == null
+        ? '<span style="color:var(--ink-faint)">null</span>' : esc(r[1])) + '</td></tr>').join('') + '</table>') +
+    '<div style="height:20px"></div>' +
+    card('profile_languages · ' + (p.languages || []).length + ' rows',
+      '<table class="dbtable">' + (p.languages || []).map((l, i) =>
+        '<tr><th>' + i + '</th><td>language=' + esc(l.name) + ' · level=' + esc(l.level) + '</td></tr>').join('') + '</table>') +
+    '<div style="height:20px"></div>' +
+    card('profile_photos · ' + ((PHOTOS.portrait ? 1 : 0) + PHOTOS.casual.length) + ' rows',
+      '<table class="dbtable">' +
+        (PHOTOS.portrait ? '<tr><th>0</th><td>kind=portrait · url=profile-images/&lt;uid&gt;/portrait.jpg</td></tr>' : '') +
+        PHOTOS.casual.map((c, i) => '<tr><th>' + ((PHOTOS.portrait ? 1 : 0) + i) + '</th><td>kind=casual · ' +
+          'url=profile-images/&lt;uid&gt;/casual-' + i + '.jpg<br>caption_en=' + esc(c.caption || '') +
+          '</td></tr>').join('') +
+        (!PHOTOS.portrait && !PHOTOS.casual.length ? '<tr><th>—</th><td>no photographs added</td></tr>' : '') +
+      '</table>') +
+    '<div style="height:20px"></div>' +
+    card('profile_experiences · ' + (p.experience || []).length + ' rows',
+      '<table class="dbtable">' + (p.experience || []).map((e, i) =>
+        '<tr><th>' + i + '</th><td>company_en=' + esc(e.company) + '<br>role_en=' + esc(e.role) +
+        '<br>period=' + esc(e.period) + '<br>desc_en=' + esc((e.descriptionEn || '').slice(0, 200)) +
+        ((e.descriptionEn || '').length > 200 ? '…' : '') + '</td></tr>').join('') + '</table>');
+}
+
+/* ============================================================
+   10b. Photographs
+   ------------------------------------------------------------
+   Two different jobs. The 証明写真 is a formal document photo at a
+   fixed 30x40mm — a 3:4 portrait — that goes onto the 履歴書. The
+   casual photographs exist because 人柄 carries real weight in
+   Japanese hiring and a CV cannot show it.
+
+   Everything is resized in the browser before it is held: phone
+   photographs are several megabytes and none of that survives
+   the frame it ends up in.
+   ============================================================ */
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;   // matches uploadProfileImage() in src/lib/storage.ts
+const CASUAL_MAX = 3;
+let PHOTOS = { portrait: null, portraitFile: null, portraitSrc: null, axis: null, crop: { x: 50, y: 40 }, casual: [] };
+
+/** Phone photographs carry their rotation in EXIF; a canvas ignores it unless asked. */
+async function decode(file){
+  try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (_) { return await createImageBitmap(file); }
+}
+
+function checkImage(file){
+  if (!/^image\//.test(file.type)) return 'That is not an image. Use a JPG or PNG.';
+  if (file.size > PHOTO_MAX_BYTES) return 'That file is over 5 MB. Most phones can export a smaller copy.';
+  return '';
+}
+
+/** Which axis a cover-fit leaves room to move along. Exactly one, unless the
+ *  photograph is already the right shape, in which case neither. */
+function slackAxis(bmp, w, h){
+  const scale = Math.max(w / bmp.width, h / bmp.height);
+  const over = { x: Math.round(bmp.width * scale - w), y: Math.round(bmp.height * scale - h) };
+  return over.y > 1 ? 'y' : over.x > 1 ? 'x' : null;
+}
+
+/** Cover-fit into a box. `pos` is a percentage along each axis, exactly as CSS
+ *  object-position reads it, so the live preview and this render agree. */
+function fitCanvas(bmp, w, h, pos){
+  const cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h);
+  const scale = Math.max(w / bmp.width, h / bmp.height);
+  const dw = bmp.width * scale, dh = bmp.height * scale;
+  const x = (pos && pos.x != null) ? pos.x : 50;
+  const y = (pos && pos.y != null) ? pos.y : 50;
+  ctx.drawImage(bmp, (w - dw) * (x / 100), (h - dh) * (y / 100), dw, dh);
+  return cv.toDataURL('image/jpeg', 0.9);
+}
+
+async function makePortrait(file, pos){
+  return fitCanvas(await decode(file), 360, 480, pos);   // 3:4, print-legible at 30x40mm
+}
+
+async function makeCasual(file){
+  return fitCanvas(await decode(file), 800, 600, { x: 50, y: 50 });   // 4:3, enough for the frames it appears in
+}
+
+/* ---- passport photograph ----
+   Positioning is by dragging the photograph inside the frame, which is what
+   people reach for. The slider is the same control for anyone on a keyboard.
+   While dragging, the preview is the original image moved with CSS
+   object-position; the 3:4 crop is only re-rendered once it settles, so a
+   large photograph does not stutter under the cursor. */
+$('pfile').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const bad = checkImage(file);
+  $('perr').textContent = bad;
+  $('perr').style.color = bad ? 'var(--seal)' : 'var(--ink-faint)';
+  if (bad) return;
+  if (PHOTOS.portraitSrc) URL.revokeObjectURL(PHOTOS.portraitSrc);
+  PHOTOS.portraitFile = file;
+  PHOTOS.portraitSrc = URL.createObjectURL(file);
+  // A tall photograph can only move up and down, a wide one only side to side.
+  // Which it is depends on the photograph, so work it out rather than assume.
+  PHOTOS.axis = slackAxis(await decode(file), 360, 480);
+  PHOTOS.crop = { x: 50, y: PHOTOS.axis === 'y' ? 40 : 50 };   // faces sit above centre
+  PHOTOS.portrait = await makePortrait(file, PHOTOS.crop);
+  paintPortrait();
+});
+
+async function setCrop(pos, live){
+  PHOTOS.crop = {
+    x: Math.max(0, Math.min(100, pos.x)),
+    y: Math.max(0, Math.min(100, pos.y)),
+  };
+  if (PHOTOS.axis) $('pcrop').value = PHOTOS.crop[PHOTOS.axis];
+  $('pimg').style.objectPosition = PHOTOS.crop.x + '% ' + PHOTOS.crop.y + '%';
+  if (live) return;                       // mid-drag: the CSS preview is enough
+  PHOTOS.portrait = await makePortrait(PHOTOS.portraitFile, PHOTOS.crop);
+}
+
+function fromSlider(v){
+  return PHOTOS.axis === 'x' ? { x: v, y: PHOTOS.crop.y } : { x: PHOTOS.crop.x, y: v };
+}
+$('pcrop').addEventListener('input', e => { if (PHOTOS.portraitFile) setCrop(fromSlider(+e.target.value), true); });
+$('pcrop').addEventListener('change', e => { if (PHOTOS.portraitFile) setCrop(fromSlider(+e.target.value), false); });
+
+(function enableDrag(){
+  const frame = $('pframe');
+  let start = null, startCrop = null, dragging = false;
+  frame.addEventListener('pointerdown', e => {
+    if (!PHOTOS.portraitFile || !PHOTOS.axis) return;
+    dragging = true;
+    start = { x: e.clientX, y: e.clientY };
+    startCrop = { ...PHOTOS.crop };
+    frame.setPointerCapture(e.pointerId);
+    frame.classList.add('dragging');
+  });
+  frame.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    e.preventDefault();
+    // Dragging down brings the upper part of the photograph into view, which is
+    // why the delta is subtracted rather than added.
+    setCrop({
+      x: startCrop.x - ((e.clientX - start.x) / frame.clientWidth) * 100,
+      y: startCrop.y - ((e.clientY - start.y) / frame.clientHeight) * 100,
+    }, true);
+  });
+  const end = async e => {
+    if (!dragging) return;
+    dragging = false;
+    frame.classList.remove('dragging');
+    try { frame.releasePointerCapture(e.pointerId); } catch (_) {}
+    await setCrop(PHOTOS.crop, false);
+  };
+  frame.addEventListener('pointerup', end);
+  frame.addEventListener('pointercancel', end);
+})();
+
+$('premove').addEventListener('click', () => {
+  if (PHOTOS.portraitSrc) URL.revokeObjectURL(PHOTOS.portraitSrc);
+  PHOTOS.portrait = null; PHOTOS.portraitFile = null; PHOTOS.portraitSrc = null;
+  $('perr').textContent = '';
+  paintPortrait();
+});
+
+function paintPortrait(){
+  const has = !!PHOTOS.portrait;
+  // Nothing to move if the photograph is already 3:4 — hide the control rather
+  // than leave one that does nothing.
+  const movable = has && !!PHOTOS.axis;
+  $('pimg').classList.toggle('hidden', !has);
+  $('phint').classList.toggle('hidden', !movable);
+  $('pempty').classList.toggle('hidden', has);
+  $('premove').classList.toggle('hidden', !has);
+  $('pcropwrap').classList.toggle('hidden', !movable);
+  $('pframe').classList.toggle('draggable', movable);
+  if (has) {
+    $('pimg').src = PHOTOS.portraitSrc || PHOTOS.portrait;
+    $('pimg').style.objectPosition = PHOTOS.crop.x + '% ' + PHOTOS.crop.y + '%';
+  }
+  if (movable) {
+    $('pcrop').value = PHOTOS.crop[PHOTOS.axis];
+    $('phint').textContent = PHOTOS.axis === 'y' ? 'Drag to move your face' : 'Drag to centre your face';
+    $('pcroplabel').textContent = PHOTOS.axis === 'y'
+      ? 'Where your face sits in the frame'
+      : 'Move the photo left or right';
+  }
+}
+
+/* ---- casual photographs ---- */
+function renderCasual(){
+  const slots = [];
+  PHOTOS.casual.forEach((c, i) => {
+    slots.push('<div class="casual"><div class="shot"><img src="' + c.url + '" alt="">' +
+      '<button class="drop-x" data-rmshot="' + i + '" aria-label="Remove">✕</button></div>' +
+      '<div class="cap"><input data-cap="' + i + '" value="' + esc(c.caption) +
+      '" placeholder="What is happening here?" maxlength="90"></div></div>');
+  });
+  if (PHOTOS.casual.length < CASUAL_MAX) {
+    slots.push('<label class="casual pick"><div class="shot"><span class="plus">+</span>' +
+      '<span class="hint">' + (CASUAL_MAX - PHOTOS.casual.length) + ' MORE</span></div>' +
+      '<input type="file" accept="image/*" class="hidden" id="cfile"></label>');
+  }
+  $('casualgrid').innerHTML = slots.join('');
+  const cf = $('cfile');
+  if (cf) cf.addEventListener('change', async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const bad = checkImage(file);
+    $('cerr').textContent = bad;
+    $('cerr').style.color = bad ? 'var(--seal)' : 'var(--ink-faint)';
+    if (bad) return;
+    PHOTOS.casual.push({ url: await makeCasual(file), caption: '' });
+    JA = null;                       // the Japanese captions no longer match
+    renderCasual();
+  });
+}
+
+$('casualgrid').addEventListener('click', e => {
+  const i = e.target.dataset.rmshot;
+  if (i === undefined) return;
+  PHOTOS.casual.splice(+i, 1);
+  JA = null;
+  renderCasual();
+});
+$('casualgrid').addEventListener('input', e => {
+  const i = e.target.dataset.cap;
+  if (i === undefined) return;
+  PHOTOS.casual[+i].caption = e.target.value;
+  JA = null;
+});
+
+/* ============================================================
+   10c. Identity verification
+   ------------------------------------------------------------
+   The ID document itself never touches this application. The
+   talent is handed to a verification provider, the provider
+   checks the document against a selfie, and all that comes back
+   is a verdict. We store the verdict, the provider and its
+   reference — never the passport image, never the number.
+
+   That is not squeamishness: holding government ID scans makes
+   you a target and puts you under data-protection regimes you
+   do not want to be under. Providers exist because this is a
+   thing to outsource.
+
+   Wired to Didit. Three server-side pieces, none of which the
+   browser can reach around:
+
+     start-verification    opens a Didit session, returns a URL
+     verification-webhook  receives the signed decision — the ONLY
+                           writer of a verified status
+     verification-status   what this page polls, because reaching
+                           the end of the flow is not the same as
+                           passing it
+
+   Configure VERIFY_START_URL and VERIFY_STATUS_URL in config.js.
+   With them blank the button runs a clearly-labelled simulation so
+   the flow can still be walked offline.
+   ============================================================ */
+let VERIFY = { status: 'unverified', provider: null, ref: null, at: null, error: '', detail: '' };
+
+const V_COPY = {
+  unverified: { label: 'Not verified', line: 'Companies see unverified profiles lower in search, and many will not open one at all.' },
+  pending:    { label: 'Checking',     line: 'Your document is with the verification service. Most checks come back in under a minute; some are reviewed by a person and take longer. You can carry on in the meantime.' },
+  verified:   { label: 'Verified',     line: 'Your name and date of birth have been confirmed against a government-issued document.' },
+  failed:     { label: 'Not confirmed', line: 'The check did not go through. That is usually a blurred photograph or glare on the document rather than anything wrong.' },
+};
+
+const TICK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2"><path d="M20 6.5L9.2 17.5L4 12.3"/></svg>';
+
+function renderVerify(){
+  const c = V_COPY[VERIFY.status];
+  const simulated = !CFG.VERIFY_START_URL;
+  const busy = VERIFY.status === 'pending';
+  $('verifycard').innerHTML =
+    '<h2 class="sect-h">Identity check</h2>' +
+    '<div class="vrow"><div class="vtext">' +
+      '<span class="vstate ' + VERIFY.status + '">' +
+        (busy ? '<span class="vspin"></span>' : VERIFY.status === 'verified' ? TICK : '') +
+        c.label + '</span>' +
+      '<p style="margin-top:12px">' + c.line + '</p>' +
+      (VERIFY.status === 'verified' ? '' :
+        '<ul><li>A passport, national ID card or driving licence</li>' +
+        '<li>A photograph of your face, taken there and then</li>' +
+        '<li>Two minutes on a phone or a laptop with a camera</li></ul>' +
+        '<p>The check is run by <b>Didit</b>. Your document and selfie go to them and are ' +
+        'never sent to AfriTalent — all that reaches us is whether it checked out. ' +
+        'By starting the check you agree to Didit processing those images for identity verification.</p>') +
+      (VERIFY.status === 'failed' && VERIFY.error
+        ? '<p class="foot-note" style="margin:0 0 12px;color:var(--seal)">' + esc(VERIFY.error) + '</p>' : '') +
+      (VERIFY.status === 'verified'
+        ? '<p class="foot-note" style="margin:0">Confirmed ' + esc(VERIFY.at || '') +
+          (VERIFY.provider ? ' · ' + esc(VERIFY.provider) : '') +
+          (VERIFY.ref ? ' · <span style="font-family:var(--mono);font-size:11px">' + esc(String(VERIFY.ref).slice(0, 8)) + '…</span>' : '') + '</p>'
+        : '<div class="btnpair" style="margin-top:4px">' +
+          '<button class="btn-line sm" id="vstart"' + (busy ? ' disabled' : '') + '>' +
+          (VERIFY.status === 'failed' ? 'Try again' : busy ? 'In progress' : 'Verify my identity') + '</button>' +
+          (simulated ? '<span class="foot-note" style="margin:0">Simulated — no provider configured</span>' : '') +
+          '</div>') +
+    '</div></div>';
+  const b = $('vstart');
+  if (b) b.addEventListener('click', startVerification);
+}
+
+async function startVerification(){
+  // Real path: our endpoint opens a Didit session and hands back a URL. The
+  // API key is on the server; this page never sees it, and never sees the
+  // document either.
+  if (CFG.VERIFY_START_URL) {
+    VERIFY.status = 'pending';
+    VERIFY.provider = 'didit';
+    renderVerify();
+    try {
+      const r = await fetch(CFG.VERIFY_START_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(CFG.VERIFY_AUTH ? { Authorization: CFG.VERIFY_AUTH } : {}) },
+        body: JSON.stringify({ language: 'en' }),
+      });
+      if (!r.ok) throw new Error((await r.text()).slice(0, 200) || ('HTTP ' + r.status));
+      const { url, session_id } = await r.json();
+      if (!url) throw new Error('the endpoint returned no session url');
+      VERIFY.ref = session_id;
+      openDiditFlow(url);
+    } catch (e) {
+      VERIFY = { status: 'failed', provider: 'didit', ref: null, at: null, error: String(e.message || e) };
+      renderVerify();
+    }
+    return;
+  }
+
+  // Simulation. It proves nothing and says so — it exists so the flow, the
+  // states and the badge can be walked without a provider account.
+  VERIFY = { status: 'pending', provider: 'simulated', ref: null, at: null };
+  renderVerify();
+  await new Promise(r => setTimeout(r, 2200));
+  VERIFY = {
+    status: 'verified', provider: 'simulated',
+    ref: 'sim_' + Math.random().toString(36).slice(2, 10),
+    at: new Date().toISOString().slice(0, 10),
+  };
+  renderVerify();
+  if (PVIEW && !$('step5').classList.contains('hidden')) renderProfile(PVIEW);
+}
+
+/* Didit's hosted flow, in an overlay.
+
+   The npm SDK would give the same thing in a modal, but this page has no build
+   step, so the hosted URL goes straight into an iframe. It needs camera and
+   microphone explicitly — an iframe does not inherit them, and without the
+   allow list the flow fails at the selfie step with nothing useful on screen.
+
+   On a phone the camera is more reliable in a whole tab than in an iframe, so
+   small screens lead with a link to one — but a NEW tab, never a redirect.
+   Everything on this page lives in memory: the parsed CV, the corrections, the
+   photographs. A same-tab redirect to the provider throws all of it away and
+   returns the candidate to an empty page, which is a worse failure than a
+   fiddly camera.
+
+   That link is a link, and not window.open(), on purpose. Opening the session
+   needs a round trip to our endpoint first, and by the time that await
+   resolves the user-gesture token is gone — so a programmatic pop-up gets
+   blocked, which looks from the outside exactly like the identity check
+   opening and instantly closing. A real click is never blocked. */
+function openDiditFlow(url){
+  const narrow = window.matchMedia('(max-width: 700px)').matches;
+  if (narrow) {
+    $('modalslot').innerHTML =
+      '<div class="scrim" id="scrim"><div class="modal">' +
+        '<h3>Identity check</h3>' +
+        '<p class="sub">Didit handles this. Your document and selfie go to them, ' +
+          'not to AfriTalent. It opens in a new tab — come back here when you are ' +
+          'done, and nothing you have filled in will be lost.</p>' +
+        '<p style="margin-top:18px"><a class="btn" href="' + esc(url) + '" ' +
+          'target="_blank" rel="noreferrer" id="verifyopen">Open the identity check</a></p>' +
+        '<div style="margin-top:20px;display:flex;justify-content:flex-end">' +
+          '<button class="btn-quiet" id="verifyclose">Done</button></div>' +
+      '</div></div>';
+    $('verifyclose').addEventListener('click', () => { closeModal(); pollVerification(); });
+    pollVerification();
+    return;
+  }
+
+  // Ask for the camera from OUR origin before handing over to the iframe.
+  //
+  // Didit decides what to offer from what the browser will actually give it:
+  // with the camera unavailable it drops to a QR code and sends the candidate
+  // to their phone. That is a sensible fallback but a poor default on a laptop
+  // that has a perfectly good webcam and has simply never been asked.
+  //
+  // A cross-origin iframe cannot raise this prompt for itself — the permission
+  // is delegated from the top-level page by the allow= list below, so if the
+  // top level has not been granted it, there is nothing to delegate. Asking
+  // here, then releasing the track immediately, means the frame inherits a
+  // permission that is already granted. A refusal is fine: Didit still shows
+  // the QR path, which is exactly where we would have been anyway.
+  primeCamera();
+
+  $('modalslot').innerHTML =
+    '<div class="scrim" id="scrim"><div class="modal verifymodal">' +
+      '<div class="verifyhead">' +
+        '<div><h3>Identity check</h3>' +
+        '<p class="sub" style="margin:0">Didit handles this. Your document and selfie go to them, not to AfriTalent.</p></div>' +
+        '<button class="btn-quiet" id="verifyclose">Cancel</button>' +
+      '</div>' +
+      '<iframe id="diditframe" src="' + esc(url) + '" ' +
+        'allow="camera; microphone; fullscreen; autoplay; encrypted-media; clipboard-write" ' +
+        'referrerpolicy="strict-origin"></iframe>' +
+      '<p class="foot-note" style="margin:12px 0 0">Trouble with the camera? ' +
+        '<a href="' + esc(url) + '" target="_blank" rel="noreferrer" style="color:var(--seal)">open it in a new tab</a>.</p>' +
+    '</div></div>';
+
+  $('verifyclose').addEventListener('click', () => { closeModal(); pollVerification(); });
+  $('scrim').addEventListener('click', e => {
+    if (e.target.id === 'scrim') { closeModal(); pollVerification(); }
+  });
+
+  pollVerification();
+}
+
+/** Grant the iframe a camera by getting one ourselves first, then letting go. */
+async function primeCamera(){
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    stream.getTracks().forEach(t => t.stop());   // release the light immediately
+  } catch (_) {
+    // Denied, dismissed, or no camera. Didit's QR path covers it.
+  }
+}
+
+/* Ask our own endpoint what the verdict was.
+
+   Not the iframe, and not the redirect: both only tell you the candidate
+   reached the end, and a declined check reaches the end too. The webhook is
+   what writes the decision, so this polls until it lands. */
+let pollTimer = null;
+async function pollVerification(){
+  if (!CFG.VERIFY_STATUS_URL || !VERIFY.ref) return;
+  clearInterval(pollTimer);
+  const started = Date.now();
+
+  const check = async () => {
+    // Ten minutes is longer than any real flow takes; past that, something has
+    // gone wrong and a spinner is not the honest thing to show.
+    if (Date.now() - started > 10 * 60 * 1000) {
+      clearInterval(pollTimer);
+      if (VERIFY.status === 'pending') {
+        VERIFY.status = 'failed';
+        VERIFY.error = 'No decision came back. Nothing was lost — you can start the check again.';
+        renderVerify();
+      }
+      return;
+    }
+    try {
+      const r = await fetch(CFG.VERIFY_STATUS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(CFG.VERIFY_AUTH ? { Authorization: CFG.VERIFY_AUTH } : {}) },
+        body: JSON.stringify({ session_id: VERIFY.ref }),
+      });
+      if (!r.ok) return;
+      const out = await r.json();
+
+      // Only a verdict we recognise ends the wait. Anything else — an error
+      // body, a reply from the wrong endpoint, a shape we did not expect —
+      // means "no decision yet", not "give up". Treating unknown payloads as
+      // terminal once made a mistyped status URL look exactly like the
+      // identity check crashing the moment it opened.
+      const terminal = out.status === 'verified' || out.status === 'failed' ||
+                       (out.status === 'unverified' && out.detail);
+      if (!terminal) return;
+
+      clearInterval(pollTimer);
+      VERIFY = {
+        status: out.status,
+        provider: 'didit', ref: VERIFY.ref,
+        at: (out.at || new Date().toISOString()).slice(0, 10),
+        detail: out.detail || '',
+      };
+      closeModal();
+      renderVerify();
+      if (PVIEW && !$('step5').classList.contains('hidden')) renderProfile(PVIEW);
+    } catch (_) { /* keep polling */ }
+  };
+
+  pollTimer = setInterval(check, 4000);
+  check();
+}
+
+/** The mark that follows a verified profile around. */
+function verifyBadge(){
+  return VERIFY.status === 'verified'
+    ? '<span class="vbadge" title="Identity confirmed against a government-issued document">' +
+      TICK + 'Verified</span>'
+    : '';
+}
+
+$('photoskip').addEventListener('click', () => { goToProfile(); });
+$('photodone').addEventListener('click', () => { goToProfile(); });
+
+function goToProfile(){
+  PROFILE.avatarUrl = PHOTOS.portrait || '';   // profiles.avatar_url
+  renderProfile(PVIEW);
+  goStep(5);
+}
+
+/** The personality panel, shown wherever the profile is shown. */
+function peopleHtml(captions){
+  if (!PHOTOS.casual.length) return '';
+  return '<div class="people">' + PHOTOS.casual.map((c, i) => {
+    const cap = (captions && captions[i]) || c.caption;
+    return '<figure><img src="' + c.url + '" alt="">' +
+      (cap ? '<figcaption>' + esc(cap) + '</figcaption>' : '') + '</figure>';
+  }).join('') + '</div>';
+}
+
+/* ============================================================
+   11b. 履歴書 / 職務経歴書
+   ------------------------------------------------------------
+   A Japanese application is two documents, and neither is a
+   translated CV:
+
+     履歴書       a ruled form. Fixed row order, chronological
+                  学歴・職歴 written oldest first with 入学/卒業
+                  and 入社/退職, closed with 現在に至る and 以上.
+     職務経歴書   prose. 職務要約, then per-employer 事業内容 /
+                  業務内容 / 実績, then スキル and 自己PR.
+
+   Only the Japanese *language* needs a model. The row order and
+   the set phrases are conventions, so they are generated here
+   and only the wording is asked for. That keeps this second
+   call small — it is sent the extracted data, not the CV.
+   ============================================================ */
+const JA_SCHEMA = obj({
+  name_kana: S(),
+  address_ja: SN(),
+  address_kana_ja: SN(),
+  education_ja: ARR(obj({ institution: S(), faculty: SN() })),
+  experience_ja: ARR(obj({ company: S(), role: S(), business: SN(), duties: ARR(S()), achievements: ARR(S()) })),
+  qualifications_ja: ARR(S()),
+  skills_ja: ARR(S()),
+  photo_captions_ja: ARR(S()),
+  summary_ja: S(),
+  self_pr_ja: S(),
+  requests_ja: S(),
+});
+
+const JA_SYSTEM_PROMPT = `あなたは、アフリカの人材が日本企業に応募するための履歴書・職務経歴書を作成する専門家です。
+入力は英文CVから抽出済みの構造化データ（JSON）です。これを日本の採用慣行に沿った日本語に変換してください。
+
+ルール
+1. 入力にない事実を追加しない。生年月日・性別・年齢など、入力にない情報は絶対に作らない。
+2. 学校名・企業名は日本語表記にする。定着した表記があればそれを用い、なければ発音に基づくカタカナ表記とし、
+   「カタカナ（原語）」の形で原語を併記する。カタカナの部分にアルファベットをそのまま入れてはならない。
+   例：University of Nairobi → ナイロビ大学
+   例：Sendy Logistics → センディ・ロジスティクス（Sendy Logistics）
+   例：Twiga Foods → トゥイガ・フーズ（Twiga Foods）
+3. 業務内容（duties）は「〜の設計・開発」のような体言止めで簡潔に書く。
+4. 実績（achievements）は数値をそのまま残して日本語にする。
+5. summary_ja（職務要約）は3〜4文。self_pr_ja（自己PR）は250〜350字。いずれも敬体（です・ます調）。
+6. requests_ja（本人希望記入欄）は勤務形態の希望を1〜2文で。給与額は書かず「貴社規定に従います」を用いる。
+7. education_ja と experience_ja は、入力の education / experience と同じ順序・同じ件数で返す。
+8. skills_ja は入力の主要なスキルを日本語表記で。技術名（Go、Reactなど）は原語のままでよい。
+8b. address_ja は入力の住所を日本語表記にする。郵便番号は別欄に入るため含めない。
+    address_kana_ja はその読みをひらがなで書く。郵便番号・番地の数字は含めない。
+    住所が入力にない場合は両方 null。
+9. photo_captions_ja は、入力の photo_captions を同じ順序・同じ件数で日本語にする。
+   入力が空配列の場合は空配列を返す。写真の説明なので簡潔に、体言止めでよい。
+10. qualifications_ja は資格名のみを書く。取得年・「取得」「合格」は書式側で付与するため含めない。
+   日本語能力試験は「日本語能力試験（JLPT）N2」のように正式名称で書く。
+
+JSONのみを返してください。`;
+
+/** The second call is sent the extraction, not the CV — a fraction of the tokens. */
+function jaSourceDoc(d){
+  const c = d.candidate || {};
+  return JSON.stringify({
+    name: c.full_name, city: c.city, country: c.country,
+    headline: c.headline, summary: c.summary,
+    seniority: (d.derived || {}).seniority,
+    education: (d.education || []).map(e => ({ institution: e.institution, field: e.field_of_study, degree: e.degree })),
+    experience: (d.experience || []).map(e => ({
+      employer: e.employer, title: e.title, summary: e.summary,
+      achievements: e.achievements, scale: e.scale_note,
+    })),
+    certifications: (d.certifications || []).map(x => ({ name: x.name, year: x.year })),
+    skills: (d.skills || []).map(x => x.canonical),
+    preferences: d.work_preferences,
+    japanese_level: (d.derived || {}).japanese_level,
+    address: [c.address_line, c.city, c.country].filter(Boolean).join(', ') || null,
+    photo_captions: PHOTOS.casual.map(c => c.caption).filter(Boolean),
+  });
+}
+
+// Japanese tokenises far denser than English — close to one token per character
+// against the ~3.7 chars/token that holds for Latin script — so TOK() badly
+// under-counts the output here. These two documents come to roughly 2,000
+// characters of Japanese, so the reservation is set from their shape instead.
+const JA_OUT = 3000;
+const JA_OUT_MIN = 1800;
+
+async function callLlmJa(d, key, model, tpmLimit, effort){
+  const src = jaSourceDoc(d);
+  const fixed = TOK(JA_SYSTEM_PROMPT) + TOK(JSON.stringify(JA_SCHEMA)) + TOK(src) + OVERHEAD;
+  // Never reserve more than the account can spend in a minute: an oversized
+  // reservation is refused on its own merits, however short the answer is.
+  const maxOut = Math.min(JA_OUT, (tpmLimit - SAFETY) - fixed);
+  if (maxOut < JA_OUT_MIN) {
+    throw Object.assign(new Error('ja_budget'), { code: 'ja_budget', need: fixed + JA_OUT_MIN });
+  }
+  const r = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+    body: JSON.stringify({
+      model, temperature: 0.2, max_completion_tokens: maxOut,
+      reasoning_effort: effort || 'low',
+      messages: [
+        { role: 'system', content: JA_SYSTEM_PROMPT },
+        { role: 'user', content: '次のデータから履歴書・職務経歴書の日本語項目を作成してください。\n\n' + src },
+      ],
+      response_format: { type: 'json_schema', json_schema: { name: 'ja_resume', strict: true, schema: JA_SCHEMA } },
+    }),
+  });
+  if (!r.ok) {
+    const err = await readError(r);
+    const e = new Error(err.message);
+    e.status = r.status; e.code = err.code;
+    // The wait is inside the message. Surfacing it beats "try again later".
+    e.retryAfter = parseWait(err.message);
+    throw e;
+  }
+  return JSON.parse((await r.json()).choices[0].message.content);
+}
+
+const JA_ERA = d => d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+const jaYear = v => v == null || v === '' ? '' : String(v);
+const jaMonth = v => { const m = /^\d{4}-(\d{2})$/.exec(String(v || '')); return m ? String(+m[1]) : ''; };
+/** 2023-02 -> 2023年2月. Japanese does not carry the leading zero. */
+const jaYM = v => { const m = /^(\d{4})-(\d{2})$/.exec(String(v || '')); return m ? m[1] + '年' + (+m[2]) + '月' : ''; };
+
+/* ------------------------------------------------------------
+   Fields a CV cannot supply. A Japanese employer expects every one
+   of these on a 履歴書, and none of them appear on a Western CV, so
+   they are typed in here rather than guessed at.
+   ------------------------------------------------------------ */
+/* Keys of every editable cell the current render put on the page, in the order
+   they appear on the form. Rebuilt by renderJapanese on each pass, because
+   which cells exist depends on what the CV supplied. */
+let JA_FIELDS = [];
+
+const JA_FILL_KEY = 'afritalent_ja_fill';
+let JA_FILL = {
+  // 年/月/日 separately, as the paper form has them — an <input type=date>
+  // renders in the browser's locale, and 18/04/1996 on a 履歴書 looks wrong.
+  birthY: '', birthM: '', birthD: '',
+  gender: '', addressKana: '', postcode: '', address: '',
+  phone: '', email: '', commute: '', dependents: '', spouse: '', spouseSupport: '',
+  requests: '', months: {},
+};
+try { Object.assign(JA_FILL, JSON.parse(localStorage.getItem(JA_FILL_KEY) || '{}')); } catch (_) {}
+
+/** 満年齢 as of the date on the document — how a 履歴書 states age. */
+function jaAge(){
+  const y = +JA_FILL.birthY, m = +JA_FILL.birthM, d = +JA_FILL.birthD;
+  if (!y || !m || !d) return '';
+  const n = new Date();
+  let age = n.getFullYear() - y;
+  if (n.getMonth() + 1 < m || (n.getMonth() + 1 === m && n.getDate() < d)) age -= 1;
+  return age >= 0 && age < 130 ? String(age) : '';
+}
+
+/** One editable cell. Blank ones tint themselves so they are easy to find. */
+function jf(key, placeholder, opts){
+  opts = opts || {};
+  if (!JA_FIELDS.includes(key)) JA_FIELDS.push(key);
+  const v = esc(jaGet(key));
+  const empty = jaGet(key) === '' ? ' empty' : '';
+  if (opts.options) {
+    return '<select class="jin' + empty + (opts.cls ? ' ' + opts.cls : '') + '" data-jf="' + key + '">' +
+      opts.options.map(o => '<option value="' + esc(o) + '"' +
+        (jaGet(key) === o ? ' selected' : '') + '>' + (o === '' ? placeholder : esc(o)) + '</option>').join('') +
+      '</select>';
+  }
+  return '<input class="jin' + empty + (opts.cls ? ' ' + opts.cls : '') + '" data-jf="' + key + '"' +
+    (opts.type ? ' type="' + opts.type + '"' : '') +
+    ' value="' + v + '" placeholder="' + esc(placeholder) + '">';
+}
+
+function jaGet(key){
+  return key.startsWith('months.') ? (JA_FILL.months[key.slice(7)] || '') : (JA_FILL[key] || '');
+}
+
+/* What a 履歴書 asks for that a CV does not carry, in plain English.
+
+   Only cells the current render actually placed are counted — a form that
+   never asked for a spouse cannot be missing one. */
+const JA_LABELS = {
+  gender: 'your gender',
+  addressKana: 'the reading of your address',
+  postcode: 'your postcode',
+  address: 'your address',
+  phone: 'your phone number',
+  email: 'your email address',
+  commute: 'your commuting time',
+  dependents: 'the number of dependents',
+  spouse: 'whether you have a spouse',
+  spouseSupport: 'whether you support a spouse',
+};
+
+function jaBlanks(){
+  return JA_FIELDS.filter(k => jaGet(k) === '');
+}
+
+function jaBlankCount(){
+  return jaBlanks().length;
+}
+
+/** The blanks named, so the candidate does not have to hunt for the tinted cells. */
+function jaGapSentence(){
+  const blank = jaBlanks();
+  const parts = [];
+
+  // 年/月/日 are three boxes but one fact. Listing them separately would read
+  // as three separate omissions.
+  if (blank.some(k => k === 'birthY' || k === 'birthM' || k === 'birthD')) {
+    parts.push('your date of birth');
+  }
+  blank.forEach(k => { if (JA_LABELS[k]) parts.push(JA_LABELS[k]); });
+
+  // Month cells are per-row and numerous; a count reads better than a list.
+  const months = blank.filter(k => k.startsWith('months.')).length;
+  if (months) {
+    parts.push(months === 1 ? 'one month in your history'
+                            : months + ' months in your history');
+  }
+
+  if (!parts.length) return 'nothing';
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1];
+}
+
+/** 学歴・職歴 — oldest first, education then work, closed the conventional way. */
+function jaHistoryRows(d, ja){
+  const rows = [];
+  const push = (y, m, text, cls, key) => rows.push({ y: y || '', m: m || '', text, cls: cls || '', key: key || '' });
+
+  const edu = (d.education || []).map((e, i) => ({ e, t: (ja.education_ja || [])[i] || {} }))
+    .sort((a, b) => (a.e.start_year || 0) - (b.e.start_year || 0));
+  if (edu.length) {
+    push('', '', '学歴', 'c');
+    edu.forEach(({ e, t }, i) => {
+      const name = (jaName(t.institution) || e.institution || '') + (t.faculty ? ' ' + t.faculty : '');
+      push(jaYear(e.start_year), '', name + ' 入学', '', 'edu' + i + 'in');
+      if (e.is_ongoing) push('', '', '同校 在学中');
+      else push(jaYear(e.end_year), '', name + ' 卒業', '', 'edu' + i + 'out');
+    });
+  }
+
+  const exp = (d.experience || []).map((e, i) => ({ e, t: (ja.experience_ja || [])[i] || {} }))
+    .sort((a, b) => String(a.e.start_date || '').localeCompare(String(b.e.start_date || '')));
+  if (exp.length) {
+    push('', '', '', '');
+    push('', '', '職歴', 'c');
+    exp.forEach(({ e, t }, i) => {
+      const co = jaName(t.company) || e.employer || '';
+      push(jaYear((e.start_date || '').slice(0, 4)), jaMonth(e.start_date), co + ' 入社', '', 'exp' + i + 'in');
+      if (e.is_current) push('', '', '現在に至る');
+      else push(jaYear((e.end_date || '').slice(0, 4)), jaMonth(e.end_date), '同社 退職', '', 'exp' + i + 'out');
+    });
+  }
+  push('', '', '以上', 'r');
+  return rows;
+}
+
+/** 免許・資格 — oldest first. JLPT is 合格, everything else 取得. */
+function jaQualRows(d, ja){
+  // The year has its own column and the verb is added below, so strip either if
+  // the model tacked them on regardless.
+  const clean = n => String(n || '')
+    .replace(/[（(]\s*\d{4}\s*年?\s*(取得|合格)?\s*[）)]/g, '')
+    .replace(/\s*(取得|合格)\s*$/, '').trim();
+  return (d.certifications || []).map((c, i) => ({ c, name: clean((ja.qualifications_ja || [])[i]) || c.name }))
+    .sort((a, b) => (a.c.year || 0) - (b.c.year || 0))
+    .map(({ c, name }) => ({
+      y: jaYear(c.year), m: '',
+      text: name + ' ' + (/JLPT|日本語能力/i.test(name) ? '合格' : '取得'),
+    }));
+}
+
+/** Guards against 「Sendy Logistics（Sendy Logistics）」 — the model echoing the
+ *  original where a katakana reading was asked for. Keep one, not both. */
+function jaName(v){
+  const m = /^(.+?)（(.+?)）$/.exec(String(v || '').trim());
+  if (m && m[1].trim().toLowerCase() === m[2].trim().toLowerCase()) return m[1].trim();
+  return String(v || '');
+}
+
+function renderJapanese(d, ja, p){
+  if (!d || !ja) return '<div class="errbox"><b>Nothing to build from</b><p>Extract your CV first.</p></div>';
+  const c = d.candidate || {};
+  const rows = jaHistoryRows(d, ja);
+  const quals = jaQualRows(d, ja);
+
+  // Prefill everything the CV actually supplied, without overwriting a
+  // correction the candidate has already made. Anything still blank after this
+  // genuinely was not in the document.
+  const dob = /^(\d{4})-(\d{2})-(\d{2})$/.exec(c.date_of_birth || '');
+  if (dob) {
+    if (!JA_FILL.birthY) JA_FILL.birthY = dob[1];
+    if (!JA_FILL.birthM) JA_FILL.birthM = String(+dob[2]);
+    if (!JA_FILL.birthD) JA_FILL.birthD = String(+dob[3]);
+  }
+  if (!JA_FILL.gender && c.gender) {
+    JA_FILL.gender = { male: '男', female: '女', other: '記入しない' }[c.gender] || '';
+  }
+  if (!JA_FILL.phone)       JA_FILL.phone = c.phone || '';
+  if (!JA_FILL.email)       JA_FILL.email = c.email || '';
+  if (!JA_FILL.postcode)    JA_FILL.postcode = c.postal_code || '';
+  if (!JA_FILL.address)     JA_FILL.address = ja.address_ja ||
+    [c.address_line, c.city, c.country].filter(Boolean).join('　');
+  if (!JA_FILL.addressKana) JA_FILL.addressKana = ja.address_kana_ja || '';
+  if (!JA_FILL.requests)    JA_FILL.requests = ja.requests_ja || '';
+
+  const age = jaAge();
+  JA_FIELDS = [];   // repopulated by every jf() call below
+
+  const rirekisho =
+    '<div class="jdoc"><h2>履 歴 書</h2>' +
+    '<p class="jwhat">Rirekisho · personal history</p>' +
+    '<p class="jdate">' + JA_ERA(new Date()) + '現在</p>' +
+    '<table class="jgrid"><tbody>' +
+      '<tr><th>ふりがな</th><td class="kana">' + esc(ja.name_kana || '') + '</td>' +
+        '<td class="photo" rowspan="3">' + (PHOTOS.portrait
+          ? '<img src="' + PHOTOS.portrait + '" alt="証明写真">'
+          : '<div>写真<br>貼付欄</div>') + '</td></tr>' +
+      '<tr><th>氏　名</th><td class="name">' + esc(c.full_name || '') + '</td></tr>' +
+      '<tr><th>生年月日</th><td>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
+          // No placeholder here: 年/月/日 already say what goes in each box, and a
+          // sample date sitting in grey reads as a value that has been filled in.
+          '<span style="width:56px">' + jf('birthY', '', { cls: 'tiny' }) + '</span>' +
+          '<span style="color:var(--ink-soft)">年</span>' +
+          '<span style="width:34px">' + jf('birthM', '', { cls: 'tiny' }) + '</span>' +
+          '<span style="color:var(--ink-soft)">月</span>' +
+          '<span style="width:34px">' + jf('birthD', '', { cls: 'tiny' }) + '</span>' +
+          '<span style="color:var(--ink-soft)">日生</span>' +
+          '<span style="white-space:nowrap;color:var(--ink-soft);margin-left:8px">満<b id="jage" ' +
+            'style="font-weight:400;color:var(--ink)">' + (age || '　') + '</b>歳</span>' +
+          '<span style="white-space:nowrap;color:var(--ink-soft);margin-left:12px">性別</span>' +
+          '<span style="width:92px">' + jf('gender', '選択', { options: ['', '男', '女', '記入しない'] }) + '</span>' +
+        '</div></td></tr>' +
+      '<tr><th>ふりがな</th><td colspan="2" class="kana">' + jf('addressKana', 'げんじゅうしょ の ふりがな') + '</td></tr>' +
+      '<tr><th>現住所</th><td colspan="2">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="white-space:nowrap;color:var(--ink-soft)">〒</span>' +
+          '<span style="width:90px">' + jf('postcode', '000-0000', { cls: 'narrow' }) + '</span>' +
+          '<span style="flex:1">' + jf('address', '都道府県・市区町村・番地まで') + '</span>' +
+        '</div></td></tr>' +
+      '<tr><th>電話</th><td colspan="2">' + jf('phone', '090-0000-0000') + '</td></tr>' +
+      '<tr><th>E-mail</th><td colspan="2">' + jf('email', 'you@example.com') + '</td></tr>' +
+    '</tbody></table>' +
+
+    '<h3>学歴・職歴</h3>' +
+    '<table class="jhist"><thead><tr><th class="y">年</th><th class="m">月</th><th>学歴・職歴</th></tr></thead><tbody>' +
+      rows.map(r => '<tr><td class="y">' + esc(r.y) + '</td><td class="m">' +
+        // The CV often gives a year with no month. That cell has to be filled in.
+        (r.m ? esc(r.m) : (r.key ? jf('months.' + r.key, '月', { cls: 'tiny' }) : '')) + '</td>' +
+        '<td class="' + r.cls + '">' + esc(r.text) + '</td></tr>').join('') +
+    '</tbody></table>' +
+
+    '<h3>免許・資格</h3>' +
+    '<table class="jhist"><thead><tr><th class="y">年</th><th class="m">月</th><th>免許・資格</th></tr></thead><tbody>' +
+      (quals.length ? quals.map((r, i) => '<tr><td class="y">' + esc(r.y) + '</td><td class="m">' +
+        jf('months.qual' + i, '月', { cls: 'tiny' }) + '</td>' +
+        '<td>' + esc(r.text) + '</td></tr>').join('')
+        : '<tr><td class="y"></td><td class="m"></td><td>特になし</td></tr>') +
+    '</tbody></table>' +
+
+    '<h3>通勤時間・扶養家族</h3>' +
+    '<table class="jgrid"><tbody><tr>' +
+      '<th>通勤時間</th><td>' + jf('commute', '約　　分') + '</td>' +
+      '<th>扶養家族<br><span style="font-size:10px">（配偶者を除く）</span></th><td>' + jf('dependents', '　人') + '</td>' +
+    '</tr><tr>' +
+      '<th>配偶者</th><td>' + jf('spouse', '選択', { options: ['', '有', '無'] }) + '</td>' +
+      '<th>配偶者の<br>扶養義務</th><td>' + jf('spouseSupport', '選択', { options: ['', '有', '無'] }) + '</td>' +
+    '</tr></tbody></table>' +
+
+    '<h3>本人希望記入欄</h3>' +
+    '<textarea class="jin" data-jf="requests" rows="3" ' +
+      'placeholder="勤務地・勤務形態などの希望を日本語でご記入ください">' + esc(JA_FILL.requests) + '</textarea>' +
+    '</div>';
+
+  const exps = (d.experience || []).map((e, i) => ({ e, t: (ja.experience_ja || [])[i] || {} }));
+  const keirekisho =
+    '<div class="jdoc"><h2>職 務 経 歴 書</h2>' +
+    '<p class="jwhat">Shokumu keirekisho · career history</p>' +
+    '<p class="jdate">' + JA_ERA(new Date()) + '現在　　氏名　' + esc(c.full_name || '') + '</p>' +
+
+    '<h3>職務要約</h3><p class="body">' + esc(ja.summary_ja || '') + '</p>' +
+
+    '<h3>職務経歴</h3>' +
+    exps.map(({ e, t }) =>
+      '<div class="jblock"><div class="co"><b>' + esc(jaName(t.company) || e.employer) + '</b>' +
+        '<span>' + esc(jaYM(e.start_date)) + '　〜　' +
+        (e.is_current ? '現在' : esc(jaYM(e.end_date))) + '</span></div>' +
+      (t.business ? '<p class="biz">事業内容：' + esc(t.business) + '</p>' : '') +
+      '<p style="margin:0 0 2px">役職：' + esc(t.role || e.title) + '</p>' +
+      ((t.duties || []).length ? '<h4>業務内容</h4><ul>' + t.duties.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') +
+      ((t.achievements || []).length ? '<h4>実績</h4><ul>' + t.achievements.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' : '') +
+      '</div>').join('') +
+
+    '<h3>活かせる経験・知識・スキル</h3>' +
+    '<p class="body">' + esc((ja.skills_ja || []).join('　/　')) + '</p>' +
+
+    '<h3>自己PR</h3><p class="body">' + esc(ja.self_pr_ja || '') + '</p>' +
+    '</div>';
+
+  // 人柄 is not part of either formal document — it is a separate sheet, which is
+  // how a Japanese candidate would actually submit something like this.
+  const people = PHOTOS.casual.length
+    ? '<div class="jdoc"><h2>人 柄</h2>' +
+      '<p class="jwhat">Hitogara · the person</p>' +
+      '<p class="jdate">' + JA_ERA(new Date()) + '現在　　氏名　' + esc(c.full_name || '') + '</p>' +
+      (VERIFY.status === 'verified'
+        ? '<h3>本人確認</h3><p class="body">公的身分証明書により本人確認済み（' + esc(VERIFY.at || '') + '）。</p>'
+        : '') +
+      '<h3>普段の様子</h3>' + peopleHtml(ja.photo_captions_ja) + '</div>'
+    : '';
+
+  const left = jaBlankCount();
+  return '<div class="jbar"><p class="jnote" style="margin:0;flex:1;min-width:260px">' +
+      'A Japanese application is not a translated CV. It is two documents: a <b>rirekisho</b>, ' +
+      'the standard personal-history form, and a <b>shokumu keirekisho</b>, the career history. ' +
+      'Both are below, ready to print.</p>' +
+      '<button class="btn-line sm" onclick="window.print()">Print</button></div>' +
+
+    (left
+      // Name what is actually missing. Anything the CV supplied has already been
+      // filled in above, so listing it here would be wrong.
+      ? '<div class="jfill"><span class="grow"><b>Fill the tinted boxes in Japanese.</b> ' +
+          'A Japanese CV asks for things yours did not carry. Still blank: ' + jaGapSentence() + '. ' +
+          'Write them in Japanese: a Japanese CV written in English will not be read. ' +
+          'The reading of your address goes in hiragana, and the address itself runs from the ' +
+          'prefecture down to the house number.' +
+          (PHOTOS.portrait ? '' : ' Your passport photo is still missing too.') +
+        '</span>' +
+        '<span id="jleft" class="foot-note" style="margin:0;white-space:nowrap">' +
+          left + ' still blank</span>' +
+        '<button class="btn-line sm" id="jasave">Save</button></div>'
+      : '<div class="jfill"><span class="grow"><b>Everything the form needs is filled in.</b> ' +
+          'Most of it came straight from your CV. Check it reads correctly, then save.' +
+          (PHOTOS.portrait ? '' : ' Your passport photo is still missing.') +
+        '</span>' +
+        '<span id="jleft" class="foot-note" style="margin:0;white-space:nowrap">All filled in</span>' +
+        '<button class="btn-line sm" id="jasave">Save</button></div>') +
+
+    rirekisho + keirekisho + people;
+}
+
+/* ============================================================
+   12. Demo fixture — a real extraction of sample-cvs/amara-nwosu-cv.*
+   Used only when no API key is present, and only for that CV.
+   ============================================================ */
+const sk = (name, canonical) => ({ name, canonical });
+
+const FIXTURE = {
+  candidate: {
+    full_name: 'AMARA CHINELO NWOSU',
+    headline: 'Full-stack engineer, logistics and e-commerce platforms',
+    summary: 'Full-stack engineer with seven years building logistics and e-commerce platforms for East African markets, currently leading a five-person team on a dispatch system handling about 40,000 deliveries a day. Owns services end to end, from schema design through to on-call. Passed JLPT N2 in July 2025 and is looking for a remote-first role with a Japanese company, open to relocating to Tokyo within twelve months.',
+    email: 'amara.nwosu@protonmail.com',
+    phone: '+254712448903',
+    links: ['https://github.com/amaranwosu', 'https://linkedin.com/in/amaranwosu', 'https://amaranwosu.dev'],
+    city: 'Nairobi', country: 'Kenya', country_code: 'KE',
+    date_of_birth: '1996-04-18', gender: 'female',
+    nationality: 'Kenyan', nationality_code: 'KE',
+    address_line: '12 Kirimani Road, Kilimani', postal_code: '00100',
+  },
+  languages: [
+    { language: 'English',  cefr: null, jlpt: null, is_native: true },
+    { language: 'Swahili',  cefr: null, jlpt: null, is_native: true },
+    { language: 'Igbo',     cefr: 'B1', jlpt: null, is_native: false },
+    { language: 'Japanese', cefr: null, jlpt: 'N2', is_native: false },
+    { language: 'German',   cefr: 'A2', jlpt: null, is_native: false },
+  ],
+  education: [
+    { institution: 'University of Nairobi', degree: 'BSc', field_of_study: 'Computer Science',
+      start_year: 2014, end_year: 2018, is_ongoing: false },
+    { institution: 'Nairobi Japanese Language School', degree: null, field_of_study: 'Japanese Language Programme',
+      start_year: 2023, end_year: null, is_ongoing: true },
+  ],
+  experience: [
+    {
+      employer: 'Sendy Logistics', title: 'Lead Software Engineer', employment_type: 'full_time',
+      start_date: '2023-02', end_date: null, is_current: true,
+      summary: 'Leads the dispatch platform that routes deliveries across Kenya, Uganda and Tanzania.',
+      achievements: [
+        'Leads a team of 5 on the dispatch platform routing about 40,000 deliveries a day across three countries',
+        'Rewrote the route-assignment service in Go, cutting median assignment time from 4.2 seconds to 900 milliseconds',
+        'Introduced trunk-based development and a staging pipeline, moving releases from fortnightly to daily',
+        'Migrated six years of trip history from MySQL to PostgreSQL with zero downtime',
+      ],
+      scale_note: '~40,000 deliveries per day across Kenya, Uganda and Tanzania',
+    },
+    {
+      employer: 'Twiga Foods', title: 'Senior Software Engineer', employment_type: 'full_time',
+      start_date: '2020-03', end_date: '2022-08', is_current: false,
+      summary: 'Built the vendor-facing ordering portal and the daily produce pricing service.',
+      achievements: [
+        'Built the vendor ordering portal used by 12,000 informal retailers',
+        'Cut checkout abandonment from 41% to 23% by rebuilding the cart flow and adding offline-first support',
+        'Designed the pricing service reconciling daily produce prices across 9 depots',
+        'Mentored 3 junior engineers, two of whom were promoted within the year',
+      ],
+      scale_note: '12,000 retailers, 9 depots',
+    },
+    {
+      employer: 'Andela', title: 'Software Engineer', employment_type: 'contract',
+      start_date: '2018-06', end_date: '2020-02', is_current: false,
+      summary: 'Remote contract with a Berlin fintech, working a permanent two-hour offset.',
+      achievements: [
+        'Built and maintained payment reconciliation APIs in Node.js and Express',
+        'Wrote the internal tooling that flagged mismatched settlements before they aged',
+        'First experience of fully asynchronous, written-first engineering culture',
+      ],
+      scale_note: null,
+    },
+  ],
+  skills: [
+    sk('Go, Golang','Go'), sk('TypeScript','TypeScript'),
+    sk('JavaScript','JavaScript'), sk('Python','Python'),
+    sk('Django','Django'), sk('React, ReactJS, React.js','React'),
+    sk('Node.js, NodeJS','Node.js'), sk('Express','Express'),
+    sk('PostgreSQL, Postgres','PostgreSQL'), sk('MySQL','MySQL'),
+    sk('MongoDB','MongoDB'), sk('Redis','Redis'),
+    sk('Kafka','Kafka'), sk('RabbitMQ','RabbitMQ'), sk('Celery','Celery'),
+    sk('Docker','Docker'), sk('Kubernetes','Kubernetes'), sk('Terraform','Terraform'),
+    sk('GCP','GCP'), sk('AWS','AWS'),
+    sk('REST APIs','REST APIs'), sk('gRPC','gRPC'), sk('GraphQL','GraphQL'),
+    sk('System Design','System Design'), sk('Distributed Systems','Distributed Systems'),
+    sk('Technical Leadership','Technical Leadership'), sk('Mentoring','Mentoring'),
+    sk('PostGIS','PostGIS'),
+  ],
+  certifications: [
+    { name: 'JLPT N2', year: 2025 },
+    { name: 'Google Cloud Professional Cloud Architect', year: 2024 },
+    { name: 'AWS Certified Developer – Associate', year: 2021 },
+  ],
+  projects: [
+    { name: 'matatu-times', description: "Open-source GTFS feed builder for Nairobi's minibus network, used by two city planning teams.",
+      url: 'https://github.com/amaranwosu/matatu-times' },
+    { name: 'kanji-drill', description: 'Spaced-repetition drill app built to get through N2 kanji.',
+      url: 'https://amaranwosu.dev/kanji-drill' },
+  ],
+  work_preferences: {
+    open_to_remote: true, open_to_relocate: true,
+    target_countries: ['Japan','Singapore','Germany'],
+    notice_period: 'Available from 1 May 2026, two months notice',
+    desired_salary: 'USD 68,000 – 85,000',
+  },
+  derived: {
+    total_years_experience: 7.5, seniority: 'lead', primary_field: 'Full-Stack Engineering',
+    japanese_level: 'N2', has_degree: true,
+    career_gaps: [{ from: '2022-08', to: '2023-02', months: 6 }],
+  },
+  extraction_meta: {
+    source_language: 'en',
+    confidence: { identity: 0.97, experience: 0.91, education: 0.95, skills: 0.86 },
+    missing_fields: ['experience[2].scale_note', 'candidate.gender'],
+    warnings: [
+      'Six months between Twiga Foods (ends 2022-08) and Sendy Logistics (starts 2023-02) with nothing listed.',
+      'German is given as "Basic (A2)" with no certificate, so the level is the candidate\'s own assessment.',
+      'The Nairobi Japanese Language School entry is an ongoing part-time programme, not a degree — it is kept out of the degree field.',
+    ],
+  },
+};
+
+/* 履歴書 fixture for the sample CV, used when there is no key. */
+const JA_FIXTURE = {
+  name_kana: 'アマラ・チネロ・ンウォス',
+  address_ja: 'ケニア共和国　ナイロビ市　キリマニ　キリマニ通り12番地',
+  address_kana_ja: 'けにあきょうわこく　ないろびし　きりまに　きりまにどおり12ばんち',
+  education_ja: [
+    { institution: 'ナイロビ大学', faculty: 'コンピュータサイエンス学部' },
+    { institution: 'ナイロビ日本語学校', faculty: '日本語課程（夜間）' },
+  ],
+  experience_ja: [
+    {
+      company: 'センディ・ロジスティクス',
+      role: 'リードソフトウェアエンジニア',
+      business: '東アフリカ3か国における配送・物流プラットフォームの開発および運営',
+      duties: [
+        '配車割当サービスの設計・開発（Go）',
+        'PostgreSQLのパーティション設計およびレプリケーション構成の運用',
+        'エンジニア5名のマネジメントおよびコードレビュー',
+        'CI/CDパイプラインの整備',
+      ],
+      achievements: [
+        '配車割当処理の中央値を4.2秒から0.9秒へ短縮',
+        'トランクベース開発の導入により、リリース頻度を隔週から毎日へ改善',
+        '6年分の走行履歴をMySQLからPostgreSQLへ無停止で移行',
+        'ケニア・ウガンダ・タンザニアの1日あたり約40,000件の配送を処理',
+      ],
+    },
+    {
+      company: 'トゥイガ・フーズ',
+      role: 'シニアソフトウェアエンジニア',
+      business: '小売事業者向け生鮮食品のB2B流通プラットフォームの運営',
+      duties: [
+        '小売事業者向け受注ポータルの設計・開発',
+        '9拠点の生鮮価格を日次で照合する価格算定サービスの設計',
+        'ジュニアエンジニア3名の育成',
+      ],
+      achievements: [
+        'カート導線の再設計とオフライン対応により、離脱率を41%から23%へ改善',
+        '12,000社の小売事業者が利用する受注ポータルを構築',
+        '育成したジュニアエンジニア3名のうち2名が同年内に昇格',
+      ],
+    },
+    {
+      company: 'アンデラ（ベルリンのフィンテック企業へ常駐・リモート）',
+      role: 'ソフトウェアエンジニア',
+      business: 'エンジニアの受託開発およびグローバル企業への技術者派遣',
+      duties: [
+        '決済照合APIの開発・保守（Node.js / Express）',
+        '未照合の決済を早期に検知する社内ツールの開発',
+      ],
+      achievements: [
+        'ドイツ拠点のクライアントと2時間の時差環境で非同期に協働',
+        '決済照合の滞留を検知する仕組みを整備',
+      ],
+    },
+  ],
+  qualifications_ja: [
+    '日本語能力試験（JLPT）N2',
+    'Google Cloud Professional Cloud Architect',
+    'AWS認定デベロッパー – アソシエイト',
+  ],
+  skills_ja: [
+    'Go', 'TypeScript', 'Python / Django', 'React', 'Node.js', 'PostgreSQL', 'Redis',
+    'Kafka', 'Docker / Kubernetes', 'GCP', 'AWS', 'システム設計', '分散システム', 'チームマネジメント',
+  ],
+  summary_ja: 'ケニア・ナイロビを拠点に、物流およびEコマース領域のWebサービス開発に約7年間従事してまいりました。' +
+    '現在はセンディ・ロジスティクスにて5名のチームを率い、1日あたり約40,000件の配送を扱う配車プラットフォームの' +
+    '設計・開発・運用を担当しております。バックエンドを中心に、フロントエンドおよびインフラまで一貫して対応できる点が強みです。' +
+    '2025年7月に日本語能力試験N2に合格し、日本企業での就業を志望しております。',
+  self_pr_ja: '私の強みは、サービスを設計から運用まで一貫して担い、成果を数値で示せることです。' +
+    'センディ・ロジスティクスでは配車割当サービスをGoで再構築し、処理時間の中央値を4.2秒から0.9秒へ短縮いたしました。' +
+    'また、トランクベース開発とステージング環境を導入し、リリース頻度を隔週から毎日へ改善しております。' +
+    'トゥイガ・フーズでは、通信環境が不安定な地域の利用者に向けてオフライン対応を実装し、離脱率を41%から23%へ改善いたしました。' +
+    '2023年より日本語の学習を継続し、日次のミーティングは日本語で対応可能です。' +
+    '長文の仕様書の読解には時間を要しますが、業務を通じて改善してまいります。',
+  requests_ja: 'リモート勤務を希望いたしますが、入社後12か月程度を目安に東京への移住も可能です。' +
+    '日本時間の午前中は問題なく対応いたします。給与その他につきましては貴社規定に従います。',
+};
+
+/* Fallback CV text, used only if sample-cvs/ cannot be fetched (file:// with
+   no server). Kept identical to sample-cvs/amara-nwosu-cv.txt. */
+const SAMPLE_CV = `AMARA CHINELO NWOSU
+Full-Stack Engineer - Nairobi, Kenya
+amara.nwosu@protonmail.com | +254 712 448 903
+github.com/amaranwosu | linkedin.com/in/amaranwosu | amaranwosu.dev
+
+PERSONAL DETAILS
+Date of Birth: 18 April 1996
+Gender: Female
+Nationality: Kenyan
+Address: 12 Kirimani Road, Kilimani, Nairobi 00100, Kenya
+
+PROFILE
+Full-stack engineer with 7 years building logistics and e-commerce platforms for
+East African markets. I own services end to end, from schema design through to
+on-call. Since 2023 I have been studying Japanese seriously and passed JLPT N2 in
+July 2025. I am looking for a remote-first role with a Japanese company and am
+open to relocating to Tokyo within twelve months.
+
+WORK EXPERIENCE
+
+Lead Software Engineer - Sendy Logistics, Nairobi, Kenya
+February 2023 - Present
+- Lead a team of 5 on the dispatch platform that routes about 40,000 deliveries a day
+  across Kenya, Uganda and Tanzania
+- Rewrote the route-assignment service in Go, cutting median assignment time from
+  4.2 seconds to 900 milliseconds
+- Introduced trunk-based development and a staging pipeline; releases went from
+  fortnightly to daily
+- Ran the migration of 6 years of trip history from MySQL to PostgreSQL with
+  zero downtime
+- Stack: Go, TypeScript, React, PostgreSQL, Redis, Kafka, Docker, Kubernetes, GCP
+
+Senior Software Engineer - Twiga Foods, Nairobi, Kenya
+March 2020 - August 2022
+- Built the vendor-facing ordering portal used by 12,000 informal retailers
+- Cut checkout abandonment from 41% to 23% by rebuilding the cart flow and adding
+  offline-first support for intermittent connections
+- Designed the pricing service that reconciles daily produce prices across 9 depots
+- Mentored 3 junior engineers, two of whom were promoted within the year
+- Stack: Python, Django, ReactJS, PostgreSQL, Celery, RabbitMQ, AWS
+
+Software Engineer - Andela (remote, contracted to a Berlin fintech)
+June 2018 - February 2020
+- Remote contract with a German client, working a permanent 2-hour offset
+- Built and maintained payment reconciliation APIs in Node.js and Express
+- Wrote the internal tooling that flagged mismatched settlements before they aged
+- First experience of fully asynchronous, written-first engineering culture
+- Stack: Node.js, Express, MongoDB, React.js, Docker
+
+EDUCATION
+
+BSc Computer Science, First Class Honours
+University of Nairobi, Kenya - 2014 to 2018
+
+Japanese Language Programme (part-time, evenings)
+Nairobi Japanese Language School - 2023 to present
+
+LANGUAGES
+English - Native
+Swahili - Native
+Igbo - Conversational
+Japanese - JLPT N2, passed July 2025. Comfortable in daily standups, still slow
+  in long written specs.
+German - Basic (A2), picked up during the Berlin contract
+
+SKILLS
+Go, Golang, TypeScript, JavaScript, Python, Django, React, ReactJS, React.js,
+Node.js, NodeJS, PostgreSQL, Postgres, MySQL, MongoDB, Redis, Kafka, RabbitMQ,
+Docker, Kubernetes, Terraform, GCP, AWS, REST APIs, gRPC, GraphQL, System Design,
+Distributed Systems, Technical Leadership, Mentoring
+
+CERTIFICATIONS
+JLPT N2 - Japan Foundation, 2025
+Google Cloud Professional Cloud Architect, 2024 (ID: GCP-PCA-118442)
+AWS Certified Developer - Associate, 2021
+
+PROJECTS
+matatu-times - Open-source GTFS feed builder for Nairobi's minibus network.
+  Go and PostGIS, used by two city planning teams. github.com/amaranwosu/matatu-times
+
+kanji-drill - Spaced-repetition drill app I built to get through N2 kanji.
+  TypeScript, React, IndexedDB. amaranwosu.dev/kanji-drill
+
+AVAILABILITY
+Available from 1 May 2026 (two months' notice at Sendy).
+Open to fully remote roles with Japanese companies; happy to overlap with JST
+mornings. Open to relocating to Tokyo after about twelve months.
+Target countries: Japan, Singapore, Germany.
+Salary expectation: USD 68,000 - 85,000.`;
+
+/* ============================================================
+   13. Init
+   ============================================================ */
+document.querySelectorAll('.langsw button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.langsw button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+}));
+
+$('key').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  if (v) localStorage.setItem(LS_KEY, v); else localStorage.removeItem(LS_KEY);
+  paintKeyBar();
+});
+
+$('model').innerHTML = API_MODELS
+  .map(m => '<option value="' + m + '">' + m + '</option>').join('');
+$('tpm').value = CFG.GEMINI_TPM_LIMIT || API_TPM;
+if (CFG.GEMINI_MODEL) $('model').value = CFG.GEMINI_MODEL;
+if (CFG.GEMINI_REASONING_EFFORT) $('effort').value = CFG.GEMINI_REASONING_EFFORT;
+const stored = localStorage.getItem(LS_KEY);
+if (stored && !CFG.GEMINI_API_KEY) $('key').value = stored;
+paintKeyBar();
+
+if (DEV) {
+  $('devdrawer').classList.remove('hidden');
+  $('dbview').classList.remove('hidden');
+  $('rtabs').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

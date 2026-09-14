@@ -1,0 +1,97 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [5 0 R 7 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 3639 >>
+stream
+BT
+/F2 17 Tf 1 0 0 1 56.00 785.89 Tm (CHIDI EMEKA OKONKWO) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 763.45 Tm (Data Analyst) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 750.25 Tm (chidi.okonkwo@gmail.com) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 737.05 Tm (+234 806 221 4478) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 723.85 Tm (linkedin.com/in/chidiokonkwo) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 697.39 Tm (SUMMARY) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 684.19 Tm (Data analyst with three years turning operational data into decisions, after) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 670.99 Tm (four years inside banking operations. I know what the numbers mean because I) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 657.79 Tm (used to be the one generating them. Strongest on SQL and dashboarding; currently) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 644.59 Tm (learning Python properly rather than copying snippets.) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 618.13 Tm (EXPERIENCE) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 597.67 Tm (Data Analyst, Interswitch - Lagos) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 584.47 Tm (2023 - Present) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 571.27 Tm (Reporting layer for the merchant acquiring team.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 558.07 Tm (- Rebuilt the daily settlement report in SQL, replacing a spreadsheet that took) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 544.87 Tm (two people three hours every morning) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 531.67 Tm (- Built 11 Power BI dashboards used across three departments) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 518.47 Tm (- Found and documented a reconciliation error that had understated chargeback) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 505.27 Tm (volume for seven months) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 492.07 Tm (- SQL, Power BI, Excel, some Python) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 471.61 Tm (Operations Analyst, Interswitch - Lagos) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 458.41 Tm (2021 - 2023) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 445.21 Tm (- Owned merchant onboarding checks, about 400 a month) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 432.01 Tm (- Automated the KYC document checklist in Excel and VBA, cutting review time) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 418.81 Tm (by roughly half) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 405.61 Tm (- Promoted into the data team in 2023) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 385.15 Tm (Banking Operations Officer, Access Bank - Lagos) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 371.95 Tm (2019 - 2021) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 358.75 Tm (- Branch operations, account opening, transaction disputes) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 345.55 Tm (- Nothing technical, but it is where I learned what the data actually describes) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 319.09 Tm (EDUCATION) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 305.89 Tm (BSc Economics, Second Class Upper) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 292.69 Tm (University of Nigeria, Nsukka) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 279.49 Tm (2014 - 2018) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 253.03 Tm (CERTIFICATIONS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 239.83 Tm (Google Data Analytics Professional Certificate, 2022) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 226.63 Tm (Microsoft Power BI Data Analyst \(PL-300\), 2024) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 200.17 Tm (SKILLS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 186.97 Tm (SQL, PostgreSQL, Power BI, PowerBI, Excel, VBA, Python, Pandas, Tableau,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 173.77 Tm (data visualisation, stakeholder reporting, requirements gathering) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 147.31 Tm (LANGUAGES) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 134.11 Tm (English - Native) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 120.91 Tm (Igbo - Native) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 107.71 Tm (Japanese - Beginner, self-study since early 2026) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 81.25 Tm (AVAILABILITY) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 68.05 Tm (Immediately available. Open to remote work with companies outside Nigeria.) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 77 >>
+stream
+BT
+/F1 9.6 Tf 1 0 0 1 56.00 785.89 Tm (Salary expectation: negotiable.) Tj
+ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000468 00000 n 
+0000004159 00000 n 
+0000004301 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+4428
+%%EOF

@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Moderation benchmark</title>
+<link rel="stylesheet" href="app.css">
+<style>
+  body{max-width:960px;margin:0 auto;padding:40px 24px 80px}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{text-align:left;padding:7px 10px;border-top:1px solid var(--hairline);vertical-align:top}
+  th{color:var(--ink-faint);font-size:11px;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+  td.msg{font-family:var(--mono);font-size:11.5px;overflow-wrap:anywhere}
+  .ok{color:var(--ok)} .miss{color:var(--seal);font-weight:600}
+  .scorecard{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);margin:24px 0}
+  .scorecard div{background:var(--paper);padding:16px}
+  .scorecard b{display:block;font-family:var(--display);font-size:26px;font-weight:500;margin-bottom:2px}
+  .scorecard span{font-size:11px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.09em}
+  .delta{color:var(--ok);font-size:12px}
+</style>
+<h1 class="page" style="font-family:var(--display);font-weight:500">Moderation benchmark</h1>
+<p class="lede">Every message below is labelled. The rules engine runs against all of
+them with no model call, and the harness counts what it caught, what it let through,
+and how many messages would still need a model. Reload to re-run.</p>
+<div id="out">Running…</div>
+<script type="module" src="bench.js"></script>

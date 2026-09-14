@@ -1,0 +1,119 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [5 0 R 7 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 4322 >>
+stream
+BT
+/F2 17 Tf 1 0 0 1 56.00 785.89 Tm (SELAMAWIT BEKELE) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 763.45 Tm (Principal Software Engineer / Platform) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 742.99 Tm (Date of Birth: 9 February 1988) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 729.79 Tm (selamawit.bekele@proton.me | +251 91 244 7710) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 716.59 Tm (Addis Ababa, Ethiopia) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 703.39 Tm (github.com/sbekele | linkedin.com/in/selamawitbekele) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 676.93 Tm (PROFILE) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 663.73 Tm (Thirteen years building and running distributed systems, the last six at) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 650.53 Tm (principal level. I have taken three platforms from a single server to) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 637.33 Tm (multi-region, and I have been on call for all of them. I am most useful where a) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 624.13 Tm (system is straining and nobody is quite sure why.) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 597.67 Tm (EXPERIENCE) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 577.21 Tm (Principal Engineer, Platform - Chapa Financial Technologies \(Addis Ababa\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 564.01 Tm (July 2022 - Present) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 550.81 Tm (- Own the platform group: 11 engineers across three teams) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 537.61 Tm (- Led the move from a single Postgres to a sharded setup handling 9,000 writes) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 524.41 Tm (per second at peak, with no scheduled downtime during the migration) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 511.21 Tm (- Introduced an error budget policy; unplanned work fell from roughly 40% of a) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 498.01 Tm (sprint to under 15%) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 484.81 Tm (- Designed the multi-region failover now serving Ethiopia, Kenya and Djibouti) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 471.61 Tm (- Stack: Go, Rust, PostgreSQL, Kafka, Kubernetes, Terraform, AWS, Datadog) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 451.15 Tm (Independent Consultant - various clients \(remote\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 437.95 Tm (March 2019 - August 2022) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 424.75 Tm (Part-time alongside the Gebeya role until 2021.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 411.55 Tm (- Reliability and scaling engagements for four fintech clients in Kenya,) Tj
+/F1 9.6 Tf 1 0 0 1 62.00 398.35 Tm (Nigeria and the UAE) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 385.15 Tm (- Typical engagement: three months, ending with a runbook and a trained team) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 371.95 Tm (- One client's checkout p99 went from 6.1s to 780ms over eleven weeks) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 351.49 Tm (Staff Engineer - Gebeya Inc \(Addis Ababa\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 338.29 Tm (January 2018 - November 2021) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 325.09 Tm (- Rebuilt the talent-matching service; match latency down from 12s to 1.4s) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 311.89 Tm (- Introduced the first CI pipeline the company had) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 298.69 Tm (- Mentored four engineers to senior level) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 285.49 Tm (- Stack: Python, Django, Celery, PostgreSQL, Redis, Docker) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 265.03 Tm (Senior Software Engineer - Ride \(Addis Ababa\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 251.83 Tm (June 2015 - December 2017) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 238.63 Tm (- Dispatch and pricing for a ride-hailing service, about 15,000 daily trips) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 225.43 Tm (- Built the surge pricing model and the driver payout reconciliation) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 204.97 Tm (Software Engineer - Ethiopian Airlines, IT Division \(Addis Ababa\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 191.77 Tm (September 2012 - May 2015) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 178.57 Tm (- Internal booking and crew-scheduling tools) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 165.37 Tm (- Java, Oracle, SOAP services, a lot of legacy) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 144.91 Tm (Graduate Trainee - Ethio Telecom \(Addis Ababa\)) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 131.71 Tm (August 2011 - August 2012) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 118.51 Tm (- Network operations, rotating placements) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 92.05 Tm (EDUCATION) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 78.85 Tm (MSc Computer Science, Addis Ababa University, 2011 - 2013 \(part-time\)) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 65.65 Tm (BSc Computer Science, Addis Ababa University, 2007 - 2011, Great Distinction) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 1784 >>
+stream
+BT
+/F2 10.5 Tf 1 0 0 1 56.00 785.89 Tm (CERTIFICATIONS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 772.69 Tm (Certified Kubernetes Administrator \(CKA\), 2021, ID: CKA-2100-4471) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 759.49 Tm (AWS Certified Solutions Architect - Professional, 2020) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 746.29 Tm (JLPT N4 - Japan Foundation, 2025) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 719.83 Tm (PROJECTS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 706.63 Tm (ratelimit-rs - Distributed rate limiter in Rust, used in production at two) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 693.43 Tm (companies. 1.2k GitHub stars. github.com/sbekele/ratelimit-rs) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 666.97 Tm (LANGUAGES) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 653.77 Tm (Amharic - Native) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 640.57 Tm (English - Fluent, professional) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 627.37 Tm (Oromo - Conversational) Tj
+/F2 9.6 Tf 1 0 0 1 56.00 614.17 Tm (Japanese - JLPT N4, studying towards N3) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 587.71 Tm (SKILLS) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 574.51 Tm (Go, Rust, Python, Java, Django, PostgreSQL, MySQL, Oracle, Redis, Kafka,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 561.31 Tm (RabbitMQ, Kubernetes, Docker, Terraform, AWS, GCP, Datadog, Prometheus,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 548.11 Tm (Grafana, distributed systems, database sharding, SRE, incident response,) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 534.91 Tm (capacity planning, technical leadership, mentoring, on-call management) Tj
+/F2 10.5 Tf 1 0 0 1 56.00 508.45 Tm (AVAILABILITY) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 495.25 Tm (Three months' notice. Open to fully remote roles with Japanese companies.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 482.05 Tm (Relocation to Japan possible but not before 2028 for family reasons.) Tj
+/F1 9.6 Tf 1 0 0 1 56.00 468.85 Tm (Target compensation: USD 110,000 - 140,000.) Tj
+ET
+endstream
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000000468 00000 n 
+0000004842 00000 n 
+0000004984 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+6820
+%%EOF

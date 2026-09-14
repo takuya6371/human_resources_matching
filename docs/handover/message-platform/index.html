@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AfriTalent — Messages</title>
+<meta name="description" content="Moderated messaging between African talent and Japanese companies.">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<nav class="top">
+  <div class="in">
+    <span class="wordmark">AfriTalent</span>
+    <span class="sect" id="viewname">Messages</span>
+    <div class="who">
+      <label class="sect" for="persona">Signed in as</label>
+      <select id="persona"></select>
+      <span class="co" id="whoami"></span>
+      <button class="btn ghost sm" id="adminlink">Trust &amp; Safety</button>
+      <button class="btn ghost sm" id="resetbtn" title="Put every conversation back to how it started">Reset</button>
+    </div>
+  </div>
+</nav>
+
+<div class="shell" id="shell">
+  <!-- threads -->
+  <div class="col threads">
+    <div class="colhead"><span class="sect">Conversations</span><span class="sect" id="threadcount"></span></div>
+    <div class="scroll" id="threadlist"></div>
+  </div>
+
+  <!-- conversation -->
+  <div class="col">
+    <div id="conv" class="col" style="flex:1;min-height:0">
+      <div class="empty">Select a conversation.</div>
+    </div>
+  </div>
+
+  <!-- guardian -->
+  <div class="col side">
+    <div class="colhead"><span class="sect">AfriTalent AI</span><span class="sect" id="guardstate">watching</span></div>
+    <div class="scroll" id="sidepanel"></div>
+  </div>
+</div>
+
+<div class="admin hidden" id="adminview"></div>
+
+<!-- Local settings, loaded if present. chat-config.js holds the Gemini key
+     that arms live translation and the second moderation tier. Missing file is
+     fine: the rules layer, the seeded translations and every block in the demo
+     work without it. -->
+<script>window.AFRITALENT_CHAT = { GEMINI_API_KEY: '', GEMINI_MODEL: 'gemini-3.6-flash' };</script>
+<script src="chat-config.js" onerror="console.info('chat-config.js not found — running without a key')"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

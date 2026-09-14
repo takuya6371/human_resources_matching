@@ -1,0 +1,100 @@
+{
+  "name": "Job",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string",
+      "description": "Linked CompanyProfile id"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "requirements": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "remote_type": {
+      "type": "string",
+      "enum": [
+        "onsite",
+        "remote",
+        "hybrid"
+      ],
+      "default": "hybrid"
+    },
+    "language_requirements": {
+      "type": "string"
+    },
+    "jlpt_required": {
+      "type": "string",
+      "enum": [
+        "none",
+        "N5",
+        "N4",
+        "N3",
+        "N2",
+        "N1"
+      ],
+      "default": "none"
+    },
+    "visa_sponsorship": {
+      "type": "boolean",
+      "default": false
+    },
+    "salary_range": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "active",
+        "closed"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "company_id",
+    "title"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

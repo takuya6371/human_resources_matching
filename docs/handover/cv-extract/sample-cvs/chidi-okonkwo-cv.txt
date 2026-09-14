@@ -1,0 +1,57 @@
+CHIDI EMEKA OKONKWO
+Data Analyst
+chidi.okonkwo@gmail.com
++234 806 221 4478
+linkedin.com/in/chidiokonkwo
+
+SUMMARY
+Data analyst with three years turning operational data into decisions, after
+four years inside banking operations. I know what the numbers mean because I
+used to be the one generating them. Strongest on SQL and dashboarding; currently
+learning Python properly rather than copying snippets.
+
+EXPERIENCE
+
+Data Analyst, Interswitch - Lagos
+2023 - Present
+Reporting layer for the merchant acquiring team.
+- Rebuilt the daily settlement report in SQL, replacing a spreadsheet that took
+  two people three hours every morning
+- Built 11 Power BI dashboards used across three departments
+- Found and documented a reconciliation error that had understated chargeback
+  volume for seven months
+- SQL, Power BI, Excel, some Python
+
+Operations Analyst, Interswitch - Lagos
+2021 - 2023
+- Owned merchant onboarding checks, about 400 a month
+- Automated the KYC document checklist in Excel and VBA, cutting review time
+  by roughly half
+- Promoted into the data team in 2023
+
+Banking Operations Officer, Access Bank - Lagos
+2019 - 2021
+- Branch operations, account opening, transaction disputes
+- Nothing technical, but it is where I learned what the data actually describes
+
+EDUCATION
+BSc Economics, Second Class Upper
+University of Nigeria, Nsukka
+2014 - 2018
+
+CERTIFICATIONS
+Google Data Analytics Professional Certificate, 2022
+Microsoft Power BI Data Analyst (PL-300), 2024
+
+SKILLS
+SQL, PostgreSQL, Power BI, PowerBI, Excel, VBA, Python, Pandas, Tableau,
+data visualisation, stakeholder reporting, requirements gathering
+
+LANGUAGES
+English - Native
+Igbo - Native
+Japanese - Beginner, self-study since early 2026
+
+AVAILABILITY
+Immediately available. Open to remote work with companies outside Nigeria.
+Salary expectation: negotiable.

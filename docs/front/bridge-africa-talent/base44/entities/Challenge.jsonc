@@ -1,0 +1,109 @@
+{
+  "name": "Challenge",
+  "type": "object",
+  "properties": {
+    "company_id": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "company_logo": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "the_challenge": {
+      "type": "string",
+      "description": "Description of the problem or challenge"
+    },
+    "looking_for": {
+      "type": "string",
+      "description": "What the company wants to achieve / looking for"
+    },
+    "areas": {
+      "type": "string",
+      "description": "Comma-separated relevant categories or skills"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "reward_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "reward_title": {
+      "type": "string"
+    },
+    "reward_description": {
+      "type": "string"
+    },
+    "reward_types": {
+      "type": "string",
+      "description": "Comma-separated reward types e.g. Cash Prize, Paid Project"
+    },
+    "num_winners": {
+      "type": "string",
+      "enum": [
+        "one",
+        "multiple"
+      ],
+      "default": "one"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "company_only"
+      ],
+      "default": "public"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closed"
+      ],
+      "default": "active"
+    },
+    "likes": {
+      "type": "number",
+      "default": 0
+    },
+    "comments": {
+      "type": "number",
+      "default": 0
+    },
+    "shares": {
+      "type": "number",
+      "default": 0
+    },
+    "ideas_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "company_id",
+    "title"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": null,
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

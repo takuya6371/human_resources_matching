@@ -1,0 +1,84 @@
+SELAMAWIT BEKELE
+Principal Software Engineer / Platform
+
+Date of Birth: 9 February 1988
+selamawit.bekele@proton.me | +251 91 244 7710
+Addis Ababa, Ethiopia
+github.com/sbekele | linkedin.com/in/selamawitbekele
+
+PROFILE
+Thirteen years building and running distributed systems, the last six at
+principal level. I have taken three platforms from a single server to
+multi-region, and I have been on call for all of them. I am most useful where a
+system is straining and nobody is quite sure why.
+
+EXPERIENCE
+
+Principal Engineer, Platform - Chapa Financial Technologies (Addis Ababa)
+July 2022 - Present
+- Own the platform group: 11 engineers across three teams
+- Led the move from a single Postgres to a sharded setup handling 9,000 writes
+  per second at peak, with no scheduled downtime during the migration
+- Introduced an error budget policy; unplanned work fell from roughly 40% of a
+  sprint to under 15%
+- Designed the multi-region failover now serving Ethiopia, Kenya and Djibouti
+- Stack: Go, Rust, PostgreSQL, Kafka, Kubernetes, Terraform, AWS, Datadog
+
+Independent Consultant - various clients (remote)
+March 2019 - August 2022
+Part-time alongside the Gebeya role until 2021.
+- Reliability and scaling engagements for four fintech clients in Kenya,
+  Nigeria and the UAE
+- Typical engagement: three months, ending with a runbook and a trained team
+- One client's checkout p99 went from 6.1s to 780ms over eleven weeks
+
+Staff Engineer - Gebeya Inc (Addis Ababa)
+January 2018 - November 2021
+- Rebuilt the talent-matching service; match latency down from 12s to 1.4s
+- Introduced the first CI pipeline the company had
+- Mentored four engineers to senior level
+- Stack: Python, Django, Celery, PostgreSQL, Redis, Docker
+
+Senior Software Engineer - Ride (Addis Ababa)
+June 2015 - December 2017
+- Dispatch and pricing for a ride-hailing service, about 15,000 daily trips
+- Built the surge pricing model and the driver payout reconciliation
+
+Software Engineer - Ethiopian Airlines, IT Division (Addis Ababa)
+September 2012 - May 2015
+- Internal booking and crew-scheduling tools
+- Java, Oracle, SOAP services, a lot of legacy
+
+Graduate Trainee - Ethio Telecom (Addis Ababa)
+August 2011 - August 2012
+- Network operations, rotating placements
+
+EDUCATION
+MSc Computer Science, Addis Ababa University, 2011 - 2013 (part-time)
+BSc Computer Science, Addis Ababa University, 2007 - 2011, Great Distinction
+
+CERTIFICATIONS
+Certified Kubernetes Administrator (CKA), 2021, ID: CKA-2100-4471
+AWS Certified Solutions Architect - Professional, 2020
+JLPT N4 - Japan Foundation, 2025
+
+PROJECTS
+ratelimit-rs - Distributed rate limiter in Rust, used in production at two
+companies. 1.2k GitHub stars. github.com/sbekele/ratelimit-rs
+
+LANGUAGES
+Amharic - Native
+English - Fluent, professional
+Oromo - Conversational
+Japanese - JLPT N4, studying towards N3
+
+SKILLS
+Go, Rust, Python, Java, Django, PostgreSQL, MySQL, Oracle, Redis, Kafka,
+RabbitMQ, Kubernetes, Docker, Terraform, AWS, GCP, Datadog, Prometheus,
+Grafana, distributed systems, database sharding, SRE, incident response,
+capacity planning, technical leadership, mentoring, on-call management
+
+AVAILABILITY
+Three months' notice. Open to fully remote roles with Japanese companies.
+Relocation to Japan possible but not before 2028 for family reasons.
+Target compensation: USD 110,000 - 140,000.

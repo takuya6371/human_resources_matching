@@ -1,0 +1,40 @@
+Grace Achieng
+Frontend Developer
+graceachieng.dev@gmail.com | 0712 998 341 | Nairobi
+
+ABOUT ME
+Self taught frontend developer. I like building things that people actually use.
+Looking for my first proper full time role, remote preferred.
+
+EXPERIENCE
+
+Freelance Web Developer
+2024 - now
+Building websites for small businesses around Nairobi. Around 6 projects so far.
+Mostly WordPress but the last two were React.
+- Salon booking site with online payments (M-Pesa)
+- Landing page for a logistics startup
+
+Intern, Moringa School
+2023
+Teaching assistant for the frontend module. Helped students debug and reviewed
+their assignments.
+
+Volunteer, Nairobi Tech Meetup
+2022 - 2023
+Ran the website and social media.
+
+EDUCATION
+Moringa School - Software Development bootcamp
+2023
+
+Kenyatta University - BA Sociology
+Did not complete
+
+SKILLS
+HTML, CSS, JavaScript, React, ReactJS, Tailwind, WordPress, Figma, Git
+
+LANGUAGES
+English, Swahili
+
+Available immediately

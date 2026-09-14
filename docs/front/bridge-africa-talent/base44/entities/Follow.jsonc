@@ -1,0 +1,60 @@
+{
+  "name": "Follow",
+  "type": "object",
+  "properties": {
+    "follower_id": {
+      "type": "string",
+      "description": "User id of the follower"
+    },
+    "follower_name": {
+      "type": "string"
+    },
+    "target_type": {
+      "type": "string",
+      "enum": [
+        "company",
+        "talent"
+      ]
+    },
+    "target_id": {
+      "type": "string",
+      "description": "Profile id being followed (CompanyProfile or TalentProfile id)"
+    },
+    "target_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "follower_id",
+    "target_type",
+    "target_id"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

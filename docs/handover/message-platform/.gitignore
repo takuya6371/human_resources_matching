@@ -1,0 +1,6 @@
+chat-config.js
+
+# Not read today, but never commit these if they appear.
+.env
+.env.local
+.DS_Store

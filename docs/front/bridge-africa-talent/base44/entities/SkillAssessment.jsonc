@@ -1,0 +1,74 @@
+{
+  "name": "SkillAssessment",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "skill": {
+      "type": "string"
+    },
+    "emoji": {
+      "type": "string",
+      "description": "Icon emoji for the assessment card"
+    },
+    "questions": {
+      "type": "string",
+      "description": "JSON array of {q, options[], answer (index)}"
+    },
+    "passing_score": {
+      "type": "number",
+      "default": 70,
+      "description": "Percentage required to pass"
+    },
+    "credits_reward": {
+      "type": "number",
+      "default": 1,
+      "description": "Credits awarded on first pass"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ],
+      "default": "intermediate"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

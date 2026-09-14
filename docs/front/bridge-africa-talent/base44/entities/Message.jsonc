@@ -1,0 +1,124 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "from_user_id": {
+      "type": "string"
+    },
+    "from_name": {
+      "type": "string"
+    },
+    "to_user_id": {
+      "type": "string"
+    },
+    "to_name": {
+      "type": "string"
+    },
+    "subject": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false
+    },
+    "related_application_id": {
+      "type": "string"
+    },
+    "attachment_url": {
+      "type": "string",
+      "description": "Uploaded file/voice/image URL"
+    },
+    "attachment_type": {
+      "type": "string",
+      "enum": [
+        "file",
+        "image",
+        "voice"
+      ],
+      "description": "Kind of attachment"
+    },
+    "attachment_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "request",
+        "accepted",
+        "declined"
+      ],
+      "default": "accepted",
+      "description": "Instagram-style: request until accepted"
+    },
+    "edited": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "from_user_id",
+    "to_user_id",
+    "subject",
+    "body"
+  ],
+  "rls": {
+    "create": null,
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.from_user_id": "{{user.id}}"
+        },
+        {
+          "data.to_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.from_user_id": "{{user.id}}"
+        },
+        {
+          "data.to_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.from_user_id": "{{user.id}}"
+        },
+        {
+          "data.to_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

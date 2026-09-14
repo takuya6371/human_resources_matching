@@ -1,0 +1,194 @@
+{
+  "name": "TalentProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Linked user id"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "headline": {
+      "type": "string",
+      "description": "Professional headline"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "country_of_residence": {
+      "type": "string"
+    },
+    "nationality": {
+      "type": "string"
+    },
+    "current_role": {
+      "type": "string"
+    },
+    "industry": {
+      "type": "string"
+    },
+    "years_experience": {
+      "type": "number"
+    },
+    "education": {
+      "type": "string"
+    },
+    "skills": {
+      "type": "string",
+      "description": "Comma-separated skills"
+    },
+    "languages": {
+      "type": "string",
+      "description": "Other languages spoken"
+    },
+    "jlpt_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "N5",
+        "N4",
+        "N3",
+        "N2",
+        "N1"
+      ],
+      "default": "none"
+    },
+    "english_level": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "conversational",
+        "fluent",
+        "native"
+      ],
+      "default": "fluent"
+    },
+    "visa_status": {
+      "type": "string",
+      "enum": [
+        "needs_sponsorship",
+        "has_work_rights",
+        "citizen",
+        "student"
+      ],
+      "default": "needs_sponsorship"
+    },
+    "cv_url": {
+      "type": "string"
+    },
+    "preferred_role": {
+      "type": "string"
+    },
+    "preferred_location": {
+      "type": "string"
+    },
+    "remote_willing": {
+      "type": "boolean",
+      "default": true
+    },
+    "relocate_willing": {
+      "type": "boolean",
+      "default": true
+    },
+    "salary_expectation": {
+      "type": "string"
+    },
+    "bio": {
+      "type": "string"
+    },
+    "github_username": {
+      "type": "string",
+      "description": "GitHub username (optional, for project showcase)"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Optional video introduction URL"
+    },
+    "hobbies": {
+      "type": "string",
+      "description": "Fun: hobbies & interests"
+    },
+    "height": {
+      "type": "string",
+      "description": "Fun: height"
+    },
+    "weight": {
+      "type": "string",
+      "description": "Fun: weight"
+    },
+    "fav_food": {
+      "type": "string",
+      "description": "Fun: favorite food"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending"
+    },
+    "profile_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "premium",
+        "pro"
+      ],
+      "default": "free"
+    },
+    "premium_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Premium expiry date"
+    },
+    "credits": {
+      "type": "number",
+      "default": 0,
+      "description": "Earned credits redeemable for extra applications"
+    }
+  },
+  "required": [
+    "full_name",
+    "email"
+  ],
+  "rls": {
+    "create": null,
+    "read": null,
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}
