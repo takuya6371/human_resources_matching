@@ -13,8 +13,7 @@
 - 拡張機能(Challenges/Assessments、Blog、Checkout/課金)は**今回は対象外**。コア機能(人材・求人・企業・管理者)を先に進める。
 - 投稿フィードは `Connect` を採用(`Newsfeed` と機能重複、`Newsfeed` は不採用)。
 - メッセージングは `docs/handover/message-platform` の仕様(2段階モデレーション設計済み)を主軸にする。bridgeの `Messages.jsx` はUI参考のみ。
-- `Matches`(AIマッチング提案)は base44 側の `computeMatches` 関数に依存し、ロジックが納品物に含まれていないため対象外。
-- AI補助機能(`ResumeAnalyzer` / `Chatbot` / `GithubRepos`)も同じ理由(`base44.functions.invoke` で呼ぶサーバー関数が未納品)で対象外。
+- `Matches`(`computeMatches`)/ `GithubRepos`(`githubRepos`)/ `ResumeAnalyzer`(`analyzeResume`)/ `Chatbot`(`askAfriTalent`)/ `aiMatchInsight` は `docs/front/bridge-africa-talent/base44/functions/*/entry.ts` に実装が存在する(Base44はカスタムサーバー関数のソースをアプリ側リポジトリで管理する方式のため、納品物に含まれていた)。`computeMatches` と `githubRepos` はAI不使用で移植は容易、`analyzeResume` / `askAfriTalent` / `aiMatchInsight` は `base44.asServiceRole.integrations.Core.InvokeLLM` というBase44のLLMラッパーに依存しており、移植には自前のLLM連携への置き換えが必要。いずれも技術的には移植可能だが、**コア機能を先に進める方針のため今回はスコープ外**とし、拡張フェーズで改めて検討する。
 - `OAuthConsent` はBase44のMCPサーバー専用ページのため恒久的に対象外。
 
 ## bridge-africa-talent 機能一覧と判定
