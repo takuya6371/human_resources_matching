@@ -1,14 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Bell } from 'lucide-react'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
+import { supabase } from '../lib/supabase'
 
 export default function Navbar() {
   const { lang, setLang } = useLang()
   const { user, company, logout } = useAuth()
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const selfId = user?.id ?? company?.id ?? null
+
+  useEffect(() => {
+    if (!selfId) { setUnreadCount(0); return }
+
+    async function refresh() {
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', selfId)
+        .eq('read', false)
+      setUnreadCount(count ?? 0)
+    }
+    refresh()
+
+    const channel = supabase
+      .channel(`navbar-notifications-${selfId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${selfId}` }, refresh)
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [selfId])
 
   const isAdmin = user?.role === 'admin'
   const companyInitial = company?.name ? company.name.slice(0, 2).toUpperCase() : '??'
@@ -36,6 +61,14 @@ export default function Navbar() {
           <Link to="/jobs" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.jobs')}
           </Link>
+          <Link to="/connect" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+            {t(lang, 'nav.connect')}
+          </Link>
+          {(user || company) && (
+            <Link to="/saved" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+              {t(lang, 'nav.saved')}
+            </Link>
+          )}
           {user && user.role === 'talent' && (
             <Link to="/applications" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
               {t(lang, 'nav.myApplications')}
@@ -72,6 +105,17 @@ export default function Navbar() {
               FR
             </button>
           </div>
+
+          {(user || company) && (
+            <Link to="/notifications" className="relative text-ink-soft hover:text-ink transition-colors" aria-label="Notifications">
+              <Bell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center bg-seal text-paper text-[9px] font-semibold leading-none">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* desktop auth */}
           <div className="hidden md:flex items-center gap-4">
@@ -143,6 +187,16 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.jobs')}
           </Link>
+          <Link to="/connect" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                onClick={() => setMenuOpen(false)}>
+            {t(lang, 'nav.connect')}
+          </Link>
+          {(user || company) && (
+            <Link to="/saved" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.saved')}
+            </Link>
+          )}
           {user && user.role === 'talent' && (
             <Link to="/applications" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                   onClick={() => setMenuOpen(false)}>

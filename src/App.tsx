@@ -16,6 +16,9 @@ import MyApplicationsPage from './pages/MyApplicationsPage'
 import CompanyJobsPage from './pages/CompanyJobsPage'
 import JobApplicantsPage from './pages/JobApplicantsPage'
 import CompanyPublicProfilePage from './pages/CompanyPublicProfilePage'
+import ConnectPage from './pages/ConnectPage'
+import SavedPage from './pages/SavedPage'
+import NotificationsPage from './pages/NotificationsPage'
 import PageNotFound from './components/PageNotFound'
 import AdminLayout from './components/AdminLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
@@ -69,6 +72,9 @@ export default function App() {
             <Route path="/company/jobs" element={<CompanyJobsPage />} />
             <Route path="/company/jobs/:id/applicants" element={<JobApplicantsPage />} />
             <Route path="/company/:id" element={<CompanyPublicProfilePage />} />
+            <Route path="/connect" element={<ConnectPage />} />
+            <Route path="/saved" element={<SavedPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>

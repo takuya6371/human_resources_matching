@@ -104,7 +104,7 @@
    - 既存の `.btn-line` / `.badge-line` / `.avatar-line` / `.input-line` / `.label-line` / `.line-card` をラップする Button/Badge/Avatar/Input/Textarea/Label/Card
    - 既存に相当物がないRadix系(Dialog/DropdownMenu/Tabs/Tooltip/Separator)は paper/ink/seal/hairline トークンで新規スタイル
 3. **骨格コンポーネント移植** — **完了**(詳細設計は下記)
-4. **ページ移植(機能グループ単位)**(詳細設計は下記)
+4. **ページ移植(機能グループ単位)** — **完了**(詳細設計は下記、5グループすべて完了)
 5. **メッセージング新規構築**: 1bのスキーマ + `moderation.js` + Realtime でゼロから実装(詳細設計は下記)
 
 各フェーズはページ数・entity数が多いため、着手の都度あらためて具体的な変更内容を確認しながら進める(一括実装はしない)。
@@ -208,7 +208,13 @@ RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは�
    - Team → Phase 1cの`team_members`テーブルにそのまま対応、変更不要
    - 現行の単一`AdminPage.tsx`は`AdminTalentReviewPage`(タレント審査+お問い合わせ)として`src/pages/admin/`に移設し、削除。`/admin`は`/admin/dashboard`へリダイレクト
    - ブラウザで管理者としてログインし、Dashboard/TalentReview/MatchingConsole(実際に応募を代理作成)/Analytics(作成した応募が反映)/Team(メンバー追加・保存)を確認
-5. **Connect/Saved/Notifications**: Connect(`posts`/`comments`/`likes`テーブル)、Saved(`saved_items`)、Notifications(`notifications`)。NavbarのMessage関連バッジは1b完了後に接続。
+5. **Connect/Saved/Notifications** — **完了**。Phase 4の最終グループとしてゼロから新規実装(既存ページによる代替はなかった):
+   - `ConnectPage`(`/connect`): 投稿フィード、企業アカウント向け投稿作成、フォロー中/おすすめ企業サイドバー。`PostCard`コンポーネントでいいね・コメント・返信・削除・保存を実装
+   - `SavedPage`(`/saved`): `saved_items`をitem_type別にグルーピングし、job/post/talent/companyそれぞれの実データ(jobs/posts/profiles/companies)をJOINして表示(非正規化コピー列を持たない設計を踏襲)
+   - `NotificationsPage`(`/notifications`): `type`+`actor_id`からen/ja/fr対応の文言を都度組み立てて表示(Phase 1c/4-2で決めた「titleカラムは英語フォールバックのみ、実際の表示はローカライズして組み立てる」設計を実装)
+   - like/comment発生時の通知自動生成トリガー(`notify_on_like`/`notify_on_comment`)を追加。**ブラウザでの実操作中に発見・修正したバグ**: トリガー内の変数`v_type`を`text`型で宣言していたため`notifications.type`(enum型)への暗黙キャストができず、コメント投稿がRLSエラーではなくトリガーエラーで静かに失敗していた(フロント側がinsertの成否を確認せず入力欄をクリアしていたため、UI上は成功したように見えていた)。`v_type`を`notification_type`型に変更して解決
+   - Navbarに「コネクト」「保存済み」リンクと通知ベル(未読数バッジ、Supabase Realtime購読)を追加。Phase 3で保留したバッジ配線をここで完了
+   - ブラウザで企業アカウントによる投稿作成、人材アカウントによるいいね・コメント・保存、通知の生成・既読化・バッジ表示までエンドツーエンドで確認
 
 ## 5 詳細設計: メッセージング機能
 

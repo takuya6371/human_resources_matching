@@ -119,6 +119,64 @@ export interface Application {
   talentNameJa?: string
 }
 
+export type PostType = 'opportunity' | 'scholarship' | 'program' | 'social_problem'
+
+export interface Post {
+  id: string
+  companyId: string
+  type: PostType
+  title: string
+  body: string
+  imageUrl?: string
+  videoUrl?: string
+  status: 'active' | 'closed'
+  createdAt: string
+  // 一覧表示用にjoinして載せる企業情報
+  companyName?: string
+  companyNameJa?: string
+  companyLogoUrl?: string
+}
+
+export interface PostComment {
+  id: string
+  postId: string
+  userId: string
+  userType: 'talent' | 'company'
+  body: string
+  parentCommentId?: string
+  createdAt: string
+  // 一覧表示用にjoinして載せる投稿者名
+  userName?: string
+}
+
+export type NotificationType =
+  | 'follow' | 'like' | 'comment' | 'reply' | 'mention' | 'message'
+  | 'application' | 'opportunity' | 'match' | 'platform'
+
+export interface AppNotification {
+  id: string
+  userId: string
+  actorId?: string
+  actorType?: 'talent' | 'company' | 'system'
+  type: NotificationType
+  title: string
+  body?: string
+  targetType?: string
+  targetId?: string
+  read: boolean
+  createdAt: string
+}
+
+export type SavedItemType = 'job' | 'post' | 'talent' | 'company'
+
+export interface SavedItemRow {
+  id: string
+  userId: string
+  itemType: SavedItemType
+  itemId: string
+  createdAt: string
+}
+
 // profiles_teaser ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
 export interface TalentTeaser {
   id: string
