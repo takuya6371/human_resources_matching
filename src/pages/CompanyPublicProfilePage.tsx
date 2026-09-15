@@ -3,7 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import FollowButton from '../components/FollowButton'
+import MessageButton from '../components/MessageButton'
 import { useLang } from '../App'
+import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
@@ -13,6 +15,7 @@ import type { Company, Job } from '../types'
 export default function CompanyPublicProfilePage() {
   const { id } = useParams<{ id: string }>()
   const { lang } = useLang()
+  const { accountType, user } = useAuth()
   const [company, setCompany] = useState<Company | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -97,7 +100,12 @@ export default function CompanyPublicProfilePage() {
                   {company.industry}{company.size ? ` · ${company.size}` : ''}
                 </p>
               )}
-              <FollowButton targetType="company" targetId={company.id} small />
+              <div className="flex items-center gap-2 flex-wrap">
+                <FollowButton targetType="company" targetId={company.id} small />
+                {accountType === 'talent' && user && (
+                  <MessageButton talentId={user.id} companyId={company.id} small />
+                )}
+              </div>
             </div>
           </div>
         </div>

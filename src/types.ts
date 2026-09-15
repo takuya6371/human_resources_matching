@@ -177,6 +177,40 @@ export interface SavedItemRow {
   createdAt: string
 }
 
+export type ThreadStatus = 'open' | 'flagged'
+
+export interface Thread {
+  id: string
+  talentId: string
+  companyId: string
+  status: ThreadStatus
+  supportRequested: boolean
+  strikeCount: number
+  flaggedBy?: 'rules' | 'model'
+  flaggedCategory?: string
+  flaggedQuote?: string
+  flaggedReason?: string
+  flaggedAt?: string
+  createdAt: string
+  updatedAt: string
+  // 一覧表示用にjoinして載せる相手方の名前
+  talentName?: string
+  companyName?: string
+}
+
+export type MessageKind = 'chat' | 'held' | 'released' | 'support_requested'
+
+export interface ChatMessage {
+  id: string
+  threadId: string
+  fromUserId?: string
+  kind: MessageKind
+  text: string
+  translation?: string
+  read: boolean
+  createdAt: string
+}
+
 // profiles_teaser ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
 export interface TalentTeaser {
   id: string

@@ -105,7 +105,7 @@
    - 既存に相当物がないRadix系(Dialog/DropdownMenu/Tabs/Tooltip/Separator)は paper/ink/seal/hairline トークンで新規スタイル
 3. **骨格コンポーネント移植** — **完了**(詳細設計は下記)
 4. **ページ移植(機能グループ単位)** — **完了**(詳細設計は下記、5グループすべて完了)
-5. **メッセージング新規構築**: 1bのスキーマ + `moderation.js` + Realtime でゼロから実装(詳細設計は下記)
+5. **メッセージング新規構築**: 1bのスキーマ + `moderation.js` + Realtime でゼロから実装 — **完了**(詳細設計は下記)
 
 各フェーズはページ数・entity数が多いため、着手の都度あらためて具体的な変更内容を確認しながら進める(一括実装はしない)。
 
@@ -250,6 +250,16 @@ message-platformのデモにもbridgeの`Messages.jsx`にも、保留スレッ�
 - `messages`テーブル(`thread_id`でフィルタ)にSupabase Realtime購読 → スレッド内の即時反映
 - `threads`テーブルの`status`変化を購読 → 管理者の保留キューに反映
 - Navbar/Sidebarの未読バッジは`messages.read`を集計、開封時に既読へ更新。Realtimeで即時反映
+
+### 実装結果と設計からの変更点
+
+- `moderation.js`を`src/lib/moderation.ts`へ verbatim 移植(`normalise`/`screen`/`CATEGORY_COPY`)。フレームワーク非依存で、クライアント(`MessagesPage.tsx`、送信前の即時プレビュー用)と`send-message` Edge Functionの両方から同一ファイルをそのままimportして使う(Denoは`../../../src/lib/moderation.ts`のような関数ディレクトリ外への相対importをローカル`functions serve`でも解決できることを確認済み)。
+- **設計時の`messages.system`列は`kind`に変更**(`'chat' | 'held' | 'released' | 'support_requested'`、Phase 1bで既に実装済みの通り)。表示側もkindで分岐する。
+- **送信経路のservice_role権限漏れ**: Phase 1bのGRANTは`authenticated`のみを対象にしており、`service_role`への明示的なGRANTが漏れていた(スキーマのデフォルト権限だけではCRUDが揃わない)。`send-message`がservice roleで`threads`を読もうとして`42501 permission denied`になっていたが、コード側がエラーを見ずに`data`のnull判定だけで`thread_not_found`(404)を返していたため誤診断しやすかった。`20260919000000_fix_messaging_service_role_grants.sql`で`threads`/`messages`/`thread_flags`への`service_role` GRANTを追加し、あわせて`send-message`側もエラーを明示チェックするよう修正。
+- **既読管理(`messages.read`)とサポート要請通知は追加のmigrationが必要だった**: Phase 1bは`messages`への書き込みを`service_role`のみに絞っていたため、クライアントの「開封時に既読へ更新」ができなかった。`20260920000000_messages_read_tracking.sql`で、`threads.support_requested`と同じ考え方(参加者に列単位の書き込みを許可し、他の列はガードトリガーでold値に戻す)を`messages.read`にも適用。あわせて、サポート要請自体は`threads.support_requested`への直接updateが引き続き参加者に許可されているため(guard_thread_updateが対象外にしている列)クライアントから直接呼べるが、通知メッセージの挿入はクライアントに`messages` insert権限がないため、`notify_on_follow`と同型のsecurity definerトリガー(`notify_support_requested`)で行うよう新規実装。
+- 送信/管理者操作のEdge Function呼び出しは`supabase.functions.invoke()`ではなく`src/lib/edgeFunction.ts`の直接fetchラッパーを新規作成して使用(`invoke()`は4xxレスポンスのJSONボディ(`reason`/`strikeCount`等)を読むのに`error.context`の手動parseが必要で、tier1 blockのUI表示に不向きなため)。
+- `MessagesPage.tsx`(`/messages`、スレッド一覧+会話+コンポーザー、クライアント側tier1即時プレビュー、Realtime購読、既読化)、`AdminModerationPage.tsx`(`/admin/moderation`、保留/サポート要請キュー、release/release_warning/wipe)、`MessageButton.tsx`(`TalentDetailPage`は企業アカウント向け、`CompanyPublicProfilePage`はタレントアカウント向けに設置)を新規実装。Navbarに「メッセージ」リンクと未読バッジ(自分が参加する全スレッドの未読messages集計、Realtime購読)を追加(Phase 3で保留していたバッジ配線をここで完了)。
+- ブラウザで実際に確認: 通常送信→即時表示、電話番号/メールアドレスのtier1ブロック(クライアント側プレビュー警告→送信時に実際に拒否、strike 1〜3)、3回目での自動保留(`status='flagged'`+保留通知挿入)、管理者による「警告付きで解除」(`release_warning`、スレッド再開+再開通知)、タレント側からのサポート要請(依頼者名入りの通知メッセージが自動挿入)、解除後の通常送信、をすべてエンドツーエンドで確認済み。`GEMINI_API_KEY`/`AZURE_TRANSLATOR_KEY`は未設定のため、tier2判定は常にfail-open(`clear`)、翻訳は無音でno-opとなることも確認済み(設計通り)。
 
 ## 検証方法
 

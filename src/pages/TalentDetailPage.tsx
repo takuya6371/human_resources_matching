@@ -10,6 +10,7 @@ import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/prof
 import { isSafeHttpUrl } from '../lib/url'
 import FollowButton from '../components/FollowButton'
 import InterestButton from '../components/InterestButton'
+import MessageButton from '../components/MessageButton'
 import type { Talent, TalentTeaser } from '../types'
 
 const LEVEL_LABELS: Record<string, { en: string; ja: string; fr: string }> = {
@@ -23,7 +24,7 @@ const BLUR_BLOCK = { background: 'rgba(28,27,24,0.08)', filter: 'blur(4px)' }
 export default function TalentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { lang } = useLang()
-  const { accountType } = useAuth()
+  const { accountType, company } = useAuth()
   const hasFullAccess = accountType === 'company' || accountType === 'admin'
 
   const [talent, setTalent] = useState<Talent | null>(null)
@@ -130,6 +131,9 @@ export default function TalentDetailPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <InterestButton toUserId={talent.id} toType="talent" small />
                   <FollowButton targetType="talent" targetId={talent.id} small />
+                  {accountType === 'company' && company && (
+                    <MessageButton talentId={talent.id} companyId={company.id} small />
+                  )}
                 </div>
               </div>
             </div>

@@ -19,6 +19,7 @@ import CompanyPublicProfilePage from './pages/CompanyPublicProfilePage'
 import ConnectPage from './pages/ConnectPage'
 import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
+import MessagesPage from './pages/MessagesPage'
 import PageNotFound from './components/PageNotFound'
 import AdminLayout from './components/AdminLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
@@ -26,6 +27,7 @@ import AdminTalentReviewPage from './pages/admin/AdminTalentReviewPage'
 import AdminTeamPage from './pages/admin/AdminTeamPage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
 import AdminMatchingConsolePage from './pages/admin/AdminMatchingConsolePage'
+import AdminModerationPage from './pages/admin/AdminModerationPage'
 
 interface LangContextType {
   lang: Lang
@@ -63,6 +65,7 @@ export default function App() {
               <Route path="dashboard" element={<AdminHomePage />} />
               <Route path="talents" element={<AdminTalentReviewPage />} />
               <Route path="matching" element={<AdminMatchingConsolePage />} />
+              <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="analytics" element={<AdminAnalyticsPage />} />
               <Route path="team" element={<AdminTeamPage />} />
             </Route>
@@ -75,6 +78,7 @@ export default function App() {
             <Route path="/connect" element={<ConnectPage />} />
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>

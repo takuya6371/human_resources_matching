@@ -425,6 +425,12 @@ verify_jwt = true
 # 署名検証は関数内で DIDIT_WEBHOOK_SECRET を使って行う。
 verify_jwt = false
 
+[functions.send-message]
+verify_jwt = true
+
+[functions.moderate-thread]
+verify_jwt = true
+
 # pg-delta is the schema diff engine for db diff / db pull / db remote commit.
 # Set enabled = false to fall back to the legacy migra engine.
 [experimental.pgdelta]

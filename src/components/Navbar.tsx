@@ -12,6 +12,7 @@ export default function Navbar() {
   const navigate = useNavigate()
   const [menuOpen, setMenuOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
+  const [unreadMessages, setUnreadMessages] = useState(0)
   const selfId = user?.id ?? company?.id ?? null
 
   useEffect(() => {
@@ -30,6 +31,34 @@ export default function Navbar() {
     const channel = supabase
       .channel(`navbar-notifications-${selfId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${selfId}` }, refresh)
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [selfId])
+
+  useEffect(() => {
+    if (!selfId) { setUnreadMessages(0); return }
+
+    async function refresh() {
+      const { data: myThreads } = await supabase
+        .from('threads')
+        .select('id')
+        .or(`talent_id.eq.${selfId},company_id.eq.${selfId}`)
+      const ids = (myThreads ?? []).map(th => th.id)
+      if (ids.length === 0) { setUnreadMessages(0); return }
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .in('thread_id', ids)
+        .eq('read', false)
+        .or(`from_user_id.is.null,from_user_id.neq.${selfId}`)
+      setUnreadMessages(count ?? 0)
+    }
+    refresh()
+
+    const channel = supabase
+      .channel(`navbar-messages-${selfId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, refresh)
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
@@ -67,6 +96,12 @@ export default function Navbar() {
           {(user || company) && (
             <Link to="/saved" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
               {t(lang, 'nav.saved')}
+            </Link>
+          )}
+          {(user || company) && (
+            <Link to="/messages" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline inline-flex items-center gap-1.5">
+              {t(lang, 'nav.messages')}
+              {unreadMessages > 0 && <span className="h-1.5 w-1.5 bg-seal" />}
             </Link>
           )}
           {user && user.role === 'talent' && (
@@ -195,6 +230,13 @@ export default function Navbar() {
             <Link to="/saved" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                   onClick={() => setMenuOpen(false)}>
               {t(lang, 'nav.saved')}
+            </Link>
+          )}
+          {(user || company) && (
+            <Link to="/messages" className="text-ink-soft text-sm py-2 no-underline hover:text-ink flex items-center gap-2"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.messages')}
+              {unreadMessages > 0 && <span className="h-2 w-2 bg-seal" />}
             </Link>
           )}
           {user && user.role === 'talent' && (
