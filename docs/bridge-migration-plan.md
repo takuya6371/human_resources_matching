@@ -201,7 +201,13 @@ RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは�
    - **実際に必要だった作業**: `CompanyPublicProfile`(企業の公開プロフィールページ)が丸ごと存在しなかったため新規追加。`/company/:id`ルートを追加し、企業情報+募集中求人一覧+FollowButtonのみで構成(bridge版が持つPosts/Comments/Likes/SaveButton/MessageButton/Challengeタブは、それぞれConnect(5)・Saved(5)・Messaging(Phase5)・対象外機能に依存するため、該当フェーズで拡張する前提で今回は含めない)
    - `JobDetailPage`の企業名表示を`CompanyPublicProfilePage`へのリンクに変更
    - ブラウザで実在の企業ID・存在しない企業ID両方の表示、求人詳細からの遷移を確認
-4. **管理者(分割構成)**: AdminHome/TalentReview/CompanyReview/JobModeration/Team/MatchingConsole/Analytics を`AdminLayout`配下のネストルートとして追加。現行の単一`AdminPage.tsx`をどう扱うか(置き換え/併存)はこのフェーズ着手時に別途確認する。
+4. **管理者(分割構成)** — **完了**。着手前にbridgeの各ページを確認したところ、2つが「ページ分割」を超えた**新規の製品ポリシー決定**を要することが判明したためユーザーに確認した:
+   - **CompanyReview**(企業承認ワークフロー)・**JobModeration**(求人審査ワークフロー) → **今回は見送り**(現行は企業登録即利用・求人即公開のまま)。`AdminLayout`のNAVからも除外
+   - **MatchingConsole**(adminが候補と求人を手動で結びつけ応募を代理作成) → **含める**。AI不使用の決定的スコアリング(bridgeのcomputeMatchesと同じ考え方)。`applications: insert`のRLSに`is_admin()`を追加して対応
+   - AdminHome/Analyticsはbridgeが前提とする現行に無いフィールド・ステータス(ATSパイプライン等)に依存していたため、現行の実データ(profiles/companies/jobs/applications、実際のapplication_status enum)に合わせて作り直した
+   - Team → Phase 1cの`team_members`テーブルにそのまま対応、変更不要
+   - 現行の単一`AdminPage.tsx`は`AdminTalentReviewPage`(タレント審査+お問い合わせ)として`src/pages/admin/`に移設し、削除。`/admin`は`/admin/dashboard`へリダイレクト
+   - ブラウザで管理者としてログインし、Dashboard/TalentReview/MatchingConsole(実際に応募を代理作成)/Analytics(作成した応募が反映)/Team(メンバー追加・保存)を確認
 5. **Connect/Saved/Notifications**: Connect(`posts`/`comments`/`likes`テーブル)、Saved(`saved_items`)、Notifications(`notifications`)。NavbarのMessage関連バッジは1b完了後に接続。
 
 ## 5 詳細設計: メッセージング機能

@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
-import { LayoutDashboard, Users, Building2, Briefcase, Sparkles, BarChart3, LogOut, Home } from 'lucide-react'
+import { LayoutDashboard, Users, Sparkles, BarChart3, LogOut, Home } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
+// CompanyReview/JobModerationは、企業承認・求人審査ワークフローが
+// 現行プロダクトに存在しないため導入していない(要相談の上で見送り)。
 const NAV = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/admin/talents', label: 'Talent Review', icon: Users },
-  { to: '/admin/companies', label: 'Company Review', icon: Building2 },
-  { to: '/admin/jobs', label: 'Job Moderation', icon: Briefcase },
   { to: '/admin/matching', label: 'Matching Console', icon: Sparkles },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/team', label: 'Team', icon: Users },

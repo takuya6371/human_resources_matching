@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, type Dispatch, type SetStateAction } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import type { Lang } from './types'
 import HomePage from './pages/HomePage'
@@ -10,7 +10,6 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardPage from './pages/DashboardPage'
 import ContactPage from './pages/ContactPage'
-import AdminPage from './pages/AdminPage'
 import JobListPage from './pages/JobListPage'
 import JobDetailPage from './pages/JobDetailPage'
 import MyApplicationsPage from './pages/MyApplicationsPage'
@@ -18,6 +17,12 @@ import CompanyJobsPage from './pages/CompanyJobsPage'
 import JobApplicantsPage from './pages/JobApplicantsPage'
 import CompanyPublicProfilePage from './pages/CompanyPublicProfilePage'
 import PageNotFound from './components/PageNotFound'
+import AdminLayout from './components/AdminLayout'
+import AdminHomePage from './pages/admin/AdminHomePage'
+import AdminTalentReviewPage from './pages/admin/AdminTalentReviewPage'
+import AdminTeamPage from './pages/admin/AdminTeamPage'
+import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
+import AdminMatchingConsolePage from './pages/admin/AdminMatchingConsolePage'
 
 interface LangContextType {
   lang: Lang
@@ -50,7 +55,14 @@ export default function App() {
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route path="dashboard" element={<AdminHomePage />} />
+              <Route path="talents" element={<AdminTalentReviewPage />} />
+              <Route path="matching" element={<AdminMatchingConsolePage />} />
+              <Route path="analytics" element={<AdminAnalyticsPage />} />
+              <Route path="team" element={<AdminTeamPage />} />
+            </Route>
             <Route path="/jobs" element={<JobListPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/applications" element={<MyApplicationsPage />} />
