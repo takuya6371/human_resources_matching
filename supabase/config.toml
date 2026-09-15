@@ -408,6 +408,20 @@ s3_secret_key = "env(S3_SECRET_KEY)"
 # ログイン済みユーザーのみ呼び出し可能にする（Azure無料枠を第三者に消費されないため）。
 verify_jwt = true
 
+[functions.parse-cv]
+verify_jwt = true
+
+[functions.start-verification]
+verify_jwt = true
+
+[functions.verification-status]
+verify_jwt = true
+
+[functions.verification-webhook]
+# 呼び出し元はDiditで、ログイン済みユーザーではないため無効にする。
+# 署名検証は関数内で DIDIT_WEBHOOK_SECRET を使って行う。
+verify_jwt = false
+
 # pg-delta is the schema diff engine for db diff / db pull / db remote commit.
 # Set enabled = false to fall back to the legacy migra engine.
 [experimental.pgdelta]

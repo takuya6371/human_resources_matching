@@ -11,7 +11,7 @@ export const PROFILE_PUBLIC_COLUMNS = [
   'degree', 'graduation_year', 'japanese_level', 'skills', 'skills_ja',
   'bio_en', 'bio_ja', 'available_from', 'available_from_ja', 'open_to_work',
   'headline_en', 'headline_ja', 'status', 'residence_area', 'dev_experience_years',
-  'past_clients', 'years_in_japan', 'hobbies', 'video_url',
+  'past_clients', 'years_in_japan', 'hobbies', 'video_url', 'verification_status',
 ].join(', ')
 
 export function deriveInitials(nameEn: string): string {
