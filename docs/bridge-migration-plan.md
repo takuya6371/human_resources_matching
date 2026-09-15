@@ -103,7 +103,7 @@
    - `src/lib/utils.ts`(`cn()`)
    - 既存の `.btn-line` / `.badge-line` / `.avatar-line` / `.input-line` / `.label-line` / `.line-card` をラップする Button/Badge/Avatar/Input/Textarea/Label/Card
    - 既存に相当物がないRadix系(Dialog/DropdownMenu/Tabs/Tooltip/Separator)は paper/ink/seal/hairline トークンで新規スタイル
-3. **骨格コンポーネント移植**(詳細設計は下記)
+3. **骨格コンポーネント移植** — **完了**(詳細設計は下記)
 4. **ページ移植(機能グループ単位)**(詳細設計は下記)
 5. **メッセージング新規構築**: 1bのスキーマ + `moderation.js` + Realtime でゼロから実装(詳細設計は下記)
 
@@ -150,20 +150,23 @@ thread_flags     -- moderationイベントの監査ログ(デモはthreads.flag�
 
 RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは全件読み取り(特にflagged)。`messages`は自分が参加するスレッドのもののみ。`thread_flags`はservice role(Edge Function)からのinsertのみ、adminのみselect。
 
-## 3 詳細設計: 骨格コンポーネント
+## 3 詳細設計: 骨格コンポーネント — **完了**
 
-各コンポーネントのbase44依存を洗い出した結果、現行コードベースの既存パターンと衝突/重複する箇所が見つかった。
+着手前の想定(bridge側をそのまま移植)は、実際にコードを読んだところ現行コードベースの状況と合わず、以下の通り方針を変更した。
 
-| コンポーネント | 対応 |
-|---|---|
-| Navbar | 移植。`base44.auth.*`→`useAuth()`、通知/メッセージ未読数の取得先を`notifications`/`messages`テーブルに、`base44.entities.*.subscribe()`→Supabase Realtimeチャンネル購読に置き換え |
-| Sidebar | Navbarと同パターン(未読数・Realtime購読) |
-| Footer / Layout | 移植。`base44.auth.isAuthenticated()`→`useAuth()`の`user`/`company`有無判定に置き換えるだけの軽微な修正 |
-| AdminLayout | 移植。`base44.auth.me()`/`logout()`→`useAuth()`。管理者分割ページ(AdminHome等)を束ねる入れ物として使う |
-| AuthLayout | 移植。base44依存なし、UI構造のみ |
-| PageNotFound | 新規追加(現行App.tsxに404キャッチオールルートが無い)。`base44.auth.me()`→`useAuth()`に置き換えて軽量移植 |
-| ScrollToTop | **不要**。`src/App.tsx`に同等のインライン実装が既に存在する |
-| ProtectedRoute | **不要、導入しない**。現行コードベースは`AdminPage.tsx`/`DashboardPage.tsx`のように各ページが`useAuth()`+`useEffect`+`navigate()`で自己ガードするパターンで統一されている。bridgeのラッパー方式は導入せず、既存パターンに合わせる(フェーズ4で全新規ページに適用) |
+| コンポーネント | 対応 | 状態 |
+|---|---|---|
+| Navbar | **移植しない**。現行の`Navbar.tsx`は既に`useAuth()`/`useLang()`に完全対応した成熟した実装。通知/メッセージの未読バッジ追加のみ必要だが、表示先ページ(`/notifications`, `/messages`)がPhase 4まで存在しないため、バッジ連携も**Phase 4のConnect/Saved/Notifications群と合わせて実施**に変更 | 見送り(Phase 4へ) |
+| Footer | **変更しない**。bridge版は別デザイン言語(shadcn汎用トークン、3カラムのサイトマップ型)で現行の「Line」意匠と合わず、機能的にも今は不要 | 対応不要 |
+| Layout(Outlet+Navbar+Sidebar+Footer+CookieConsent+Chatbotの束ね) | **導入しない**。各ページがNavbar/Footerを個別に描画する既存規約と衝突(ProtectedRouteと同じ理由) | 見送り |
+| Sidebar | ログイン済み全ページのレイアウトを変えるUX判断のためユーザーに確認 → **今回は導入しない**という回答 | 見送り |
+| AuthLayout | ルーティング用ラッパーではなくプレゼンテーショナルコンポーネントのため既存規約と衝突しない。paper/ink/sealで再スタイルして追加 | **完了** |
+| AdminLayout | Phase 4で決定済みの`/admin/*`ネストルート化に対応するコンポーネント。`useAuth()`ベースの自己ガードパターンに合わせて追加(Outlet配下のページはPhase 4で実装、まだ未配線) | **完了** |
+| PageNotFound | 新規追加。現行`App.tsx`に404キャッチオールルートが無かったため追加し、`<Route path="*">`で配線。i18nに`page404`キーを追加(en/ja/fr) | **完了** |
+| ScrollToTop | **不要**。`src/App.tsx`に同等のインライン実装が既に存在する | 対応不要 |
+| ProtectedRoute | **不要、導入しない**。現行コードベースは`AdminPage.tsx`/`DashboardPage.tsx`のように各ページが`useAuth()`+`useEffect`+`navigate()`で自己ガードするパターンで統一されている。bridgeのラッパー方式は導入せず、既存パターンに合わせる(フェーズ4で全新規ページに適用) | 対応不要 |
+
+ブラウザで404ページとホームページの表示を確認済み(既存ページへの影響なし)。
 
 ## 4 詳細設計: ページ移植
 

@@ -259,6 +259,12 @@ export const translations: TranslationStore = {
       tagline: 'Bridging Africa and Japan through talent.',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
+    page404: {
+      title: 'Page not found',
+      body: 'The page you are looking for does not exist or has been moved.',
+      adminNote: 'Admin note: if this page should exist, ask the team to implement it.',
+      home: 'Back to home',
+    },
   },
   ja: {
     nav: {
@@ -515,6 +521,12 @@ export const translations: TranslationStore = {
       tagline: 'アフリカと日本を人材でつなぐ。',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
+    page404: {
+      title: 'ページが見つかりません',
+      body: 'お探しのページは存在しないか、移動した可能性があります。',
+      adminNote: '管理者向け: このページが必要な場合は開発チームに実装を依頼してください。',
+      home: 'トップに戻る',
+    },
   },
   fr: {
     nav: {
@@ -770,6 +782,12 @@ export const translations: TranslationStore = {
     footer: {
       tagline: 'Connecter l\'Afrique et le Japon à travers les talents.',
       rights: '© 2026 AfriTalent. Tous droits réservés.',
+    },
+    page404: {
+      title: 'Page introuvable',
+      body: 'La page que vous recherchez n\'existe pas ou a été déplacée.',
+      adminNote: 'Note admin : si cette page devrait exister, demandez à l\'équipe de l\'implémenter.',
+      home: 'Retour à l\'accueil',
     },
   },
 }
