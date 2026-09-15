@@ -96,7 +96,7 @@
 1. **DB基盤**
    - 1a. cv-extract の migration 5本 + Edge Functions 4本を移植 — **完了**。`supabase db reset`(ローカル)で全migrationの適用を確認済み。`profileMapper.ts`の`PROFILE_PUBLIC_COLUMNS`に`verification_status`を追加。未実施: Edge Functionsの実機デプロイとシークレット設定(`GEMINI_API_KEY`/`DIDIT_API_KEY`/`DIDIT_WEBHOOK_SECRET`)
    - 1b. `threads` / `messages` / `thread_flags` の新規migration作成 — **完了**。`supabase db reset`(ローカル)で適用確認、GRANT/RLSが設計通り(`messages`/`thread_flags`はauthenticatedにSELECTのみ、`threads`はINSERT/SELECT/UPDATE)であることを確認済み
-   - 1c. `posts` / `comments` / `likes` / `follows` / `interests` / `saved_items` / `notifications` / `team_members` / `trusted_companies` の新規migration作成(`base44/entities/*.jsonc` にフィールド定義・RLSルールが揃っているため、Postgres RLSへの書き換えのみ)
+   - 1c. `posts` / `comments` / `likes` / `follows` / `interests` / `saved_items` / `notifications` / `team_members` / `trusted_companies` の新規migration作成 — **完了**。非正規化コピー列(user_name等)は持たずJOINする方針に変更、Challengeとの連携(SavedItemの'challenge')は今回スコープ外のため除外。RLSはなりすまし投稿の拒否・本人投稿の成功を実際にINSERTして確認済み。notificationsへの直接INSERTは admin(`is_admin()`)のみに限定 — follow/like/comment発生時の自動生成はPhase 4で設計
 2. **UIコンポーネント基盤**(実装可能な粒度まで済み)
    - `@/` パスエイリアス追加(`vite.config.ts`, `tsconfig.json`)
    - `class-variance-authority` / `clsx` / `tailwind-merge` / 対応するRadixパッケージ / `tailwindcss-animate` を追加
