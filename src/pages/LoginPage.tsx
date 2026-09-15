@@ -3,13 +3,14 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
+import AuthLayout from '../components/AuthLayout'
 
 const INPUT_CLS = 'input-line'
 const LABEL_CLS = 'label-line'
 
 export default function LoginPage() {
   const { user, company, accountType, login, signUp } = useAuth()
-  const { lang, setLang } = useLang()
+  const { lang } = useLang()
   const navigate = useNavigate()
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [signUpType, setSignUpType] = useState<'talent' | 'company'>('talent')
@@ -65,37 +66,11 @@ export default function LoginPage() {
   const isLogin = mode === 'login'
 
   return (
-    <div className="min-h-screen line-page flex flex-col">
-      <div className="px-6 py-4 flex items-center justify-between border-b border-hairline">
-        <Link to="/" className="flex items-center gap-2.5 no-underline">
-          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
-        </Link>
-        <div className="flex items-center border border-hairline">
-          <button onClick={() => setLang('ja')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${lang === 'ja' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
-            JA
-          </button>
-          <button onClick={() => setLang('en')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'en' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
-            EN
-          </button>
-          <button onClick={() => setLang('fr')}
-            className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'fr' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>
-            FR
-          </button>
-        </div>
-      </div>
-
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h1 className="font-display font-medium text-ink text-3xl tracking-wide mb-2">
-              {isLogin ? t(lang, 'login.title') : t(lang, 'login.signUpTitle')}
-            </h1>
-            <p className="text-ink-soft text-sm">{t(lang, 'login.subtitle')}</p>
-          </div>
-
-          {signedUp ? (
+    <AuthLayout
+      title={isLogin ? t(lang, 'login.title') : t(lang, 'login.signUpTitle')}
+      subtitle={t(lang, 'login.subtitle')}
+    >
+      {signedUp ? (
             <div className="line-card p-8 text-center">
               <div className="avatar-line w-12 h-12 mx-auto mb-4">
                 <span className="text-lg">✓</span>
@@ -161,9 +136,16 @@ export default function LoginPage() {
               </div>
 
               <div className="mb-6">
-                <label className={LABEL_CLS}>
-                  {t(lang, 'login.passwordLabel')}
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={LABEL_CLS + ' mb-0'}>
+                    {t(lang, 'login.passwordLabel')}
+                  </label>
+                  {isLogin && (
+                    <Link to="/forgot-password" className="text-ink-faint text-xs hover:text-ink transition-colors no-underline">
+                      {t(lang, 'login.forgotPassword')}
+                    </Link>
+                  )}
+                </div>
                 <input
                   type="password"
                   value={password}
@@ -189,14 +171,6 @@ export default function LoginPage() {
               </p>
             </form>
           )}
-
-          <p className="text-center mt-5">
-            <Link to="/" className="text-ink-faint text-sm hover:text-ink transition-colors no-underline">
-              ← {t(lang, 'login.backToTop')}
-            </Link>
-          </p>
-        </div>
-      </div>
-    </div>
+    </AuthLayout>
   )
 }

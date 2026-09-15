@@ -1,27 +1,55 @@
 import type { ReactNode } from 'react'
-import type { LucideIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useLang } from '../App'
+import { t } from '../i18n'
 
 interface AuthLayoutProps {
-  icon: LucideIcon
   title: string
   subtitle?: string
-  footer?: ReactNode
   children: ReactNode
 }
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }: AuthLayoutProps) {
+// LoginPage.tsx の元々のヘッダー/カード構造を、他の認証系ページ
+// (ForgotPassword/ResetPassword)でも使えるように切り出したもの。
+export default function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
+  const { lang, setLang } = useLang()
+
   return (
-    <div className="min-h-screen line-page flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 border border-hairline mb-4">
-            <Icon className="w-6 h-6 text-ink" aria-hidden="true" />
-          </div>
-          <h1 className="font-display text-2xl text-ink tracking-wide">{title}</h1>
-          {subtitle && <p className="text-ink-soft text-sm mt-2">{subtitle}</p>}
+    <div className="min-h-screen line-page flex flex-col">
+      <div className="px-6 py-4 flex items-center justify-between border-b border-hairline">
+        <Link to="/" className="flex items-center gap-2.5 no-underline">
+          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
+        </Link>
+        <div className="flex items-center border border-hairline">
+          {(['ja', 'en', 'fr'] as const).map((l, i) => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${i > 0 ? 'border-l border-hairline' : ''} ${
+                lang === l ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'
+              }`}
+            >
+              {l.toUpperCase()}
+            </button>
+          ))}
         </div>
-        <div className="line-card p-8">{children}</div>
-        {footer && <p className="text-center text-sm text-ink-soft mt-6">{footer}</p>}
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="font-display font-medium text-ink text-3xl tracking-wide mb-2">{title}</h1>
+            {subtitle && <p className="text-ink-soft text-sm">{subtitle}</p>}
+          </div>
+
+          {children}
+
+          <p className="text-center mt-5">
+            <Link to="/" className="text-ink-faint text-sm hover:text-ink transition-colors no-underline">
+              ← {t(lang, 'login.backToTop')}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

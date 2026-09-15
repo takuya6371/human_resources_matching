@@ -11,6 +11,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ error: string | null }>
   signUp: (email: string, password: string, opts?: SignUpOptions) => Promise<{ error: string | null }>
   logout: () => Promise<void>
+  resetPasswordRequest: (email: string) => Promise<{ error: string | null }>
+  resetPassword: (newPassword: string) => Promise<{ error: string | null }>
   updateProfile: (updates: Partial<User>) => Promise<void>
   updateCompany: (updates: Partial<Company>) => Promise<void>
   submitForReview: () => Promise<void>
@@ -29,6 +31,8 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => ({ error: null }),
   signUp: async () => ({ error: null }),
   logout: async () => {},
+  resetPasswordRequest: async () => ({ error: null }),
+  resetPassword: async () => ({ error: null }),
   updateProfile: async () => {},
   updateCompany: async () => {},
   submitForReview: async () => {},
@@ -135,6 +139,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCompany(null)
   }
 
+  // メールにパスワード再設定リンクを送る。アカウントの有無に関わらず常に成功扱いにする
+  // （送信元がメールアドレスの実在確認に使われないようにするため）。
+  const resetPasswordRequest = async (email: string): Promise<{ error: string | null }> => {
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    return { error: null }
+  }
+
+  // resetPasswordRequestのリンクを踏むと、SupabaseがURLのハッシュから回復用セッションを
+  // 自動的に確立する（onAuthStateChangeでsession付きのイベントが飛んでくる）ため、
+  // トークンをこちらで扱う必要はなく、そのセッションに対してパスワードを更新するだけでよい。
+  const resetPassword = async (newPassword: string): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    return { error: error?.message ?? null }
+  }
+
   const updateProfile = async (updates: Partial<User>) => {
     if (!user) return
 
@@ -232,7 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, updateProfile, updateCompany, submitForReview }}>
+    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, resetPasswordRequest, resetPassword, updateProfile, updateCompany, submitForReview }}>
       {children}
     </AuthContext.Provider>
   )

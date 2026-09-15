@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage'
 import TalentListPage from './pages/TalentListPage'
 import TalentDetailPage from './pages/TalentDetailPage'
 import LoginPage from './pages/LoginPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import DashboardPage from './pages/DashboardPage'
 import ContactPage from './pages/ContactPage'
 import AdminPage from './pages/AdminPage'
@@ -43,6 +45,8 @@ export default function App() {
             <Route path="/talents" element={<TalentListPage />} />
             <Route path="/talent/:id" element={<TalentDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/admin" element={<AdminPage />} />

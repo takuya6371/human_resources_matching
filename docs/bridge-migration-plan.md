@@ -179,7 +179,12 @@ RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは�
 
 ### グループ順序と個別対応
 
-1. **認証一式**: Login/Register/ForgotPassword/ResetPassword/GetStarted。現行`LoginPage.tsx`の実装パターンに合わせ、`useAuth()`の`login`/`signUp`を使用。
+1. **認証一式** — **完了**。着手前に現行`LoginPage.tsx`を確認したところ、Login/Register/GetStartedは既にログイン・サインアップ(タレント/企業選択込み)として1ページに統合済みで、追加実装は不要だった。実際に必要だったのはForgotPassword/ResetPasswordの2ページのみ:
+   - `AuthContext`に`resetPasswordRequest`/`resetPassword`を追加(Supabaseの`resetPasswordForEmail`/`updateUser`を使用。bridge版はトークンを手動で扱う設計だったが、Supabaseはメールリンクで回復用セッションが自動確立されるためトークンの受け渡しは不要)
+   - `AuthLayout`をbridge版ではなく`LoginPage.tsx`の実際のヘッダー構造(ロゴ+言語切替+カード)から共通化して作り直し、`LoginPage.tsx`自身もこれを使うようリファクタ(見た目の変更なし、ブラウザで確認済み)
+   - ローカルのMailpitで実際にメール送信→リンククリック→パスワード変更→ログイン状態遷移までエンドツーエンドで動作確認
+   - **副次的発見**: `supabase/config.toml`の`site_url`/`additional_redirect_urls`が実際の開発ポート(README記載の`localhost:5173`)と不一致で、パスワード再設定メールが送信されない不具合があったため修正
+   - Register.jsxのOTP認証・Social Auth(Google等)は現行のSupabase標準の確認メールフローと異なる仕組みで、追加のインフラ設定(OAuthプロバイダ登録等)が必要なため今回は見送り
 2. **タレント側**: TalentOnboarding/TalentDashboard/TalentProfile/TalentPublicProfile/TalentBrowse。`TalentProfile`/`TalentPublicProfile`は`IdeaSubmission`ウィジェットを削って移植。
 3. **企業・求人側**: CompanyOnboarding/CompanyDashboard/CompanyProfile/CompanyPublicProfile/PostJob/Jobs。`CompanyDashboard`/`CompanyPublicProfile`は`Challenge`ウィジェットと`Promotion`(ブースト)UIを削って移植。
 4. **管理者(分割構成)**: AdminHome/TalentReview/CompanyReview/JobModeration/Team/MatchingConsole/Analytics を`AdminLayout`配下のネストルートとして追加。現行の単一`AdminPage.tsx`をどう扱うか(置き換え/併存)はこのフェーズ着手時に別途確認する。
