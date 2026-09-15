@@ -8,6 +8,8 @@ import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
 import { isSafeHttpUrl } from '../lib/url'
+import FollowButton from '../components/FollowButton'
+import InterestButton from '../components/InterestButton'
 import type { Talent, TalentTeaser } from '../types'
 
 const LEVEL_LABELS: Record<string, { en: string; ja: string; fr: string }> = {
@@ -120,10 +122,14 @@ export default function TalentDetailPage() {
                   <span className="text-2xl leading-none">{talent.flag}</span>
                 </div>
                 <p className="text-ink-soft text-sm sm:text-base mb-4">{country} · {field}</p>
-                <div className="flex items-center gap-2.5 flex-wrap">
+                <div className="flex items-center gap-2.5 flex-wrap mb-4">
                   <span className="badge-line">{talent.japaneseLevel}</span>
                   <span className="badge-line-ink">{talent.degree} · {talent.graduationYear}</span>
                   {availableFrom && <span className="badge-line-ink">{availableFrom}</span>}
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <InterestButton toUserId={talent.id} toType="talent" small />
+                  <FollowButton targetType="talent" targetId={talent.id} small />
                 </div>
               </div>
             </div>

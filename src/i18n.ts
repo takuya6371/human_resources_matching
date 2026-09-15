@@ -50,6 +50,12 @@ export const translations: TranslationStore = {
       available: 'Available',
       locked: 'Sign in to view',
     },
+    follow: {
+      follow: 'Follow',
+      following: 'Following',
+      interested: 'Interested',
+      expressInterest: 'Interested',
+    },
     gate: {
       title: 'Full profiles are for company accounts',
       subtitle: 'Sign in with a company account to see names, bios, work history and contact options for every talent.',
@@ -332,6 +338,12 @@ export const translations: TranslationStore = {
       available: '求職中',
       locked: 'ログインして見る',
     },
+    follow: {
+      follow: 'フォロー',
+      following: 'フォロー中',
+      interested: '興味あり',
+      expressInterest: '興味あり',
+    },
     gate: {
       title: 'プロフィールの全文閲覧は企業アカウント限定です',
       subtitle: '企業アカウントでログインすると、氏名・自己紹介・職務経歴・連絡先など全ての情報を閲覧できます。',
@@ -613,6 +625,12 @@ export const translations: TranslationStore = {
       viewProfile: 'Voir le profil',
       available: 'Disponible',
       locked: 'Connectez-vous pour voir',
+    },
+    follow: {
+      follow: 'Suivre',
+      following: 'Suivi(e)',
+      interested: 'Intéressé(e)',
+      expressInterest: 'Intéressé(e)',
     },
     gate: {
       title: 'Les profils complets sont réservés aux comptes entreprise',

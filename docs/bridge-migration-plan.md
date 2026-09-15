@@ -185,7 +185,15 @@ RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは�
    - ローカルのMailpitで実際にメール送信→リンククリック→パスワード変更→ログイン状態遷移までエンドツーエンドで動作確認
    - **副次的発見**: `supabase/config.toml`の`site_url`/`additional_redirect_urls`が実際の開発ポート(README記載の`localhost:5173`)と不一致で、パスワード再設定メールが送信されない不具合があったため修正
    - Register.jsxのOTP認証・Social Auth(Google等)は現行のSupabase標準の確認メールフローと異なる仕組みで、追加のインフラ設定(OAuthプロバイダ登録等)が必要なため今回は見送り
-2. **タレント側**: TalentOnboarding/TalentDashboard/TalentProfile/TalentPublicProfile/TalentBrowse。`TalentProfile`/`TalentPublicProfile`は`IdeaSubmission`ウィジェットを削って移植。
+2. **タレント側** — **完了**。着手前に現行実装を確認したところ、既に大部分がカバー済みだった:
+   - TalentDashboard/TalentProfile(自己編集) → 現行`DashboardPage`+`TalentDashboard`が両方を1コンポーネントに統合済み(閲覧/編集モード切替)
+   - TalentPublicProfile → 現行`TalentDetailPage`が同等(企業/管理者はフル情報、それ以外はゲート表示)
+   - TalentBrowse → 現行`TalentListPage`が同等(検索・フィルタ・ティザー表示)
+   - TalentOnboarding → **移植しない**。bridge版は6ステップウィザードで、現行スキーマに無い項目(visa_status、salary_expectation、height/weight等の「fun facts」、github_username)を多数含み、クレジット付与(Checkout連動、対象外)にも依存する。現行の「ダッシュボードで直接編集」で初回入力の要件は満たせるため見送り
+   - **実際に必要だった作業**: Phase 1cで作った`follows`/`interests`テーブルの使い先(FollowButton/InterestButton)が未実装だったため新規追加。bridgeでの実際の使用箇所を調査し、`TalentCard`(一覧、小)と`TalentDetailPage`(詳細、小)に設置。`InterestButton`は企業アカウントのみ表示(bridgeの`TalentBrowse.jsx`の条件を踏襲)
+   - フォロー時の通知自動生成トリガー(`notify_on_follow`)を追加。notifications直接INSERTはadmin限定のまま、`follows`へのINSERT自体をトリガーに(security definer)することでなりすまし通知を防止
+   - 実装中に発見・修正したバグ: `InterestButton`が`user`(タレント用)を参照しており、企業アカウント(`company`)でログイン中は常に未ログイン扱いになっていた。ブラウザでの実クリック確認で発覚
+   - ブラウザで企業アカウントとして実際にフォロー/興味ありをクリックし、DB反映(followsテーブル・通知トリガー・interestsテーブル)を確認
 3. **企業・求人側**: CompanyOnboarding/CompanyDashboard/CompanyProfile/CompanyPublicProfile/PostJob/Jobs。`CompanyDashboard`/`CompanyPublicProfile`は`Challenge`ウィジェットと`Promotion`(ブースト)UIを削って移植。
 4. **管理者(分割構成)**: AdminHome/TalentReview/CompanyReview/JobModeration/Team/MatchingConsole/Analytics を`AdminLayout`配下のネストルートとして追加。現行の単一`AdminPage.tsx`をどう扱うか(置き換え/併存)はこのフェーズ着手時に別途確認する。
 5. **Connect/Saved/Notifications**: Connect(`posts`/`comments`/`likes`テーブル)、Saved(`saved_items`)、Notifications(`notifications`)。NavbarのMessage関連バッジは1b完了後に接続。
