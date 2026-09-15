@@ -281,6 +281,14 @@ export const translations: TranslationStore = {
       notFound: 'Position not found.',
       backToManage: '← Back to manage jobs',
     },
+    companyProfile: {
+      back: '← Back',
+      notFound: 'Company not found.',
+      openPositions: 'Open positions',
+      noOpenPositions: 'No open positions right now.',
+      about: 'About',
+      website: 'Website',
+    },
     footer: {
       tagline: 'Bridging Africa and Japan through talent.',
       rights: '© 2026 AfriTalent. All rights reserved.',
@@ -569,6 +577,14 @@ export const translations: TranslationStore = {
       notFound: '求人が見つかりませんでした。',
       backToManage: '← 求人管理に戻る',
     },
+    companyProfile: {
+      back: '← 戻る',
+      notFound: '企業が見つかりませんでした。',
+      openPositions: '募集中の求人',
+      noOpenPositions: '現在募集中の求人はありません。',
+      about: '会社概要',
+      website: 'ウェブサイト',
+    },
     footer: {
       tagline: 'アフリカと日本を人材でつなぐ。',
       rights: '© 2026 AfriTalent. All rights reserved.',
@@ -856,6 +872,14 @@ export const translations: TranslationStore = {
       backToJobs: '← Retour aux offres',
       notFound: 'Offre introuvable.',
       backToManage: '← Retour à la gestion des offres',
+    },
+    companyProfile: {
+      back: '← Retour',
+      notFound: 'Entreprise introuvable.',
+      openPositions: 'Postes ouverts',
+      noOpenPositions: "Aucun poste ouvert pour l'instant.",
+      about: 'À propos',
+      website: 'Site web',
     },
     footer: {
       tagline: 'Connecter l\'Afrique et le Japon à travers les talents.',

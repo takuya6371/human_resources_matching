@@ -102,7 +102,7 @@ export default function JobDetailPage() {
         </Link>
 
         <div className="line-card p-6 mt-3 mb-6">
-          <div className="flex items-center gap-3 mb-4">
+          <Link to={`/company/${job.companyId}`} className="inline-flex items-center gap-3 mb-4 no-underline group">
             {job.companyLogoUrl ? (
               <img src={job.companyLogoUrl} alt="" className="avatar-line w-12 h-12" />
             ) : (
@@ -110,8 +110,8 @@ export default function JobDetailPage() {
                 {(job.companyName ?? '??').slice(0, 2).toUpperCase()}
               </div>
             )}
-            <p className="text-ink-soft text-sm">{companyName}</p>
-          </div>
+            <p className="text-ink-soft text-sm group-hover:text-ink transition-colors">{companyName}</p>
+          </Link>
           <h1 className="font-display font-medium text-ink text-2xl sm:text-3xl tracking-wide mb-3">
             {jobTitle(job, lang)}
           </h1>

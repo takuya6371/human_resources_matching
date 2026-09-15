@@ -194,7 +194,13 @@ RLS方針: `threads`はtalent_id/company_id本人のみ読み書き、adminは�
    - フォロー時の通知自動生成トリガー(`notify_on_follow`)を追加。notifications直接INSERTはadmin限定のまま、`follows`へのINSERT自体をトリガーに(security definer)することでなりすまし通知を防止
    - 実装中に発見・修正したバグ: `InterestButton`が`user`(タレント用)を参照しており、企業アカウント(`company`)でログイン中は常に未ログイン扱いになっていた。ブラウザでの実クリック確認で発覚
    - ブラウザで企業アカウントとして実際にフォロー/興味ありをクリックし、DB反映(followsテーブル・通知トリガー・interestsテーブル)を確認
-3. **企業・求人側**: CompanyOnboarding/CompanyDashboard/CompanyProfile/CompanyPublicProfile/PostJob/Jobs。`CompanyDashboard`/`CompanyPublicProfile`は`Challenge`ウィジェットと`Promotion`(ブースト)UIを削って移植。
+3. **企業・求人側** — **完了**。タレント側と同様、着手前の確認で大部分がカバー済みと判明:
+   - CompanyOnboarding/CompanyDashboard/CompanyProfile(自己編集) → 現行`DashboardPage`+`CompanyDashboard`が統合済み
+   - PostJob → 現行`CompanyJobsPage`の`mode: 'list' | 'edit'`で既に実装済み
+   - Jobs(公開求人一覧) → 現行`JobListPage`/`JobDetailPage`で対応済み
+   - **実際に必要だった作業**: `CompanyPublicProfile`(企業の公開プロフィールページ)が丸ごと存在しなかったため新規追加。`/company/:id`ルートを追加し、企業情報+募集中求人一覧+FollowButtonのみで構成(bridge版が持つPosts/Comments/Likes/SaveButton/MessageButton/Challengeタブは、それぞれConnect(5)・Saved(5)・Messaging(Phase5)・対象外機能に依存するため、該当フェーズで拡張する前提で今回は含めない)
+   - `JobDetailPage`の企業名表示を`CompanyPublicProfilePage`へのリンクに変更
+   - ブラウザで実在の企業ID・存在しない企業ID両方の表示、求人詳細からの遷移を確認
 4. **管理者(分割構成)**: AdminHome/TalentReview/CompanyReview/JobModeration/Team/MatchingConsole/Analytics を`AdminLayout`配下のネストルートとして追加。現行の単一`AdminPage.tsx`をどう扱うか(置き換え/併存)はこのフェーズ着手時に別途確認する。
 5. **Connect/Saved/Notifications**: Connect(`posts`/`comments`/`likes`テーブル)、Saved(`saved_items`)、Notifications(`notifications`)。NavbarのMessage関連バッジは1b完了後に接続。
 

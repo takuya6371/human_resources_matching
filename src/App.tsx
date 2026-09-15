@@ -16,6 +16,7 @@ import JobDetailPage from './pages/JobDetailPage'
 import MyApplicationsPage from './pages/MyApplicationsPage'
 import CompanyJobsPage from './pages/CompanyJobsPage'
 import JobApplicantsPage from './pages/JobApplicantsPage'
+import CompanyPublicProfilePage from './pages/CompanyPublicProfilePage'
 import PageNotFound from './components/PageNotFound'
 
 interface LangContextType {
@@ -55,6 +56,7 @@ export default function App() {
             <Route path="/applications" element={<MyApplicationsPage />} />
             <Route path="/company/jobs" element={<CompanyJobsPage />} />
             <Route path="/company/jobs/:id/applicants" element={<JobApplicantsPage />} />
+            <Route path="/company/:id" element={<CompanyPublicProfilePage />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
