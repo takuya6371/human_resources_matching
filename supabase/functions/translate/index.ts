@@ -1,89 +1,116 @@
-// Azure Translator を使って英語→日本語の翻訳を行うEdge Function。
+// Gemini を使って翻訳を行うEdge Function（旧: Azure Translator）。
 //
-// フロントの「保存時に日本語欄が空なら英語から自動翻訳して埋める」機能から呼ばれる。
-// APIキーをクライアントに渡さないよう、実際のAzure呼び出しはこの関数の中でのみ行う。
+// フロントの「保存時に日本語欄が空なら英語から自動翻訳して埋める」機能と、
+// メッセージング機能の「メッセージ単位の翻訳表示」から呼ばれる。
+// APIキーをクライアントに渡さないよう、実際のGemini呼び出しはこの関数の中でのみ行う。
 //
 // 必須のSupabase Secrets:
-//   AZURE_TRANSLATOR_KEY    Azure Translatorのサブスクリプションキー
-//   AZURE_TRANSLATOR_REGION Azureリソースのリージョン（例: japaneast）
+//   GEMINI_API_KEY   parse-cv / send-message と共有
 //
 // verify_jwt はデフォルトで有効（config.tomlで個別設定していない場合）。
-// ログイン済みユーザーのみが呼び出せる状態を維持し、無料枠を第三者に
-// 消費されるのを防ぐ。
+// ログイン済みユーザー（またはsend-messageからのservice role呼び出し）のみが
+// 呼び出せる状態を維持し、無料枠を第三者に消費されるのを防ぐ。
 
-const AZURE_ENDPOINT = 'https://api.cognitive.microsofttranslator.com/translate'
-const MAX_TEXTS = 20
-const MAX_TEXT_LENGTH = 5000
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+const MODEL = Deno.env.get("GEMINI_TRANSLATE_MODEL") ?? "gemini-3.6-flash";
+
+const MAX_TEXTS = 20;
+const MAX_TEXT_LENGTH = 5000;
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const LANG_NAMES: Record<string, string> = {
+  ja: "Japanese",
+  en: "English",
+  fr: "French",
+};
 
 interface RequestBody {
-  texts: string[]
-  target?: string // デフォルト 'ja'
+  texts: string[];
+  target?: string; // デフォルト 'ja'
+}
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (!GEMINI_API_KEY) return json({ error: "missing_gemini_key" }, 500);
+
+  let body: RequestBody;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "bad_json" }, 400);
   }
+
+  const texts = (body.texts ?? []).filter(t => typeof t === "string" && t.trim().length > 0);
+  const target = body.target ?? "ja";
+
+  if (texts.length === 0) return json({ translations: [] });
+  if (texts.length > MAX_TEXTS || texts.some(t => t.length > MAX_TEXT_LENGTH)) {
+    return json({ error: "テキストが長すぎるか件数が多すぎます" }, 400);
+  }
+
+  const targetName = LANG_NAMES[target] ?? target;
 
   try {
-    const key = Deno.env.get('AZURE_TRANSLATOR_KEY')
-    const region = Deno.env.get('AZURE_TRANSLATOR_REGION')
-    if (!key || !region) {
-      return new Response(
-        JSON.stringify({ error: 'AZURE_TRANSLATOR_KEY / AZURE_TRANSLATOR_REGION が設定されていません' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    const res = await fetch(GEMINI_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${GEMINI_API_KEY}` },
+      body: JSON.stringify({
+        model: MODEL,
+        temperature: 0,
+        messages: [
+          {
+            role: "system",
+            content:
+              `You are a translation engine. You receive a JSON array of texts in mixed, ` +
+              `auto-detected languages. Translate each one into ${targetName}. If a text is ` +
+              `already in ${targetName}, return it unchanged. Preserve line breaks and formatting. ` +
+              `Return exactly one translation per input text, in the same order. Do not add ` +
+              `commentary, quotes, or explanations.`,
+          },
+          { role: "user", content: JSON.stringify(texts) },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "translations",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: { translations: { type: "array", items: { type: "string" } } },
+              required: ["translations"],
+              additionalProperties: false,
+            },
+          },
+        },
+      }),
+    });
+
+    if (!res.ok) {
+      const detail = await res.text();
+      return json({ error: `Gemini error: ${detail}` }, 502);
     }
 
-    const body = (await req.json()) as RequestBody
-    const texts = (body.texts ?? []).filter(t => typeof t === 'string' && t.trim().length > 0)
-    const target = body.target ?? 'ja'
-
-    if (texts.length === 0) {
-      return new Response(JSON.stringify({ translations: [] }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-    if (texts.length > MAX_TEXTS || texts.some(t => t.length > MAX_TEXT_LENGTH)) {
-      return new Response(JSON.stringify({ error: 'テキストが長すぎるか件数が多すぎます' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
+    const data = await res.json();
+    const parsed = JSON.parse(data.choices[0].message.content) as { translations?: string[] };
+    const translations = parsed.translations ?? [];
+    if (translations.length !== texts.length) {
+      return json({ error: "translation_count_mismatch" }, 502);
     }
 
-    const azureRes = await fetch(`${AZURE_ENDPOINT}?api-version=3.0&to=${encodeURIComponent(target)}`, {
-      method: 'POST',
-      headers: {
-        'Ocp-Apim-Subscription-Key': key,
-        'Ocp-Apim-Subscription-Region': region,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(texts.map(text => ({ Text: text }))),
-    })
-
-    if (!azureRes.ok) {
-      const errText = await azureRes.text()
-      return new Response(JSON.stringify({ error: `Azure Translator error: ${errText}` }), {
-        status: 502,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    const azureData = (await azureRes.json()) as { translations: { text: string }[] }[]
-    const translations = azureData.map(item => item.translations[0]?.text ?? '')
-
-    return new Response(JSON.stringify({ translations }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return json({ translations });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    return json({ error: err instanceof Error ? err.message : "Unknown error" }, 500);
   }
-})
+});

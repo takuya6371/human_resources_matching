@@ -6,6 +6,8 @@ import { t } from '../i18n'
 import { uploadProfileImage } from '../lib/storage'
 import { isSafeHttpUrl } from '../lib/url'
 import { fillMissingJapanese, translateToJa } from '../lib/translate'
+import CvImportDialog from './CvImportDialog'
+import type { CvFieldKey, CvFields } from '../lib/cvImport'
 import type { User, JLPTLevel, LanguageLevel, Language, Experience } from '../types'
 
 const LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5']
@@ -43,6 +45,24 @@ interface EditForm {
 const INPUT_CLS = 'input-line'
 const LABEL_CLS = 'label-line'
 
+// CV取り込みのレビュー画面に「今フォームに入っている値」を見せるための表示用変換。
+// languages/experience の書式は describeCvField と揃えてある。
+function cvCurrentValues(f: EditForm): Record<CvFieldKey, string> {
+  return {
+    nameEn: f.nameEn,
+    email: f.email,
+    headlineEn: f.headlineEn,
+    bioEn: f.bioEn,
+    university: f.university,
+    faculty: f.faculty,
+    japaneseLevel: f.japaneseLevel,
+    devExperienceYears: f.devExperienceYears,
+    skillsEn: f.skillsEn,
+    languages: f.languages.map(l => `${l.name} (${l.level})`).join(', '),
+    experience: f.experience.map(e => `${e.role} — ${e.company}`).join('\n'),
+  }
+}
+
 const STATUS_COLOR: Record<string, string> = {
   draft: '#B7B2A1',
   pending: '#BA7517',
@@ -60,6 +80,7 @@ export default function TalentDashboard({ user }: { user: User }) {
   const [form, setForm] = useState<EditForm | null>(null)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarError, setAvatarError] = useState('')
+  const [cvOpen, setCvOpen] = useState(false)
 
   const name = lang === 'ja' ? user.nameJa : user.nameEn
   const skills = lang === 'ja' ? user.skillsJa : user.skills
@@ -128,9 +149,11 @@ export default function TalentDashboard({ user }: { user: User }) {
 
     const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
     const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
+    // 翻訳できなかった分は空文字で返るので落とす。そのまま保存すると
+    // 日本語表示が「・・・・」だけの空スキルになる。
     const skillsJaArr = skillsJaArrInput.length > 0
       ? skillsJaArrInput
-      : (skillsEnArr.length > 0 ? await translateToJa(skillsEnArr) : [])
+      : (skillsEnArr.length > 0 ? (await translateToJa(skillsEnArr)).filter(Boolean) : [])
 
     const updates: Partial<User> = {
       email: form.email,
@@ -168,6 +191,19 @@ export default function TalentDashboard({ user }: { user: User }) {
 
   function setField<K extends keyof EditForm>(key: K, value: EditForm[K]) {
     setForm(f => f ? { ...f, [key]: value } : f)
+  }
+
+  // CVから読み取った値はフォームに載せるだけで、保存は通常の「変更を保存」に任せる。
+  // 英語欄を置き換えたときは、対応する日本語欄が古い内容のまま残ると英日で食い違うため
+  // 空にしておく。保存時の自動翻訳が新しい英語から埋め直す。
+  function applyCvFields(fields: CvFields) {
+    const clearedJa: Partial<EditForm> = {
+      ...(fields.headlineEn != null && { headlineJa: '' }),
+      ...(fields.bioEn != null && { bioJa: '' }),
+      ...(fields.skillsEn != null && { skillsJa: '' }),
+    }
+    setForm(f => f ? { ...f, ...fields, ...clearedJa } : f)
+    setCvOpen(false)
   }
 
   async function handleLogout() {
@@ -232,6 +268,26 @@ export default function TalentDashboard({ user }: { user: User }) {
 
         {editing && form ? (
           <form onSubmit={handleSave}>
+            <section className="line-card p-6 mb-5 flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest">
+                  {t(lang, 'dashboard.cvImportTitle')}
+                </h2>
+                <p className="text-sm text-ink-soft mt-2">{t(lang, 'dashboard.cvImportIntro')}</p>
+              </div>
+              <button type="button" onClick={() => setCvOpen(true)} className="btn-line whitespace-nowrap">
+                {t(lang, 'dashboard.cvImport')}
+              </button>
+            </section>
+
+            <CvImportDialog
+              open={cvOpen}
+              ownerId={user.id}
+              currentValues={cvCurrentValues(form)}
+              onApply={applyCvFields}
+              onClose={() => setCvOpen(false)}
+            />
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <div className="space-y-5">
                 <section className="line-card p-6">

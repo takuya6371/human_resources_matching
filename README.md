@@ -97,13 +97,10 @@ verify it applies cleanly before committing.
   Supabase access token (`npx supabase login`) with access to the project.
 - **Edge Functions**: `npx supabase functions deploy <name>`.
 
-Auto-translation (EN -> JA) for job postings and talent profiles requires an
-Azure Translator key set as a Supabase secret:
-```bash
-npx supabase secrets set AZURE_TRANSLATOR_KEY=... AZURE_TRANSLATOR_REGION=japaneast
-```
-Without it, leaving a Japanese field blank just saves it blank — nothing
-breaks, translation is simply skipped.
+Auto-translation (EN -> JA) for job postings, talent profiles, and chat
+messages uses Gemini and shares the same `GEMINI_API_KEY` secret as CV
+parsing (see below). Without it, leaving a Japanese field blank just saves it
+blank — nothing breaks, translation is simply skipped.
 
 ## Notes
 

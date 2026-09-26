@@ -408,7 +408,7 @@ s3_access_key = "env(S3_ACCESS_KEY)"
 s3_secret_key = "env(S3_SECRET_KEY)"
 
 [functions.translate]
-# ログイン済みユーザーのみ呼び出し可能にする（Azure無料枠を第三者に消費されないため）。
+# ログイン済みユーザーのみ呼び出し可能にする（Gemini無料枠を第三者に消費されないため）。
 verify_jwt = true
 
 [functions.parse-cv]
