@@ -1,9 +1,9 @@
 import { supabase } from './supabase'
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+export const MAX_PROFILE_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 
 export async function uploadProfileImage(file: File, ownerId: string): Promise<string> {
-  if (file.size > MAX_FILE_SIZE) {
+  if (file.size > MAX_PROFILE_IMAGE_SIZE) {
     throw new Error('FILE_TOO_LARGE')
   }
 

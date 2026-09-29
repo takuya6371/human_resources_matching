@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
-import { uploadProfileImage } from '../lib/storage'
+import { MAX_PROFILE_IMAGE_SIZE, uploadProfileImage } from '../lib/storage'
 import { isSafeHttpUrl } from '../lib/url'
 import { fillMissingJapanese, translateToJa } from '../lib/translate'
 import CvImportDialog from './CvImportDialog'
@@ -78,9 +78,14 @@ export default function TalentDashboard({ user }: { user: User }) {
   const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
-  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  // 写真は選択時点ではアップロードせず、保存時にまとめて送る。
+  // 選択しただけで編集をやめた場合に、紐づかないファイルがStorageに残らないようにするため。
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState('')
   const [avatarError, setAvatarError] = useState('')
   const [cvOpen, setCvOpen] = useState(false)
+
+  useEffect(() => () => { if (avatarPreview) URL.revokeObjectURL(avatarPreview) }, [avatarPreview])
 
   const name = lang === 'ja' ? user.nameJa : user.nameEn
   const skills = lang === 'ja' ? user.skillsJa : user.skills
@@ -117,30 +122,45 @@ export default function TalentDashboard({ user }: { user: User }) {
     })
     setEditing(true)
     setSaved(false)
-    setAvatarError('')
+    discardAvatarPick()
   }
 
-  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
-    setAvatarError('')
-    setUploadingAvatar(true)
-    try {
-      const url = await uploadProfileImage(file, user.id)
-      setField('avatarUrl', url)
-    } catch (err) {
-      setAvatarError(err instanceof Error && err.message === 'FILE_TOO_LARGE'
-        ? (lang === 'ja' ? 'ファイルサイズは5MB以下にしてください。' : 'File must be under 5MB.')
-        : (lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.'))
-    } finally {
-      setUploadingAvatar(false)
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE) {
+      setAvatarError(lang === 'ja' ? 'ファイルサイズは5MB以下にしてください。' : 'File must be under 5MB.')
+      return
     }
+
+    setAvatarError('')
+    setAvatarFile(file)
+    setAvatarPreview(URL.createObjectURL(file))
+  }
+
+  function discardAvatarPick() {
+    setAvatarFile(null)
+    setAvatarPreview('')
+    setAvatarError('')
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
+
+    // 写真を選んでいれば、ここで初めてStorageへ送る。失敗したら保存自体を中断して
+    // 編集画面に留まる（黙って写真だけ落として保存すると気づけないため）。
+    let avatarUrl = form.avatarUrl
+    if (avatarFile) {
+      try {
+        avatarUrl = await uploadProfileImage(avatarFile, user.id)
+      } catch {
+        setAvatarError(lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.')
+        return
+      }
+    }
 
     const [headlineJa, bioJa] = await fillMissingJapanese([
       { en: form.headlineEn, ja: form.headlineJa },
@@ -181,9 +201,10 @@ export default function TalentDashboard({ user }: { user: User }) {
       hobbies: form.hobbies || undefined,
       videoUrl: form.videoUrl || undefined,
       pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
-      avatarUrl: form.avatarUrl || undefined,
+      avatarUrl: avatarUrl || undefined,
     }
     await updateProfile(updates)
+    discardAvatarPick()
     setEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
@@ -298,16 +319,16 @@ export default function TalentDashboard({ user }: { user: User }) {
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.photo')}</label>
                       <div className="flex items-center gap-4">
-                        {form.avatarUrl ? (
-                          <img src={form.avatarUrl} alt="" className="avatar-line w-16 h-16 text-lg" />
+                        {avatarPreview || form.avatarUrl ? (
+                          <img src={avatarPreview || form.avatarUrl} alt="" className="avatar-line w-16 h-16 text-lg" />
                         ) : (
                           <div className="avatar-line w-16 h-16 text-lg">
                             {user.initials}
                           </div>
                         )}
                         <label className="btn-line text-xs px-4 py-2 cursor-pointer">
-                          {uploadingAvatar ? '···' : t(lang, 'dashboard.uploadPhoto')}
-                          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} disabled={uploadingAvatar} />
+                          {t(lang, 'dashboard.uploadPhoto')}
+                          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                         </label>
                       </div>
                       {avatarError && <p className="text-xs mt-2 text-seal">{avatarError}</p>}
@@ -549,7 +570,7 @@ export default function TalentDashboard({ user }: { user: User }) {
             </section>
 
             <div className="flex items-center justify-end gap-3 mt-6">
-              <button type="button" onClick={() => setEditing(false)}
+              <button type="button" onClick={() => { discardAvatarPick(); setEditing(false) }}
                       className="px-6 py-2.5 text-sm text-ink-soft hover:text-ink transition-colors cursor-pointer border border-hairline">
                 {t(lang, 'dashboard.cancelBtn')}
               </button>
