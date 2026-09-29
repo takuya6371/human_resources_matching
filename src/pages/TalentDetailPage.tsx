@@ -155,7 +155,7 @@ export default function TalentDetailPage() {
                 <p className="text-sm text-ink-soft">{skills.join(' · ')}</p>
               </section>
 
-              {(talent.residenceArea || talent.devExperienceYears != null || talent.yearsInJapan != null || talent.hobbies || talent.videoUrl || (talent.pastClients && talent.pastClients.length > 0)) && (
+              {(talent.residenceArea || talent.devExperienceYears != null || talent.yearsInJapan != null || talent.returnHomeMonth || talent.hobbies || talent.videoUrl || (talent.pastClients && talent.pastClients.length > 0)) && (
                 <section className="line-card p-6">
                   <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-4">
                     {t(lang, 'dashboard.sectionAdditional')}
@@ -169,6 +169,9 @@ export default function TalentDetailPage() {
                     )}
                     {talent.yearsInJapan != null && (
                       <p className="text-ink"><span className="text-ink-faint">{t(lang, 'dashboard.yearsInJapan')}: </span>{talent.yearsInJapan}</p>
+                    )}
+                    {talent.returnHomeMonth && (
+                      <p className="text-ink"><span className="text-ink-faint">{t(lang, 'dashboard.returnHomeMonth')}: </span>{talent.returnHomeMonth}</p>
                     )}
                     {talent.hobbies && (
                       <p className="text-ink"><span className="text-ink-faint">{t(lang, 'dashboard.hobbies')}: </span>{talent.hobbies}</p>

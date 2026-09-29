@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
-import { mapProfileRow, deriveInitials } from '../lib/profileMapper'
+import { mapProfileRow, deriveInitials, toReturnHomeDate } from '../lib/profileMapper'
 import type { User, Company, AccountType } from '../types'
 
 interface AuthContextType {
@@ -187,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       hobbies: updates.hobbies,
       video_url: updates.videoUrl,
       past_clients: updates.pastClients,
+      return_home_on: updates.returnHomeMonth ? toReturnHomeDate(updates.returnHomeMonth) : null,
     }).eq('id', user.id).select('status, admin_note, published_at').single()
 
     if (updates.languages !== undefined) {

@@ -12,7 +12,17 @@ export const PROFILE_PUBLIC_COLUMNS = [
   'bio_en', 'bio_ja', 'available_from', 'available_from_ja', 'open_to_work',
   'headline_en', 'headline_ja', 'status', 'residence_area', 'dev_experience_years',
   'past_clients', 'years_in_japan', 'hobbies', 'video_url', 'verification_status',
+  'return_home_on',
 ].join(', ')
+
+// DBのdate（月初）と、UIで扱う 'YYYY-MM' の相互変換。
+export function toReturnHomeMonth(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length >= 7 ? value.slice(0, 7) : undefined
+}
+
+export function toReturnHomeDate(month: string): string | null {
+  return /^\d{4}-\d{2}$/.test(month) ? `${month}-01` : null
+}
 
 export function deriveInitials(nameEn: string): string {
   return nameEn.split(' ').map(n => n[0] ?? '').join('').slice(0, 2).toUpperCase() || '??'
@@ -79,6 +89,7 @@ export function mapProfileRow(
     yearsInJapan: profile.years_in_japan ?? undefined,
     hobbies: profile.hobbies ?? undefined,
     videoUrl: profile.video_url ?? undefined,
+    returnHomeMonth: toReturnHomeMonth(profile.return_home_on),
   }
 }
 

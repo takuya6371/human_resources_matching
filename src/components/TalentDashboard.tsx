@@ -36,6 +36,7 @@ interface EditForm {
   residenceArea: string
   devExperienceYears: string
   yearsInJapan: string
+  returnHomeMonth: string
   hobbies: string
   videoUrl: string
   pastClients: string
@@ -115,6 +116,7 @@ export default function TalentDashboard({ user }: { user: User }) {
       residenceArea: user.residenceArea ?? '',
       devExperienceYears: user.devExperienceYears != null ? String(user.devExperienceYears) : '',
       yearsInJapan: user.yearsInJapan != null ? String(user.yearsInJapan) : '',
+      returnHomeMonth: user.returnHomeMonth ?? '',
       hobbies: user.hobbies ?? '',
       videoUrl: user.videoUrl ?? '',
       pastClients: (user.pastClients ?? []).join(', '),
@@ -198,6 +200,7 @@ export default function TalentDashboard({ user }: { user: User }) {
       residenceArea: form.residenceArea || undefined,
       devExperienceYears: form.devExperienceYears ? Number(form.devExperienceYears) : undefined,
       yearsInJapan: form.yearsInJapan ? Number(form.yearsInJapan) : undefined,
+      returnHomeMonth: form.returnHomeMonth || undefined,
       hobbies: form.hobbies || undefined,
       videoUrl: form.videoUrl || undefined,
       pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
@@ -238,7 +241,7 @@ export default function TalentDashboard({ user }: { user: User }) {
     setSubmitting(false)
   }
 
-  const hasAdditionalInfo = !!(user.residenceArea || user.devExperienceYears || user.yearsInJapan || user.hobbies || user.videoUrl || (user.pastClients && user.pastClients.length > 0))
+  const hasAdditionalInfo = !!(user.residenceArea || user.devExperienceYears || user.yearsInJapan || user.returnHomeMonth || user.hobbies || user.videoUrl || (user.pastClients && user.pastClients.length > 0))
   const statusColor = STATUS_COLOR[user.status] ?? STATUS_COLOR.draft
 
   return (
@@ -354,6 +357,12 @@ export default function TalentDashboard({ user }: { user: User }) {
                                placeholder={key === 'headlineJa' ? t(lang, 'jobs.autoTranslateHint') : undefined} />
                       </div>
                     ))}
+                    <div>
+                      <label className={LABEL_CLS}>{t(lang, 'dashboard.returnHomeMonth')}</label>
+                      <input className={INPUT_CLS} type="month" value={form.returnHomeMonth}
+                             onChange={e => setField('returnHomeMonth', e.target.value)} />
+                      <p className="text-xs text-ink-faint mt-1">{t(lang, 'dashboard.returnHomeMonthHint')}</p>
+                    </div>
                     <div>
                       <label className={LABEL_CLS}>{t(lang, 'dashboard.japaneseLevel')}</label>
                       <select className={INPUT_CLS} value={form.japaneseLevel}
@@ -667,6 +676,9 @@ export default function TalentDashboard({ user }: { user: User }) {
                     )}
                     {user.yearsInJapan != null && (
                       <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.yearsInJapan')}: </span>{user.yearsInJapan}</p>
+                    )}
+                    {user.returnHomeMonth && (
+                      <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.returnHomeMonth')}: </span>{user.returnHomeMonth}</p>
                     )}
                     {user.hobbies && (
                       <p className="text-ink-soft"><span className="text-ink-faint">{t(lang, 'dashboard.hobbies')}: </span>{user.hobbies}</p>

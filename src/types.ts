@@ -56,6 +56,8 @@ export interface Talent {
   yearsInJapan?: number
   hobbies?: string
   videoUrl?: string
+  // 帰国予定時期。'YYYY-MM' で保持し、DBには月初のdateとして保存する。未定は undefined。
+  returnHomeMonth?: string
 }
 
 export interface User extends Talent {
