@@ -5,8 +5,10 @@ import type { Experience, JLPTLevel, Language, LanguageLevel } from '../types'
 // cvs バケットの file_size_limit と parse-cv の MAX_BYTES に合わせる。
 const MAX_FILE_SIZE = 8 * 1024 * 1024
 
-const ACCEPTED_EXTENSIONS = ['pdf', 'docx', 'txt']
-export const CV_FILE_ACCEPT = '.pdf,.docx,.txt'
+// 紙のCVしか持っていない人向けに写真も受け付ける（スマホでは撮影が選択肢に出る）。
+// 画像はサーバー側でGeminiに文字起こしさせてから抽出にかける。
+const ACCEPTED_EXTENSIONS = ['pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg']
+export const CV_FILE_ACCEPT = '.pdf,.docx,.txt,image/png,image/jpeg'
 
 // parse-cv の CV_SCHEMA のうち、プロフィールに反映する部分だけを型にしている。
 // strict な json_schema で返るのでキーの存在は保証されるが、値はnull許容。

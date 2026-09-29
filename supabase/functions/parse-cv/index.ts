@@ -23,6 +23,7 @@
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 import { extractText, getDocumentProxy } from "npm:unpdf@0.12.1";
+import { encodeBase64 } from "jsr:@std/encoding@1/base64";
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY")!;
 const GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
@@ -172,6 +173,37 @@ async function pdfToText(bytes: Uint8Array): Promise<string> {
   const doc = await getDocumentProxy(bytes);
   const { text } = await extractText(doc, { mergePages: true });
   return (text as string).trim();
+}
+
+// 紙のCVをその場で撮って登録する導線のための、画像からの文字起こし。
+// クライアントにOCR（tesseract等）を載せる手もあるが、斜めから撮った紙・影・
+// 日本語混在に弱く、会場でスマホ撮影という用途では精度が出ない。抽出に使うのと
+// 同じGeminiに文字起こしだけさせ、以降のパイプラインはテキストと共通にする。
+async function imageToText(bytes: Uint8Array, mime: string): Promise<string> {
+  const res = await fetch(GEMINI_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${GEMINI_API_KEY}` },
+    body: JSON.stringify({
+      model: MODEL,
+      temperature: 0,
+      messages: [{
+        role: "user",
+        content: [
+          { type: "text", text:
+            "Transcribe this CV exactly as printed, in its original language. Keep line breaks " +
+            "and section headings. Do not translate, summarise, correct or add anything. " +
+            "Output only the transcription." },
+          { type: "image_url", image_url: { url: `data:${mime};base64,${encodeBase64(bytes)}` } },
+        ],
+      }],
+    }),
+  });
+
+  if (!res.ok) {
+    throw Object.assign(new Error(`gemini_${res.status}`), { status: res.status, detail: await res.text() });
+  }
+  const body = await res.json();
+  return (body.choices[0]?.message?.content ?? "").trim();
 }
 
 // DOCX は ZIP の中の word/document.xml が本文。変換ライブラリは書式のために
@@ -390,11 +422,17 @@ Deno.serve(async (req) => {
     } else if (lower.endsWith(".docx")) {
       try { text = await docxToText(bytes); }
       catch (e) { return json({ error: "docx_parse_failed", detail: String(e) }, 400); }
+    } else if (/\.(png|jpe?g)$/.test(lower)) {
+      // cvsバケットが許可しているのは png / jpeg のみ（20260825000000_cv_uploads_storage.sql）
+      const mime = lower.endsWith(".png") ? "image/png" : "image/jpeg";
+      try { text = await imageToText(bytes, mime); }
+      catch (e) { return json({ error: "image_read_failed", detail: String(e) }, 400); }
     } else if (lower.endsWith(".txt")) {
       text = new TextDecoder().decode(bytes).trim();
     } else {
       return json({ error: "unsupported_type",
-        message: "Send .pdf, .docx or .txt via storage_path, or extract client-side and send { text }." }, 415);
+        message: "Send .pdf, .docx, .txt or a photo (.png/.jpg) via storage_path, " +
+                 "or extract client-side and send { text }." }, 415);
     }
     textMs = Date.now() - t0;
   }

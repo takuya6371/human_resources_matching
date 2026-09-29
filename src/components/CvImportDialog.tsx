@@ -25,6 +25,8 @@ const FIELD_LABEL_KEYS: Record<CvFieldKey, string> = {
 const ERROR_KEYS: Record<string, string> = {
   needs_ocr: 'dashboard.cvErrNeedsOcr',
   insufficient_text: 'dashboard.cvErrInsufficient',
+  image_read_failed: 'dashboard.cvErrImage',
+  docx_parse_failed: 'dashboard.cvErrDocx',
   file_too_large: 'dashboard.cvErrTooLarge',
   unsupported_type: 'dashboard.cvErrUnsupported',
   upload_failed: 'dashboard.cvErrUpload',
