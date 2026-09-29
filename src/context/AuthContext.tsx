@@ -98,9 +98,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    // supabase-js はこのコールバックを内部の認証ロックを保持したまま呼ぶ。
+    // ここで supabase.* を await すると、そのリクエストが同じロックを取ろうとして
+    // デッドロックし、以降のSupabase呼び出しが返らなくなり得る。
+    // コールバック自体は同期で終わらせ、実際の読み込みはロックの外へ出す。
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        await loadAccount(session.user.id, session.user.email ?? '')
+        setTimeout(() => { loadAccount(session.user.id, session.user.email ?? '') }, 0)
       } else {
         setUser(null)
         setCompany(null)
