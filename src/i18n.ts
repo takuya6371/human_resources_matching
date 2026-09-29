@@ -21,8 +21,9 @@ export const translations: TranslationStore = {
     },
     hero: {
       badge: 'African Talent × Japanese Companies',
-      title: 'Discover African\nTalent in Japan',
-      subtitle: 'Connect with talented African professionals studying in Japan — diverse skills, global perspective, ready to contribute.',
+      title: 'Connecting Japan\nand Africa',
+      subtitle: 'A platform linking African professionals in Japan with Japanese companies working with Africa. Planning to return home and keep working with Japan? Register your profile.',
+      registerCta: 'Register your profile',
       searchPlaceholder: 'Search by name or skill…',
       searchBtn: 'Search',
       stats: {
@@ -472,8 +473,9 @@ export const translations: TranslationStore = {
     },
     hero: {
       badge: 'アフリカ人材 × 日本企業 マッチング',
-      title: '日本にいる\n世界水準の人材',
-      subtitle: '日本に留学中の優秀なアフリカ人材を発見。多様なスキル、グローバルな視点を持つ即戦力人材と出会いましょう。',
+      title: '日本とアフリカを\n仕事でつなぐ',
+      subtitle: '日本で働く・学ぶアフリカ出身の方と、アフリカに関わる日本企業をつなぐプラットフォームです。帰国後も日本の仕事を続けたい方の登録をお待ちしています。',
+      registerCta: 'プロフィールを登録する',
       searchPlaceholder: '名前またはスキルで検索…',
       searchBtn: '検索',
       stats: {
@@ -923,8 +925,9 @@ export const translations: TranslationStore = {
     },
     hero: {
       badge: 'Talents africains × Entreprises japonaises',
-      title: 'Découvrez les talents\nafricains au Japon',
-      subtitle: 'Connectez-vous avec de brillants professionnels africains étudiant au Japon — compétences variées, vision internationale, prêts à contribuer.',
+      title: 'Relier le Japon\net l\'Afrique',
+      subtitle: 'Une plateforme qui relie les professionnels africains au Japon et les entreprises japonaises tournées vers l\'Afrique. Vous comptez rentrer au pays et continuer à travailler avec le Japon ? Créez votre profil.',
+      registerCta: 'Créer mon profil',
       searchPlaceholder: 'Rechercher par nom ou compétence…',
       searchBtn: 'Rechercher',
       stats: {

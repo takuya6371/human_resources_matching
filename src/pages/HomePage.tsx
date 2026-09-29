@@ -59,18 +59,9 @@ export default function HomePage() {
             </button>
           </form>
 
-          <div className="flex gap-10 sm:gap-14 mt-16 pt-8 border-t border-hairline max-w-xl">
-            {([
-              ['5', 'hero.stats.talents'],
-              ['12+', 'hero.stats.companies'],
-              ['4', 'hero.stats.countries'],
-            ] as const).map(([val, key]) => (
-              <div key={key}>
-                <p className="font-display text-ink text-3xl" style={{ fontVariantNumeric: 'tabular-nums' }}>{val}</p>
-                <p className="text-ink-faint text-xs mt-1.5 uppercase tracking-wide">{t(lang, key)}</p>
-              </div>
-            ))}
-          </div>
+          <Link to="/login" className="inline-block mt-8 text-sm text-seal hover:opacity-70 no-underline border-b border-seal pb-0.5">
+            {t(lang, 'hero.registerCta')} →
+          </Link>
         </div>
       </section>
 
