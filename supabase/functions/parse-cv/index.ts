@@ -174,6 +174,32 @@ async function pdfToText(bytes: Uint8Array): Promise<string> {
   return (text as string).trim();
 }
 
+// DOCX は ZIP の中の word/document.xml が本文。変換ライブラリは書式のために
+// 重くなるが、ここで欲しいのは抽出モデルに渡す素のテキストだけなので、
+// 段落・改行・タブに当たるタグだけ区切りに変え、残りのタグを落とす。
+// 日本語の職務経歴書は表組みが多いが、セルの中身も同じ <w:p> なので拾える。
+async function docxToText(bytes: Uint8Array): Promise<string> {
+  const { unzip } = await import("npm:fflate@0.8.2");
+
+  const files: Record<string, Uint8Array> = await new Promise((resolve, reject) =>
+    unzip(bytes, (err: unknown, out: Record<string, Uint8Array>) => err ? reject(err) : resolve(out)));
+
+  const doc = files["word/document.xml"];
+  if (!doc) throw new Error("no_document_xml");
+
+  return new TextDecoder().decode(doc)
+    .replace(/<w:tab\b[^>]*\/>/g, "\t")
+    .replace(/<w:br\b[^>]*\/>/g, "\n")
+    .replace(/<\/w:p>/g, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 /** Post-schema checks the model cannot guarantee. */
 function validate(d: any): string[] {
   const p: string[] = [];
@@ -361,11 +387,14 @@ Deno.serve(async (req) => {
         return json({ error: "needs_ocr", needs_ocr: true,
           message: "This PDF has no text layer. Run OCR on the client (tesseract.js) and resubmit as { text }." }, 422);
       }
+    } else if (lower.endsWith(".docx")) {
+      try { text = await docxToText(bytes); }
+      catch (e) { return json({ error: "docx_parse_failed", detail: String(e) }, 400); }
     } else if (lower.endsWith(".txt")) {
       text = new TextDecoder().decode(bytes).trim();
     } else {
       return json({ error: "unsupported_type",
-        message: "Send .pdf or .txt via storage_path, or extract client-side and send { text }." }, 415);
+        message: "Send .pdf, .docx or .txt via storage_path, or extract client-side and send { text }." }, 415);
     }
     textMs = Date.now() - t0;
   }

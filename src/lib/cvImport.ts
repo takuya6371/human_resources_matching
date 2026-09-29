@@ -5,10 +5,8 @@ import type { Experience, JLPTLevel, Language, LanguageLevel } from '../types'
 // cvs バケットの file_size_limit と parse-cv の MAX_BYTES に合わせる。
 const MAX_FILE_SIZE = 8 * 1024 * 1024
 
-// バケット自体はdocx/画像も受け付けるが、parse-cv が storage_path から読めるのは
-// .pdf と .txt だけで、それ以外は unsupported_type を返す。選ばせない。
-const ACCEPTED_EXTENSIONS = ['pdf', 'txt']
-export const CV_FILE_ACCEPT = '.pdf,.txt'
+const ACCEPTED_EXTENSIONS = ['pdf', 'docx', 'txt']
+export const CV_FILE_ACCEPT = '.pdf,.docx,.txt'
 
 // parse-cv の CV_SCHEMA のうち、プロフィールに反映する部分だけを型にしている。
 // strict な json_schema で返るのでキーの存在は保証されるが、値はnull許容。
