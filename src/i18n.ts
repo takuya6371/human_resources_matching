@@ -20,9 +20,9 @@ export const translations: TranslationStore = {
       messages: 'Messages',
     },
     hero: {
-      badge: 'African Talent × Japanese Companies',
-      title: 'Connecting Japan\nand Africa',
-      subtitle: 'A platform linking African professionals in Japan with Japanese companies working with Africa. Planning to return home and keep working with Japan? Register your profile.',
+      badge: 'Global Talent × Japanese Companies',
+      title: 'Connecting Japan\nand the world',
+      subtitle: 'A platform linking professionals from around the world who are in Japan with Japanese companies working across borders. Planning to return home and keep working with Japan? Register your profile.',
       registerCta: 'Register your profile',
       searchPlaceholder: 'Search by name or skill…',
       searchBtn: 'Search',
@@ -33,13 +33,13 @@ export const translations: TranslationStore = {
       },
     },
     home: {
-      featuredHeading: 'Meet exceptional African talent in Japan',
+      featuredHeading: 'Meet exceptional international talent in Japan',
       featuredSub: 'Handpicked professionals ready to contribute',
       viewAll: 'View all talents',
     },
     list: {
       heading: 'All talents',
-      subheading: 'Exceptional professionals from across Africa',
+      subheading: 'Exceptional professionals from around the world',
       filterAll: 'All fields',
       filterLevel: 'Japanese level',
       noResults: 'No talents found. Try a different search.',
@@ -303,7 +303,7 @@ export const translations: TranslationStore = {
     },
     jobs: {
       heading: 'Open positions',
-      subheading: 'Roles from companies hiring African talent in Japan',
+      subheading: 'Roles from companies hiring international talent in Japan',
       searchPlaceholder: 'Search by title or field…',
       noResults: 'No open positions right now.',
       resultCount: 'positions',
@@ -344,7 +344,7 @@ export const translations: TranslationStore = {
       jobTypeStaffing: 'Ongoing contract',
       jobTypeProject: 'Project-based contract',
       remoteOkLabel: 'Remote OK',
-      remoteOkOption: 'Can work remotely from Africa — no relocation to Japan required',
+      remoteOkOption: 'Can work remotely from abroad — no relocation to Japan required',
       durationLabel: 'Duration',
       durationPlaceholder: 'e.g. 6 months (renewable)',
       deliverablesLabel: 'Deliverables',
@@ -446,7 +446,7 @@ export const translations: TranslationStore = {
       flaggedBadge: 'On hold',
     },
     footer: {
-      tagline: 'Bridging Africa and Japan through talent.',
+      tagline: 'Connecting Japan and the world through talent.',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
     page404: {
@@ -472,9 +472,9 @@ export const translations: TranslationStore = {
       messages: 'メッセージ',
     },
     hero: {
-      badge: 'アフリカ人材 × 日本企業 マッチング',
-      title: '日本とアフリカを\n仕事でつなぐ',
-      subtitle: '日本で働く・学ぶアフリカ出身の方と、アフリカに関わる日本企業をつなぐプラットフォームです。帰国後も日本の仕事を続けたい方の登録をお待ちしています。',
+      badge: '海外人材 × 日本企業 マッチング',
+      title: '日本と世界を\n仕事でつなぐ',
+      subtitle: '日本で働く・学ぶ海外出身の方と、海外とつながる日本企業をつなぐプラットフォームです。帰国後も日本の仕事を続けたい方の登録をお待ちしています。',
       registerCta: 'プロフィールを登録する',
       searchPlaceholder: '名前またはスキルで検索…',
       searchBtn: '検索',
@@ -485,13 +485,13 @@ export const translations: TranslationStore = {
       },
     },
     home: {
-      featuredHeading: 'アフリカの優秀な人材と出会う',
-      featuredSub: 'アフリカ各国から集まった優秀な人材',
+      featuredHeading: '世界から集まった人材と出会う',
+      featuredSub: '世界各国から集まった優秀な人材',
       viewAll: '人材一覧を見る',
     },
     list: {
       heading: '人材一覧',
-      subheading: 'アフリカ各国から集まった優秀な人材',
+      subheading: '世界各国から集まった優秀な人材',
       filterAll: 'すべての分野',
       filterLevel: '日本語レベル',
       noResults: '該当する人材が見つかりませんでした。',
@@ -755,7 +755,7 @@ export const translations: TranslationStore = {
     },
     jobs: {
       heading: '求人一覧',
-      subheading: '日本でアフリカ人材を採用したい企業の求人',
+      subheading: '日本で海外人材を採用したい企業の求人',
       searchPlaceholder: '職種・分野で検索…',
       noResults: '現在公開中の求人はありません。',
       resultCount: '件',
@@ -796,7 +796,7 @@ export const translations: TranslationStore = {
       jobTypeStaffing: '業務委託（継続稼働）',
       jobTypeProject: '受託開発（プロジェクト）',
       remoteOkLabel: 'リモート可',
-      remoteOkOption: 'アフリカ在住のまま就業可能（来日不要）',
+      remoteOkOption: '海外在住のまま就業可能（来日不要）',
       durationLabel: '契約期間',
       durationPlaceholder: '例: 6ヶ月（更新あり）',
       deliverablesLabel: '成果物',
@@ -898,7 +898,7 @@ export const translations: TranslationStore = {
       flaggedBadge: '保留中',
     },
     footer: {
-      tagline: 'アフリカと日本を人材でつなぐ。',
+      tagline: '日本と世界を人材でつなぐ。',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
     page404: {
@@ -924,9 +924,9 @@ export const translations: TranslationStore = {
       messages: 'Messages',
     },
     hero: {
-      badge: 'Talents africains × Entreprises japonaises',
-      title: 'Relier le Japon\net l\'Afrique',
-      subtitle: 'Une plateforme qui relie les professionnels africains au Japon et les entreprises japonaises tournées vers l\'Afrique. Vous comptez rentrer au pays et continuer à travailler avec le Japon ? Créez votre profil.',
+      badge: 'Talents internationaux × Entreprises japonaises',
+      title: 'Relier le Japon\net le monde',
+      subtitle: 'Une plateforme qui relie les professionnels internationaux au Japon et les entreprises japonaises tournées vers l\'international. Vous comptez rentrer au pays et continuer à travailler avec le Japon ? Créez votre profil.',
       registerCta: 'Créer mon profil',
       searchPlaceholder: 'Rechercher par nom ou compétence…',
       searchBtn: 'Rechercher',
@@ -937,13 +937,13 @@ export const translations: TranslationStore = {
       },
     },
     home: {
-      featuredHeading: 'Rencontrez les meilleurs talents africains au Japon',
+      featuredHeading: 'Rencontrez les meilleurs talents internationaux au Japon',
       featuredSub: 'Des professionnels sélectionnés, prêts à contribuer',
       viewAll: 'Voir tous les talents',
     },
     list: {
       heading: 'Tous les talents',
-      subheading: 'Des professionnels exceptionnels venus de toute l\'Afrique',
+      subheading: 'Des professionnels exceptionnels venus du monde entier',
       filterAll: 'Tous les domaines',
       filterLevel: 'Niveau de japonais',
       noResults: 'Aucun talent trouvé. Essayez une autre recherche.',
@@ -1207,7 +1207,7 @@ export const translations: TranslationStore = {
     },
     jobs: {
       heading: "Offres d'emploi",
-      subheading: 'Postes proposés par des entreprises recrutant des talents africains au Japon',
+      subheading: 'Postes proposés par des entreprises recrutant des talents internationaux au Japon',
       searchPlaceholder: 'Rechercher par titre ou domaine…',
       noResults: 'Aucune offre disponible pour le moment.',
       resultCount: 'offres',
@@ -1248,7 +1248,7 @@ export const translations: TranslationStore = {
       jobTypeStaffing: 'Contrat continu',
       jobTypeProject: 'Contrat par projet',
       remoteOkLabel: 'Télétravail possible',
-      remoteOkOption: "Peut travailler à distance depuis l'Afrique — sans déménager au Japon",
+      remoteOkOption: "Peut travailler à distance depuis l'étranger — sans déménager au Japon",
       durationLabel: 'Durée',
       durationPlaceholder: 'ex. 6 mois (renouvelable)',
       deliverablesLabel: 'Livrables',
@@ -1350,7 +1350,7 @@ export const translations: TranslationStore = {
       flaggedBadge: 'En attente',
     },
     footer: {
-      tagline: 'Connecter l\'Afrique et le Japon à travers les talents.',
+      tagline: 'Connecter le Japon et le monde à travers les talents.',
       rights: '© 2026 AfriTalent. Tous droits réservés.',
     },
     page404: {
