@@ -65,7 +65,9 @@ export default function JobDetailPage() {
       cover_message: coverMessage.trim(),
     })
     if (error) {
-      setApplyError(error.message)
+      // RLS拒否はほぼ「プロフィールが未承認」なので、DBの文言をそのまま出さない。
+      const isRls = error.message.includes('row-level security')
+      setApplyError(t(lang, isRls ? 'jobs.applyNeedsApproval' : 'jobs.applyFailed'))
       setSubmitting(false)
       return
     }
@@ -143,7 +145,15 @@ export default function JobDetailPage() {
         )}
 
         <div className="line-card p-6">
-          {accountType === 'talent' ? (
+          {accountType === 'talent' && user && user.status !== 'approved' && !applicationStatus ? (
+            // 応募できるのは掲載が承認された人材のみ（applicationsのRLS）。フォームを
+            // 出して送信時に弾くと、生のDBエラーが出て理由も次の行動も分からない。
+            <div className="text-center py-4">
+              <p className="text-ink font-medium mb-1">{t(lang, 'jobs.applyNeedsApproval')}</p>
+              <p className="text-ink-soft text-xs leading-relaxed mb-4">{t(lang, 'jobs.applyNeedsApprovalHint')}</p>
+              <Link to="/dashboard" className="btn-line no-underline">{t(lang, 'jobs.goToProfile')}</Link>
+            </div>
+          ) : accountType === 'talent' ? (
             applicationStatus ? (
               <div className="text-center py-4">
                 <p className="text-ink font-medium mb-1">
