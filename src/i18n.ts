@@ -128,6 +128,12 @@ export const translations: TranslationStore = {
       invalidBody: 'This link is missing or has expired. Please request a new one.',
       requestNewLink: 'Request a new link',
     },
+    preview: {
+      openBtn: 'Preview as a company',
+      banner: 'This is how your profile looks to companies.',
+      bannerHint: 'Everything here is visible to signed-in company accounts. Anyone else sees a limited version without your name or contact details.',
+      backToDashboard: 'Back to my profile',
+    },
     dashboard: {
       welcome: 'Welcome back,',
       editBtn: 'Edit Profile',
@@ -580,6 +586,12 @@ export const translations: TranslationStore = {
       invalidBody: 'このリンクは無効か、期限切れです。もう一度リクエストしてください。',
       requestNewLink: '再度リクエストする',
     },
+    preview: {
+      openBtn: '企業からの見え方を確認',
+      banner: 'これは企業から見たあなたのプロフィールです。',
+      bannerHint: 'ここに表示されている内容は、ログイン済みの企業アカウントから閲覧できます。それ以外の人には、氏名や連絡先を伏せた限定表示になります。',
+      backToDashboard: 'プロフィールに戻る',
+    },
     dashboard: {
       welcome: '',
       editBtn: 'プロフィール編集',
@@ -1031,6 +1043,12 @@ export const translations: TranslationStore = {
       invalidTitle: 'Lien invalide',
       invalidBody: 'Ce lien est manquant ou a expiré. Veuillez en demander un nouveau.',
       requestNewLink: 'Demander un nouveau lien',
+    },
+    preview: {
+      openBtn: 'Aperçu côté entreprise',
+      banner: "Voici votre profil tel que les entreprises le voient.",
+      bannerHint: "Tout ce qui figure ici est visible par les comptes entreprise connectés. Les autres visiteurs voient une version limitée, sans votre nom ni vos coordonnées.",
+      backToDashboard: 'Retour à mon profil',
     },
     dashboard: {
       welcome: 'Bienvenue,',

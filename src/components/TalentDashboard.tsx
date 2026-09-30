@@ -631,12 +631,17 @@ export default function TalentDashboard({ user }: { user: User }) {
                       {t(lang, `dashboard.status${user.status.charAt(0).toUpperCase()}${user.status.slice(1)}`)}
                     </span>
                   </div>
-                  {(user.status === 'draft' || user.status === 'rejected') && (
-                    <button onClick={handleSubmitForReview} disabled={submitting}
-                            className="btn-line text-xs px-4 py-2 disabled:opacity-50">
-                      {submitting ? '···' : t(lang, user.status === 'rejected' ? 'dashboard.resubmit' : 'dashboard.submitForReview')}
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Link to={`/talent/${user.id}`} className="btn-line-ghost text-xs px-4 py-2 no-underline whitespace-nowrap">
+                      {t(lang, 'preview.openBtn')}
+                    </Link>
+                    {(user.status === 'draft' || user.status === 'rejected') && (
+                      <button onClick={handleSubmitForReview} disabled={submitting}
+                              className="btn-line text-xs px-4 py-2 disabled:opacity-50">
+                        {submitting ? '···' : t(lang, user.status === 'rejected' ? 'dashboard.resubmit' : 'dashboard.submitForReview')}
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {(user.status === 'draft' || user.status === 'pending') && (
                   <p className="text-ink-faint text-xs mt-2 leading-relaxed">{t(lang, 'dashboard.submitForReviewHint')}</p>

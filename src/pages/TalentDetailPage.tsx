@@ -24,8 +24,12 @@ const BLUR_BLOCK = { background: 'rgba(28,27,24,0.08)', filter: 'blur(4px)' }
 export default function TalentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { lang } = useLang()
-  const { accountType, company } = useAuth()
-  const hasFullAccess = accountType === 'company' || accountType === 'admin'
+  const { accountType, company, user } = useAuth()
+  // 本人が自分のプロフィールを開いたときは、企業から見えるのと同じ全文表示にする。
+  // 何が企業に渡るのかを登録者自身が確認できるようにするため（RLSでも本人は
+  // 自分の行を読めるので、追加の権限は要らない）。
+  const isOwnProfile = user?.id === id
+  const hasFullAccess = accountType === 'company' || accountType === 'admin' || isOwnProfile
 
   const [talent, setTalent] = useState<Talent | null>(null)
   const [teaser, setTeaser] = useState<TalentTeaser | null>(null)
@@ -101,9 +105,21 @@ export default function TalentDetailPage() {
         <Navbar />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-          <Link to="/talents" className="inline-flex items-center text-ink-soft text-sm hover:text-ink transition-colors no-underline mb-8">
-            {t(lang, 'detail.back')}
-          </Link>
+          {isOwnProfile ? (
+            <div className="line-card p-5 mb-8 flex flex-wrap items-center justify-between gap-3 border-seal">
+              <div className="min-w-0">
+                <p className="text-sm text-ink font-medium">{t(lang, 'preview.banner')}</p>
+                <p className="text-xs text-ink-soft mt-1">{t(lang, 'preview.bannerHint')}</p>
+              </div>
+              <Link to="/dashboard" className="btn-line whitespace-nowrap no-underline">
+                {t(lang, 'preview.backToDashboard')}
+              </Link>
+            </div>
+          ) : (
+            <Link to="/talents" className="inline-flex items-center text-ink-soft text-sm hover:text-ink transition-colors no-underline mb-8">
+              {t(lang, 'detail.back')}
+            </Link>
+          )}
 
           {/* profile header */}
           <div className="line-card mb-6">
