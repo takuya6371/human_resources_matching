@@ -93,6 +93,11 @@ export default function Navbar() {
           <Link to="/connect" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.connect')}
           </Link>
+          {user && (
+            <Link to="/board" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+              {t(lang, 'nav.board')}
+            </Link>
+          )}
           {(user || company) && (
             <Link to="/saved" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
               {t(lang, 'nav.saved')}
@@ -226,6 +231,11 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.connect')}
           </Link>
+          {user && (
+            <Link to="/board" onClick={() => setMenuOpen(false)} className="block py-2 text-ink-soft text-sm hover:text-ink no-underline">
+              {t(lang, 'nav.board')}
+            </Link>
+          )}
           {(user || company) && (
             <Link to="/saved" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
                   onClick={() => setMenuOpen(false)}>

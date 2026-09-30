@@ -17,6 +17,7 @@ import CompanyJobsPage from './pages/CompanyJobsPage'
 import JobApplicantsPage from './pages/JobApplicantsPage'
 import CompanyPublicProfilePage from './pages/CompanyPublicProfilePage'
 import ConnectPage from './pages/ConnectPage'
+import BoardPage from './pages/BoardPage'
 import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
 import MessagesPage from './pages/MessagesPage'
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="/company/jobs/:id/applicants" element={<JobApplicantsPage />} />
             <Route path="/company/:id" element={<CompanyPublicProfilePage />} />
             <Route path="/connect" element={<ConnectPage />} />
+            <Route path="/board" element={<BoardPage />} />
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />
