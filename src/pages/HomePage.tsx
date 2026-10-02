@@ -1,19 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import TalentCard from '../components/TalentCard'
+import TalentTeaserCard from '../components/TalentTeaserCard'
 import Footer from '../components/Footer'
-import talentsData from '../data/talents.json'
 import { useLang } from '../App'
 import { t } from '../i18n'
-import type { Talent } from '../types'
-
-const FEATURED = (talentsData as Talent[]).slice(0, 3)
+import { supabase } from '../lib/supabase'
+import { mapTeaserRow } from '../lib/profileMapper'
+import type { TalentTeaser } from '../types'
 
 export default function HomePage() {
   const { lang } = useLang()
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
+  const [featured, setFeatured] = useState<TalentTeaser[]>([])
+
+  // トップは未ログインでも開くため、氏名や連絡先を含まない profiles_preview を使う。
+  useEffect(() => {
+    supabase.from('profiles_preview').select('*').limit(3)
+      .then(({ data }) => setFeatured((data ?? []).map(mapTeaserRow)))
+  }, [])
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -65,7 +71,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured talents */}
+      {/* Featured talents — 登録者がいないうちは見出しごと出さない */}
+      {featured.length > 0 && (
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
         <div className="flex items-end justify-between gap-4 mb-10">
           <div>
@@ -80,11 +87,12 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {FEATURED.map((talent, i) => (
-            <TalentCard key={talent.id} talent={talent} index={i} disableLink />
+          {featured.map(talent => (
+            <TalentTeaserCard key={talent.id} talent={talent} />
           ))}
         </div>
       </main>
+      )}
 
       <Footer />
     </div>
