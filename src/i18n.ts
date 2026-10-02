@@ -143,6 +143,7 @@ export const translations: TranslationStore = {
       replyPlaceholder: 'Share what you know…',
       delete: 'Delete',
       adminBadge: 'Team',
+      you: 'You',
       anonymous: 'A member',
     },
     preview: {
@@ -622,6 +623,7 @@ export const translations: TranslationStore = {
       replyPlaceholder: '知っていることを書いてください…',
       delete: '削除',
       adminBadge: '運営',
+      you: 'あなた',
       anonymous: '登録者',
     },
     preview: {
@@ -1101,6 +1103,7 @@ export const translations: TranslationStore = {
       replyPlaceholder: 'Partagez ce que vous savez…',
       delete: 'Supprimer',
       adminBadge: 'Équipe',
+      you: 'Vous',
       anonymous: 'Un membre',
     },
     preview: {

@@ -7,8 +7,8 @@ import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 
-interface Reply { id: string; authorId: string; authorName: string; isAdmin: boolean; body: string; createdAt: string }
-interface Thread { id: string; authorId: string; authorName: string; title: string; body: string; createdAt: string; replies: Reply[] }
+interface Reply { id: string; authorId: string; fromStaff: boolean; body: string; createdAt: string }
+interface Thread { id: string; authorId: string; fromStaff: boolean; title: string; body: string; createdAt: string; replies: Reply[] }
 
 // 相談は人材と運営だけの場。企業から見えるとビザや帰国の本音が書けなくなるため、
 // RLSで企業を弾いている（20260922000000_talent_board.sql）。画面側でも企業には出さない。
@@ -31,25 +31,27 @@ export default function BoardPage() {
     load()
   }, [authLoading, user, accountType])
 
+  // 人材は他人のprofiles行を読めないため、名前は引かない（相談の匿名性としても
+  // そのほうが望ましい）。運営かどうかだけサーバー側で立てたfrom_staffで判別する。
   async function load() {
     const [{ data: threadRows }, { data: replyRows }] = await Promise.all([
-      supabase.from('board_threads').select('*, profiles!board_threads_author_id_fkey(name_en, name_ja, role)').order('created_at', { ascending: false }),
-      supabase.from('board_replies').select('*, profiles!board_replies_author_id_fkey(name_en, name_ja, role)').order('created_at'),
+      supabase.from('board_threads').select('*').order('created_at', { ascending: false }),
+      supabase.from('board_replies').select('*').order('created_at'),
     ])
 
-    const name = (p: any) => (lang === 'ja' ? p?.name_ja : p?.name_en) || p?.name_en || t(lang, 'board.anonymous')
-
-    const replies = (replyRows ?? []).map(r => ({
-      id: r.id, authorId: r.author_id, authorName: name(r.profiles),
-      isAdmin: r.profiles?.role === 'admin', body: r.body, createdAt: r.created_at,
-    }))
-
     setThreads((threadRows ?? []).map(row => ({
-      id: row.id, authorId: row.author_id, authorName: name(row.profiles),
+      id: row.id, authorId: row.author_id, fromStaff: row.from_staff,
       title: row.title, body: row.body, createdAt: row.created_at,
-      replies: replies.filter(r => (replyRows ?? []).find(x => x.id === r.id)?.thread_id === row.id),
+      replies: (replyRows ?? []).filter(r => r.thread_id === row.id).map(r => ({
+        id: r.id, authorId: r.author_id, fromStaff: r.from_staff, body: r.body, createdAt: r.created_at,
+      })),
     })))
     setLoading(false)
+  }
+
+  function authorLabel(authorId: string, fromStaff: boolean) {
+    if (fromStaff) return t(lang, 'board.adminBadge')
+    return authorId === user?.id ? t(lang, 'board.you') : t(lang, 'board.anonymous')
   }
 
   async function handlePost(e: React.FormEvent) {
@@ -106,7 +108,7 @@ export default function BoardPage() {
                   <div className="min-w-0">
                     <h2 className="text-ink font-medium">{th.title}</h2>
                     <p className="text-ink-faint text-xs mt-1">
-                      {th.authorName} · {new Date(th.createdAt).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US')}
+                      {authorLabel(th.authorId, th.fromStaff)} · {new Date(th.createdAt).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US')}
                     </p>
                   </div>
                   {(th.authorId === user?.id || accountType === 'admin') && (
@@ -122,8 +124,9 @@ export default function BoardPage() {
                       <div key={r.id} className="flex items-start justify-between gap-4">
                         <div className="min-w-0">
                           <p className="text-xs">
-                            <span className="text-ink font-medium">{r.authorName}</span>
-                            {r.isAdmin && <span className="badge-line ml-2 text-[10px]">{t(lang, 'board.adminBadge')}</span>}
+                            <span className={r.fromStaff ? 'badge-line-ink text-[10px]' : 'text-ink font-medium'}>
+                              {authorLabel(r.authorId, r.fromStaff)}
+                            </span>
                           </p>
                           <p className="text-ink-soft text-sm mt-1 whitespace-pre-line leading-relaxed">{r.body}</p>
                         </div>
