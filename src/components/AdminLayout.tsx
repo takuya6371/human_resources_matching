@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom'
-import { LayoutDashboard, Users, Sparkles, BarChart3, LogOut, Home, Flag } from 'lucide-react'
+import { LayoutDashboard, Users, Sparkles, BarChart3, LogOut, Home, Flag, Building2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 // CompanyReview/JobModerationは、企業承認・求人審査ワークフローが
@@ -12,6 +12,7 @@ const NAV = [
   { to: '/admin/moderation', label: 'Moderation', icon: Flag },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { to: '/admin/team', label: 'Team', icon: Users },
+  { to: '/admin/trusted', label: 'Partner Companies', icon: Building2 },
 ]
 
 export default function AdminLayout() {

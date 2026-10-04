@@ -29,6 +29,7 @@ import AdminLayout from './components/AdminLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
 import AdminTalentReviewPage from './pages/admin/AdminTalentReviewPage'
 import AdminTeamPage from './pages/admin/AdminTeamPage'
+import AdminTrustedCompaniesPage from './pages/admin/AdminTrustedCompaniesPage'
 import AdminAnalyticsPage from './pages/admin/AdminAnalyticsPage'
 import AdminMatchingConsolePage from './pages/admin/AdminMatchingConsolePage'
 import AdminModerationPage from './pages/admin/AdminModerationPage'
@@ -72,6 +73,7 @@ export default function App() {
               <Route path="moderation" element={<AdminModerationPage />} />
               <Route path="analytics" element={<AdminAnalyticsPage />} />
               <Route path="team" element={<AdminTeamPage />} />
+              <Route path="trusted" element={<AdminTrustedCompaniesPage />} />
             </Route>
             <Route path="/jobs" element={<JobListPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />

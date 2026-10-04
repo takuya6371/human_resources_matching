@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import TalentTeaserCard from '../components/TalentTeaserCard'
 import Footer from '../components/Footer'
+import TrustedCompanies from '../components/TrustedCompanies'
 import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
@@ -70,6 +71,8 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      <TrustedCompanies />
 
       {/* Featured talents — 登録者がいないうちは見出しごと出さない */}
       {featured.length > 0 && (
