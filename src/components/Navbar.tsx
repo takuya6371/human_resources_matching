@@ -93,6 +93,13 @@ export default function Navbar() {
           <Link to="/connect" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
             {t(lang, 'nav.connect')}
           </Link>
+          {/* 未ログインの訪問者にだけ出す。登録済みの人には不要で、ログイン後は
+              ナビが他の導線で埋まるため。About はフッターに置いている。 */}
+          {!user && !company && (
+            <Link to="/how-it-works" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
+              {t(lang, 'nav.howItWorks')}
+            </Link>
+          )}
           {user && (
             <Link to="/board" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
               {t(lang, 'nav.board')}
@@ -231,6 +238,12 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}>
             {t(lang, 'nav.connect')}
           </Link>
+          {!user && !company && (
+            <Link to="/how-it-works" className="text-ink-soft text-sm py-2 no-underline hover:text-ink"
+                  onClick={() => setMenuOpen(false)}>
+              {t(lang, 'nav.howItWorks')}
+            </Link>
+          )}
           {user && (
             <Link to="/board" onClick={() => setMenuOpen(false)} className="block py-2 text-ink-soft text-sm hover:text-ink no-underline">
               {t(lang, 'nav.board')}

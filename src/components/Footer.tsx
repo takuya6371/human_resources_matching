@@ -13,7 +13,9 @@ export default function Footer() {
           <span className="text-ink-soft text-sm">{t(lang, 'footer.tagline')}</span>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+            <Link to="/about" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'nav.about')}</Link>
+            <Link to="/how-it-works" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'nav.howItWorks')}</Link>
             <Link to="/terms" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'legal.terms')}</Link>
             <Link to="/privacy" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'legal.privacy')}</Link>
           </div>
