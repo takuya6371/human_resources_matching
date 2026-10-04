@@ -167,9 +167,11 @@ export const privacy: LegalDocSet = {
       {
         heading: '11. Cookie等の取扱い',
         list: [
-          '本サービスは、ログイン状態の維持および表示言語の保持のために、ブラウザの保存領域（Cookieおよびローカルストレージ）を使用します。',
-          '当社は、広告の配信または第三者による行動ターゲティングを目的とした Cookie を使用していません。',
-          'ブラウザの設定により Cookie を無効にすることができますが、その場合はログインを維持できないなど、本サービスの一部を利用できなくなります。',
+          '本サービスは、ログイン状態の維持と、選択された表示言語の保持にのみ、ブラウザの保存領域（ローカルストレージ）を使用します。いずれも本サービスの提供に必要なものです。',
+          '当社は、アクセス解析、広告の配信および第三者による行動ターゲティングを目的とした Cookie を使用していません。そのため、Cookie の使用に関する同意を求める表示は行っていません。',
+          '保存される値は、認証に用いるトークンと言語の選択のみであり、閲覧履歴や行動の記録は保存していません。',
+          'ブラウザの設定により保存を無効にすることができますが、その場合はログインを維持できないなど、本サービスの一部を利用できなくなります。',
+          '当社が解析または広告の目的でブラウザの保存領域を使用することとなった場合は、あらかじめ本ポリシーを改定し、必要な同意取得の手段を設けます。',
         ],
       },
       {
@@ -366,9 +368,11 @@ export const privacy: LegalDocSet = {
       {
         heading: '11. Cookies and similar technologies',
         list: [
-          'The Service uses browser storage (cookies and local storage) to keep you signed in and to remember your display language.',
-          'We do not use cookies for advertising or for behavioural targeting by third parties.',
-          'You can disable cookies in your browser, but parts of the Service, such as staying signed in, will then not work.',
+          'The Service uses browser storage (local storage) only to keep you signed in and to remember the display language you choose. Both are necessary to provide the Service.',
+          'We do not use cookies for analytics, advertising or behavioural targeting by third parties. For that reason we do not show a cookie consent banner.',
+          'The only values stored are your authentication token and your language choice. We do not store browsing history or records of your behaviour.',
+          'You can disable storage in your browser, but parts of the Service, such as staying signed in, will then not work.',
+          'If we ever use browser storage for analytics or advertising, we will amend this Policy in advance and put a means of obtaining consent in place.',
         ],
       },
       {

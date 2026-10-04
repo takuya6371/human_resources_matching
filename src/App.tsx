@@ -48,8 +48,32 @@ function ScrollToTop() {
   return null
 }
 
+const LANGS: Lang[] = ['en', 'ja', 'fr']
+const LANG_KEY = 'afritalent.lang'
+
+// 言語は保存していなかったため、英語や仏語に切り替えても再読み込みで
+// 日本語に戻っていた。日本語を読めない利用者には毎回切り替えが必要になる。
+// プライバシーポリシー第11条もこの保存を前提に書いている。
+function readStoredLang(): Lang {
+  try {
+    const saved = localStorage.getItem(LANG_KEY)
+    if (saved && LANGS.includes(saved as Lang)) return saved as Lang
+    // 保存が無ければブラウザの言語を見る。該当しなければ日本語。
+    const nav = navigator.language.slice(0, 2).toLowerCase()
+    if (LANGS.includes(nav as Lang)) return nav as Lang
+  } catch {
+    // プライベートモード等で localStorage が使えなくても動くこと
+  }
+  return 'ja'
+}
+
 export default function App() {
-  const [lang, setLang] = useState<Lang>('ja')
+  const [lang, setLang] = useState<Lang>(readStoredLang)
+
+  useEffect(() => {
+    try { localStorage.setItem(LANG_KEY, lang) } catch { /* 保存できなくても続行 */ }
+    document.documentElement.lang = lang
+  }, [lang])
 
   return (
     <AuthProvider>
