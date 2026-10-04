@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
-import { mapPostRow } from '../lib/postMapper'
+import { loadPostFeed, type LikeRow, type CommentRow } from '../lib/postFeed'
 import type { Post, PostType } from '../types'
 
 const TYPES: { value: PostType; labelKey: string }[] = [
@@ -19,8 +19,6 @@ const TYPES: { value: PostType; labelKey: string }[] = [
   { value: 'social_problem', labelKey: 'connect.typeSocialProblem' },
 ]
 
-interface LikeRow { id: string; postId: string; userId: string }
-interface CommentRow { id: string; postId: string; userId: string; userType: 'talent' | 'company'; body: string; parentCommentId?: string; createdAt: string }
 interface CompanyLite { id: string; name: string; nameJa: string; logoUrl: string; industry: string }
 
 export default function ConnectPage() {
@@ -43,42 +41,15 @@ export default function ConnectPage() {
   const [posting, setPosting] = useState(false)
 
   async function load() {
-    const [{ data: postRows }, { data: companyRows }] = await Promise.all([
-      supabase.from('posts').select('*, companies(name, name_ja, logo_url)').eq('status', 'active').order('created_at', { ascending: false }).limit(50),
+    const [feed, { data: companyRows }] = await Promise.all([
+      loadPostFeed(lang),
       supabase.from('companies').select('id, name, name_ja, logo_url, industry'),
     ])
-    const mappedPosts = (postRows ?? []).map(mapPostRow)
-    setPosts(mappedPosts)
+    setPosts(feed.posts)
+    setLikes(feed.likes)
+    setComments(feed.comments)
+    setUserNames(feed.userNames)
     setCompanies((companyRows ?? []).map(c => ({ id: c.id, name: c.name ?? '', nameJa: c.name_ja ?? '', logoUrl: c.logo_url ?? '', industry: c.industry ?? '' })))
-
-    const postIds = mappedPosts.map(p => p.id)
-    if (postIds.length > 0) {
-      const [{ data: likeRows }, { data: commentRows }] = await Promise.all([
-        supabase.from('likes').select('id, post_id, user_id').in('post_id', postIds),
-        supabase.from('comments').select('id, post_id, user_id, user_type, body, parent_comment_id, created_at').in('post_id', postIds).order('created_at'),
-      ])
-      setLikes((likeRows ?? []).map(r => ({ id: r.id, postId: r.post_id, userId: r.user_id })))
-      const mappedComments = (commentRows ?? []).map(r => ({
-        id: r.id, postId: r.post_id, userId: r.user_id, userType: r.user_type, body: r.body,
-        parentCommentId: r.parent_comment_id ?? undefined, createdAt: r.created_at,
-      }))
-      setComments(mappedComments)
-
-      const commenterIds = Array.from(new Set(mappedComments.map(c => c.userId)))
-      if (commenterIds.length > 0) {
-        const [{ data: profileRows }, { data: commenterCompanyRows }] = await Promise.all([
-          supabase.from('profiles').select('id, name_en, name_ja').in('id', commenterIds),
-          supabase.from('companies').select('id, name, name_ja').in('id', commenterIds),
-        ])
-        const names = new Map<string, string>()
-        for (const p of profileRows ?? []) names.set(p.id, lang === 'ja' && p.name_ja ? p.name_ja : p.name_en)
-        for (const c of commenterCompanyRows ?? []) names.set(c.id, lang === 'ja' && c.name_ja ? c.name_ja : c.name)
-        setUserNames(names)
-      }
-    } else {
-      setLikes([])
-      setComments([])
-    }
 
     if (selfId) {
       const { data: followRows } = await supabase.from('follows').select('target_id').eq('follower_id', selfId).eq('target_type', 'company')

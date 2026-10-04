@@ -4,12 +4,15 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import FollowButton from '../components/FollowButton'
 import MessageButton from '../components/MessageButton'
+import SaveButton from '../components/SaveButton'
+import PostCard from '../components/PostCard'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { isSafeHttpUrl } from '../lib/url'
+import { loadPostFeed, type PostFeed } from '../lib/postFeed'
 import type { Company, Job } from '../types'
 
 export default function CompanyPublicProfilePage() {
@@ -20,6 +23,8 @@ export default function CompanyPublicProfilePage() {
   const [jobs, setJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
+  // 計画書201行目が「Connect/Saved の完了後に足す」としたまま残っていた分。
+  const [feed, setFeed] = useState<PostFeed>({ posts: [], likes: [], comments: [], userNames: new Map() })
 
   useEffect(() => {
     if (!id) return
@@ -28,9 +33,10 @@ export default function CompanyPublicProfilePage() {
     setNotFound(false)
 
     async function load() {
-      const [{ data: companyRow }, { data: jobRows }] = await Promise.all([
+      const [{ data: companyRow }, { data: jobRows }, postFeed] = await Promise.all([
         supabase.from('companies').select('*').eq('id', id).maybeSingle(),
         supabase.from('jobs').select('*').eq('company_id', id).eq('status', 'open').order('created_at', { ascending: false }),
+        loadPostFeed(lang, id),
       ])
       if (cancelled) return
       if (!companyRow) {
@@ -50,11 +56,12 @@ export default function CompanyPublicProfilePage() {
         logoUrl: companyRow.logo_url ?? '',
       })
       setJobs((jobRows ?? []).map(mapJobRow))
+      setFeed(postFeed)
       setLoading(false)
     }
     load()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, lang])
 
   if (loading) {
     return (
@@ -102,6 +109,7 @@ export default function CompanyPublicProfilePage() {
               )}
               <div className="flex items-center gap-2 flex-wrap">
                 <FollowButton targetType="company" targetId={company.id} small />
+                <SaveButton itemType="company" itemId={company.id} small />
                 {accountType === 'talent' && user && (
                   <MessageButton talentId={user.id} companyId={company.id} small />
                 )}
@@ -147,6 +155,26 @@ export default function CompanyPublicProfilePage() {
                 </div>
               )}
             </section>
+
+            {feed.posts.length > 0 && (
+              <section>
+                <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-4 px-1">
+                  {t(lang, 'companyProfile.posts')}
+                </h2>
+                <div className="space-y-4">
+                  {feed.posts.map(post => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      likes={feed.likes.filter(l => l.postId === post.id)}
+                      comments={feed.comments.filter(c => c.postId === post.id)}
+                      getUserName={(uid) => feed.userNames.get(uid) ?? '—'}
+                      onRefresh={() => { loadPostFeed(lang, id).then(setFeed) }}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {company.website && (

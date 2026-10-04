@@ -422,6 +422,7 @@ export const translations: TranslationStore = {
       openPositions: 'Open positions',
       noOpenPositions: 'No open positions right now.',
       about: 'About',
+      posts: 'Updates',
       website: 'Website',
     },
     connect: {
@@ -1008,6 +1009,7 @@ export const translations: TranslationStore = {
       openPositions: '募集中の求人',
       noOpenPositions: '現在募集中の求人はありません。',
       about: '会社概要',
+      posts: '企業からのお知らせ',
       website: 'ウェブサイト',
     },
     connect: {
@@ -1594,6 +1596,7 @@ export const translations: TranslationStore = {
       openPositions: 'Postes ouverts',
       noOpenPositions: "Aucun poste ouvert pour l'instant.",
       about: 'À propos',
+      posts: 'Actualités',
       website: 'Site web',
     },
     connect: {
