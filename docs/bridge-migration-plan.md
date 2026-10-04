@@ -266,3 +266,52 @@ message-platformのデモにもbridgeの`Messages.jsx`にも、保留スレッ�
 - 各フェーズ完了時に `npm run typecheck` と `npm run build` を実行
 - DBフェーズは `supabase db push`(ローカル)後、RLSを anon/authenticated 双方のロールで手動確認
 - UI基盤フェーズは既存ページ(HomePage等)を崩さないことを目視確認してから新規ページ移植に進む
+
+---
+
+## 事後監査(2026-10-05)
+
+「Phase 4 完了(5グループすべて完了)」「移行計画完了(d75db6a)」と記録されていたが、
+計画書と現物を突き合わせたところ、記録なく落ちていた項目があった。以下はその結果と対応。
+
+### 記録なく落ちていた項目
+
+| 項目 | 何が起きていたか | 対応 |
+|---|---|---|
+| 静的ページ4枚 | 26行目の表で「IN」としながら、Phase 4 の5グループのどこにも含まれていなかった。見送った他のページ(TalentOnboarding、CompanyReview、JobModeration)は理由が明記されているのに、これだけ記載がない | Terms/Privacy は 4d694cd、About/HowItWorks は 154db77 で移植 |
+| `trusted_companies` | Phase 1c でテーブルだけ作られ、57行目で LogoCarousel(Home)の受け皿とされていたが、読む画面も書く画面も無いまま放置 | 70749be でトップ表示と `/admin/trusted` を追加 |
+| CookieConsent.jsx | 移植とも見送りとも書かれていない | 4bfaf15。アプリは Cookie も localStorage も使っておらず、保存されるのは認証トークンのみ。解析も広告も無いため同意バナーは設けない |
+| 企業向けページ | `nav.companies` が3言語とも定義済みなのに、ページもリンクも無い | 1385f38 で `/for-companies` を追加 |
+| CompanyPublicProfile の SaveButton / 投稿 | 201行目が「該当フェーズで拡張する前提」としたまま、Connect(5)・Saved(5)完了後も追加されていない | eb2a7e5 で追加。読み込みは `src/lib/postFeed.ts` に共通化 |
+
+### 併せて見つかった不具合
+
+- **本人確認3関数が削除済みの列を参照**(18c6619)。2409fe5 で profiles から profile_private へ
+  移した列を、Edge Function 側で直し忘れていた。画面から呼ばれていないため実害は出ていなかったが、
+  DIDIT を繋いだ時点で落ちる状態だった。
+- **service_role の GRANT 漏れ**(同上)。`profiles` / `profile_private` / `verification_events` の
+  いずれも anon と authenticated にしか GRANT しておらず、service_role には何も無い。
+  クラウドは postgres の default privileges で結果的に通るが、ローカルでは通らない。
+  20260919000000 が threads/messages について直したのと同じ漏れ。
+- **表示言語が永続化されていなかった**(4bfaf15)。`useState('ja')` のままで、英語・仏語に
+  切り替えても再読み込みで日本語に戻る。日本語を読めない利用者には毎回の切り替えを強いていた。
+
+### 片付けた残骸
+
+- 未参照の shadcn ラッパー11個と依存8個(f2c87b2)。Phase 2 で12個作って、使われていたのは dialog のみ。
+- 未使用の i18n キー15件、誤ったビュー名コメント(2ffb4eb)。`profiles_teaser` は実在せず、正しくは `profiles_preview`。
+
+### 未了(担当者の判断・情報が必要)
+
+- **SMTP 未設定**。`smtp_host: None` / `rate_limit_email_sent: 2`(毎時)。この状態では
+  フォーラム等での一斉登録はほぼ確実に失敗する。送信サービスの認証情報が要る。
+- **チーム情報**。`team_members` に移植元の4名を登録したが、内容が現時点で正しいか確認が取れて
+  いないため、全員 `active = false`(非表示)。公開は `/admin/team` から。
+  写真は移植元が base44 のCDNを指しており、その基盤から離れる方針と矛盾するため設定していない。
+  経歴文も「Africa and Japan」固定で 8f12218 の方針と衝突するため入れていない。
+
+### この種の取りこぼしを繰り返さないために
+
+スコープ表で「IN」としたものは、実行フェーズのどれかに必ず現れること。
+見送る場合は、TalentOnboarding や CompanyReview のように理由を書いて残すこと。
+「完了」と書く前に、スコープ表の IN 項目を1件ずつ突き合わせること。
