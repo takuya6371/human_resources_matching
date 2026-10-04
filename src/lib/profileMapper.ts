@@ -1,10 +1,10 @@
 import type { Experience, Language, Talent, TalentTeaser } from '../types'
 
-// 企業/管理者が一覧・詳細で閲覧する profiles の列を明示的に限定する。
-// email・admin_note（管理者の内部審査メモ）はUI上どこにも表示していないが、
-// select('*') のままだとAPIレスポンスのJSON上には流れてしまい、企業アカウントが
-// ネットワークタブを見れば直接メールアドレスや審査メモを読めてしまう。
-// そのため一覧・詳細ページ（企業/管理者向け）では常にこの列だけを取得する。
+// 企業/管理者が一覧・詳細で閲覧する profiles の列。
+// なお、列をここで絞るのは転送量と意図を明確にするためであって、保護の手段ではない。
+// RLSは行単位でしか効かないため、機微な情報（メール・審査メモ・住所・生年月日・
+// 家族構成など）は profiles ではなく profile_private に置き、テーブルごと分離して
+// 企業から遮断している（20260924000000_protect_private_profile_fields.sql）。
 export const PROFILE_PUBLIC_COLUMNS = [
   'id', 'name_en', 'name_ja', 'country', 'country_ja', 'flag', 'avatar_url',
   'field', 'field_ja', 'university_en', 'university_ja', 'faculty_en', 'faculty_ja',
@@ -82,7 +82,6 @@ export function mapProfileRow(
     languages,
     experience,
     status: profile.status ?? 'draft',
-    adminNote: profile.admin_note ?? undefined,
     residenceArea: profile.residence_area ?? undefined,
     devExperienceYears: profile.dev_experience_years ?? undefined,
     pastClients: profile.past_clients ?? [],

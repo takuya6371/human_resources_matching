@@ -54,15 +54,21 @@ export default function AdminTalentReviewPage() {
 
   async function fetchProfiles() {
     setFetching(true)
+    // email と admin_note は profile_private にある（企業から読めないよう分離）。
+    // 管理者は両方にアクセスできるので結合して表示する。
     const query = supabase
       .from('profiles')
-      .select('id, name_en, name_ja, email, country, field, japanese_level, status, admin_note, created_at')
+      .select('id, name_en, name_ja, country, field, japanese_level, status, created_at, profile_private(email, admin_note)')
       .order('created_at', { ascending: false })
 
     if (tab === 'pending') query.eq('status', 'pending')
 
     const { data } = await query
-    setProfiles((data as ProfileRow[]) ?? [])
+    setProfiles(((data ?? []) as any[]).map(p => ({
+      ...p,
+      email: p.profile_private?.email ?? null,
+      admin_note: p.profile_private?.admin_note ?? null,
+    })) as ProfileRow[])
     setFetching(false)
   }
 

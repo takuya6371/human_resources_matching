@@ -39,8 +39,11 @@ const AuthContext = createContext<AuthContextType>({
 })
 
 async function fetchProfile(userId: string, email: string): Promise<User | null> {
-  const [{ data: profile }, { data: langs }, { data: exps }] = await Promise.all([
+  // admin_note は profile_private にある（企業から読めないようにするため分離。
+  // 20260924000000_protect_private_profile_fields.sql を参照）。
+  const [{ data: profile }, { data: priv }, { data: langs }, { data: exps }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).single(),
+    supabase.from('profile_private').select('admin_note').eq('id', userId).maybeSingle(),
     supabase.from('profile_languages').select('*').eq('profile_id', userId).order('sort_order'),
     supabase.from('profile_experiences').select('*').eq('profile_id', userId).order('sort_order'),
   ])
@@ -49,6 +52,7 @@ async function fetchProfile(userId: string, email: string): Promise<User | null>
 
   return {
     ...mapProfileRow(profile, langs ?? [], exps ?? []),
+    adminNote: priv?.admin_note ?? undefined,
     email,
     role: (profile.role as 'talent' | 'company' | 'admin') ?? 'talent',
   }
@@ -188,7 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       video_url: updates.videoUrl,
       past_clients: updates.pastClients,
       return_home_on: updates.returnHomeMonth ? toReturnHomeDate(updates.returnHomeMonth) : null,
-    }).eq('id', user.id).select('status, admin_note, published_at').single()
+    }).eq('id', user.id).select('status, published_at').single()
 
     if (updates.languages !== undefined) {
       await supabase.from('profile_languages').delete().eq('profile_id', user.id)
@@ -228,10 +232,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...prev,
       ...updates,
       initials: deriveInitials(nameEn),
-      // status/admin_note/published_atはDBのトリガー（承認済み編集時の自動差し戻し等）で
-      // クライアントの送信値と変わりうるため、実際にDBへ書き込まれた値を正としてマージする
+      // statusはDBのトリガー（承認済み編集時の自動差し戻し等）でクライアントの
+      // 送信値と変わりうるため、実際にDBへ書き込まれた値を正としてマージする。
+      // adminNoteはprofile_privateにあり、ここでは変更しないので据え置く。
       status: saved?.status ?? prev.status,
-      adminNote: saved?.admin_note ?? undefined,
+      adminNote: prev.adminNote,
     } : prev)
   }
 
