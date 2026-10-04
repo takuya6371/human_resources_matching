@@ -48,15 +48,23 @@ Deno.serve(async (req) => {
   if (authErr || !user) return json({ error: "unauthorized" }, 401);
 
   // The webhook is the source of truth, so try the database first.
+  // verification_detail and verification_ref live on `profile_private` since
+  // 20260924000000 — the caller is the candidate, and its RLS lets them read
+  // their own row, so the embed resolves.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("verification_status, verification_detail, verified_at, verification_ref")
+    .select("verification_status, verified_at, profile_private(verification_detail, verification_ref)")
     .eq("id", user.id).single();
+
+  const priv = (Array.isArray(profile?.profile_private)
+    ? profile?.profile_private[0]
+    : profile?.profile_private) as
+      { verification_detail: string | null; verification_ref: string | null } | undefined;
 
   if (profile && profile.verification_status !== "pending") {
     return json({
       status: profile.verification_status,
-      detail: profile.verification_detail,
+      detail: priv?.verification_detail ?? null,
       at: profile.verified_at,
       by: "webhook",
     });
@@ -64,7 +72,7 @@ Deno.serve(async (req) => {
 
   // Still pending. Ask Didit directly rather than leaving the page spinning —
   // this is a read, and the webhook remains what actually writes the profile.
-  const sessionId = profile?.verification_ref;
+  const sessionId = priv?.verification_ref;
   if (sessionId && DIDIT_API_KEY) {
     const r = await fetch(`https://verification.didit.me/v3/session/${sessionId}/decision/`, {
       headers: { "x-api-key": DIDIT_API_KEY },
@@ -76,5 +84,5 @@ Deno.serve(async (req) => {
     }
   }
 
-  return json({ status: "pending", detail: profile?.verification_detail ?? null, by: "db" });
+  return json({ status: "pending", detail: priv?.verification_detail ?? null, by: "db" });
 });

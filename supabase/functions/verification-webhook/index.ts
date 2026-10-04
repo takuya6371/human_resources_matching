@@ -133,15 +133,22 @@ Deno.serve(async (req) => {
   const mapped = STATUS_MAP[status];
 
   if (profileId && mapped) {
-    const row: Record<string, unknown> = {
+    // The verdict itself stays on `profiles` — a company may see that a
+    // candidate is verified. Which provider was used and the session id
+    // identify the person to that provider, so 20260924000000 moved them to
+    // `profile_private`, readable only by the candidate and admins.
+    const { error } = await admin.from("profiles").update({
       verification_status: mapped,
+      verified_at: mapped === "verified" ? new Date().toISOString() : null,
+    }).eq("id", profileId);
+    if (error) console.error("profile update failed", error);
+
+    const { error: privErr } = await admin.from("profile_private").update({
       verification_provider: "didit",
       verification_ref: parsed.session_id ?? null,
       verification_detail: status,
-      verified_at: mapped === "verified" ? new Date().toISOString() : null,
-    };
-    const { error } = await admin.from("profiles").update(row).eq("id", profileId);
-    if (error) console.error("profile update failed", error);
+    }).eq("id", profileId);
+    if (privErr) console.error("profile_private update failed", privErr);
   }
 
   // Deliberately nothing from `decision` is stored: not the document number,

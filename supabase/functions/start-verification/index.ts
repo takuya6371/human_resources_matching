@@ -80,8 +80,14 @@ Deno.serve(async (req) => {
   // Mark it in flight. The trigger blocks the client from writing this, so it
   // goes through the service role.
   const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  // verification_status is on `profiles` (companies may see that a candidate is
+  // verified). The provider name and the session id identify a person to an
+  // outside service, so 20260924000000 moved them to `profile_private`, which
+  // only the candidate and admins can read.
   await admin.from("profiles").update({
     verification_status: "pending",
+  }).eq("id", user.id);
+  await admin.from("profile_private").update({
     verification_provider: "didit",
     verification_ref: session.session_id,
   }).eq("id", user.id);
