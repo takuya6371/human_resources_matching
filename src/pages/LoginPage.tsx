@@ -155,6 +155,22 @@ export default function LoginPage() {
                 />
               </div>
 
+              {/* 同意はボタンの直前に置く。登録時点で読める位置にないと
+                  「同意のうえ登録した」と言えないため。 */}
+              {!isLogin && (
+                <p className="text-ink-faint text-xs leading-relaxed mb-4">
+                  {t(lang, 'login.consentPrefix')}
+                  <Link to="/terms" target="_blank" className="text-seal hover:opacity-70 underline">
+                    {t(lang, 'legal.terms')}
+                  </Link>
+                  {t(lang, 'login.consentAnd')}
+                  <Link to="/privacy" target="_blank" className="text-seal hover:opacity-70 underline">
+                    {t(lang, 'legal.privacy')}
+                  </Link>
+                  {t(lang, 'login.consentSuffix')}
+                </p>
+              )}
+
               <button type="submit" disabled={submitting}
                       className="btn-line w-full justify-center disabled:opacity-50">
                 {submitting ? '···' : (isLogin ? t(lang, 'login.submitBtn') : t(lang, 'login.signUpBtn'))}

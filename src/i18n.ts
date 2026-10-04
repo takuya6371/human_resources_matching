@@ -97,6 +97,9 @@ export const translations: TranslationStore = {
       signUpTitle: 'Create your AfriTalent account',
       signUpBtn: 'Sign up',
       signUpLink: 'Sign up',
+      consentPrefix: 'By creating an account you agree to our ',
+      consentAnd: ' and ',
+      consentSuffix: ', including the transfer of your data to the external services listed there.',
       signInLink: 'Sign in',
       noAccount: 'New here?',
       hasAccount: 'Already have an account?',
@@ -477,6 +480,11 @@ export const translations: TranslationStore = {
       tagline: 'Connecting Japan and the world through talent.',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
+    legal: {
+      terms: 'Terms of Service',
+      privacy: 'Privacy Policy',
+      draftWarning: 'Draft. The operator details below have not been filled in yet, so this document is not in force.',
+    },
     page404: {
       title: 'Page not found',
       body: 'The page you are looking for does not exist or has been moved.',
@@ -577,6 +585,9 @@ export const translations: TranslationStore = {
       signUpTitle: 'AfriTalentに登録する',
       signUpBtn: '登録する',
       signUpLink: '新規登録',
+      consentPrefix: '登録することで、',
+      consentAnd: 'および',
+      consentSuffix: 'に同意したものとみなします（記載の外部サービスへのデータ送信を含みます）。',
       signInLink: 'ログイン',
       noAccount: 'アカウントをお持ちでない方は',
       hasAccount: 'すでにアカウントをお持ちの方は',
@@ -957,6 +968,11 @@ export const translations: TranslationStore = {
       tagline: '日本と世界を人材でつなぐ。',
       rights: '© 2026 AfriTalent. All rights reserved.',
     },
+    legal: {
+      terms: '利用規約',
+      privacy: 'プライバシーポリシー',
+      draftWarning: '草案です。事業者情報が未記入のため、この文書はまだ効力を持ちません。',
+    },
     page404: {
       title: 'ページが見つかりません',
       body: 'お探しのページは存在しないか、移動した可能性があります。',
@@ -1057,6 +1073,9 @@ export const translations: TranslationStore = {
       signUpTitle: 'Créer votre compte AfriTalent',
       signUpBtn: 'S\'inscrire',
       signUpLink: 'S\'inscrire',
+      consentPrefix: 'En créant un compte, vous acceptez nos ',
+      consentAnd: ' et notre ',
+      consentSuffix: ', y compris le transfert de vos données aux services externes qui y sont listés.',
       signInLink: 'Se connecter',
       noAccount: 'Nouveau ici ?',
       hasAccount: 'Vous avez déjà un compte ?',
@@ -1436,6 +1455,12 @@ export const translations: TranslationStore = {
     footer: {
       tagline: 'Connecter le Japon et le monde à travers les talents.',
       rights: '© 2026 AfriTalent. Tous droits réservés.',
+    },
+    legal: {
+      // 本文は英語版を表示する（法務文書の仏訳は用意していない）。
+      terms: 'Conditions d\'utilisation',
+      privacy: 'Politique de confidentialité',
+      draftWarning: 'Brouillon. Les informations sur l\'exploitant ne sont pas encore renseignées ; ce document n\'est pas en vigueur.',
     },
     page404: {
       title: 'Page introuvable',

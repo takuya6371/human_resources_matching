@@ -21,6 +21,7 @@ import BoardPage from './pages/BoardPage'
 import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
 import MessagesPage from './pages/MessagesPage'
+import LegalPage from './pages/LegalPage'
 import PageNotFound from './components/PageNotFound'
 import AdminLayout from './components/AdminLayout'
 import AdminHomePage from './pages/admin/AdminHomePage'
@@ -81,6 +82,8 @@ export default function App() {
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/terms" element={<LegalPage doc="terms" />} />
+            <Route path="/privacy" element={<LegalPage doc="privacy" />} />
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>
