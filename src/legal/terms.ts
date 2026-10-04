@@ -5,7 +5,7 @@ import type { LegalDocSet } from './types'
 //
 // 実装に合わせて書いている。変更するときは対応する挙動も確認すること:
 //   第6条 審査と掲載      → profiles.status / AdminTalentReviewPage
-//   第7条 公開範囲        → profiles_teaser ビュー / profile_private テーブル
+//   第7条 公開範囲        → profiles_preview ビュー / profile_private テーブル
 //   第8条 履歴書の自動処理 → supabase/functions/parse-cv
 //   第9条 自動翻訳        → supabase/functions/translate
 //   第11条 メッセージ審査  → supabase/functions/send-message の screen()
