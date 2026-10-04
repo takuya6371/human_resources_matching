@@ -213,7 +213,7 @@ export interface ChatMessage {
   createdAt: string
 }
 
-// profiles_teaser ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
+// profiles_preview ビューが返す、未ログイン/人材アカウント向けの安全なカラムのみのサブセット
 export interface TalentTeaser {
   id: string
   field: string

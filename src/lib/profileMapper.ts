@@ -92,7 +92,7 @@ export function mapProfileRow(
   }
 }
 
-// `profiles_teaser` ビューの1行を TalentTeaser 形状にマップする。
+// `profiles_preview` ビューの1行を TalentTeaser 形状にマップする。
 // 未ログイン・人材アカウントが見る、氏名・連絡先・自己紹介を含まない安全なサブセット。
 export function mapTeaserRow(row: Record<string, any>): TalentTeaser {
   return {
