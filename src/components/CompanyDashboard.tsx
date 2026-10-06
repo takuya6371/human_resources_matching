@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Navbar from './Navbar'
+import Footer from './Footer'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
@@ -21,9 +22,8 @@ const INPUT_CLS = 'input-line'
 const LABEL_CLS = 'label-line'
 
 export default function CompanyDashboard({ company }: { company: Company }) {
-  const { logout, updateCompany } = useAuth()
-  const { lang, setLang } = useLang()
-  const navigate = useNavigate()
+  const { updateCompany } = useAuth()
+  const { lang } = useLang()
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
@@ -78,39 +78,12 @@ export default function CompanyDashboard({ company }: { company: Company }) {
     setForm(f => f ? { ...f, [key]: value } : f)
   }
 
-  async function handleLogout() {
-    await logout()
-    navigate('/')
-  }
 
   const initial = company.name ? company.name.slice(0, 2).toUpperCase() : '??'
 
   return (
     <div className="min-h-screen line-page">
-      <nav className="line-page border-b border-hairline sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5 no-underline">
-            <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">NeBonga Link</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/talents" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline">
-              {t(lang, 'nav.talents')}
-            </Link>
-            <div className="hidden sm:flex items-center border border-hairline">
-              <button onClick={() => setLang('ja')}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${lang === 'ja' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>JA</button>
-              <button onClick={() => setLang('en')}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'en' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>EN</button>
-              <button onClick={() => setLang('fr')}
-                className={`px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer border-l border-hairline ${lang === 'fr' ? 'bg-ink text-paper' : 'text-ink-soft hover:text-ink'}`}>FR</button>
-            </div>
-            <button onClick={handleLogout}
-                    className="text-ink-soft text-sm hover:text-ink transition-colors cursor-pointer">
-              {t(lang, 'dashboard.logout')}
-            </button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
@@ -246,6 +219,7 @@ export default function CompanyDashboard({ company }: { company: Company }) {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   )
 }

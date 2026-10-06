@@ -78,19 +78,22 @@ export default function Navbar() {
   }, [selfId])
 
   // メニュー外のクリックと Esc で閉じる。開きっぱなしは誤操作のもと。
+  // Esc はハンバーガー側にも効かせる（開いたまま戻れないと詰む）。
   useEffect(() => {
-    if (!accountOpen) return
+    if (!accountOpen && !menuOpen) return
     function onDown(e: MouseEvent) {
       if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false)
     }
-    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') setAccountOpen(false) }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setAccountOpen(false); setMenuOpen(false) }
+    }
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
     return () => {
       document.removeEventListener('mousedown', onDown)
       document.removeEventListener('keydown', onKey)
     }
-  }, [accountOpen])
+  }, [accountOpen, menuOpen])
 
   const isAdmin = user?.role === 'admin'
   const loggedIn = Boolean(user || company)
