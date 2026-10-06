@@ -31,7 +31,7 @@ const RELEASE_NOTICE = {
     ja: "運営チームの確認により、このやり取りを再開しました。対応は不要です。",
   },
   warning: {
-    en: "Trust & Safety have reviewed this conversation and reopened it. Please keep everything about this role on AfriTalent — a second flag will pause the account, not just the thread.",
+    en: "Trust & Safety have reviewed this conversation and reopened it. Please keep everything about this role on NeBonga Link — a second flag will pause the account, not just the thread.",
     ja: "運営チームの確認により、このやり取りを再開しました。今後もすべてのやり取りはプラットフォーム内でお願いいたします。",
   },
 };

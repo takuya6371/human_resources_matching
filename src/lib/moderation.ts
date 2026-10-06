@@ -1,5 +1,5 @@
 /* ============================================================
-   AfriTalent — message moderation
+   NeBonga Link — message moderation
    ------------------------------------------------------------
    Two tiers, in this order:
 
@@ -158,7 +158,7 @@ export const CATEGORY_COPY: Record<string, string> = {
   url: 'a link',
   handle: 'a social handle',
   app: 'a private messaging app',
-  intent: 'a plan to move the conversation off AfriTalent',
+  intent: 'a plan to move the conversation off NeBonga Link',
   split: 'a phone number spread across several messages',
 }
 

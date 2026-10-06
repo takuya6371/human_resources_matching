@@ -50,7 +50,7 @@ function ScrollToTop() {
 }
 
 const LANGS: Lang[] = ['en', 'ja', 'fr']
-const LANG_KEY = 'afritalent.lang'
+const LANG_KEY = 'nebonga-link.lang'
 
 // 言語は保存していなかったため、英語や仏語に切り替えても再読み込みで
 // 日本語に戻っていた。日本語を読めない利用者には毎回切り替えが必要になる。

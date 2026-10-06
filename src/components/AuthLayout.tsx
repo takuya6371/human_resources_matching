@@ -18,7 +18,7 @@ export default function AuthLayout({ title, subtitle, children }: AuthLayoutProp
     <div className="min-h-screen line-page flex flex-col">
       <div className="px-6 py-4 flex items-center justify-between border-b border-hairline">
         <Link to="/" className="flex items-center gap-2.5 no-underline">
-          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
+          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">NeBonga Link</span>
         </Link>
         <div className="flex items-center border border-hairline">
           {(['ja', 'en', 'fr'] as const).map((l, i) => (

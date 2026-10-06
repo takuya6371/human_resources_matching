@@ -249,7 +249,7 @@ export default function TalentDashboard({ user }: { user: User }) {
       <nav className="line-page border-b border-hairline sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
-            <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
+            <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">NeBonga Link</span>
           </Link>
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center border border-hairline">

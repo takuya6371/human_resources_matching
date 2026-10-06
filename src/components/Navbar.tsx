@@ -79,7 +79,7 @@ export default function Navbar() {
     <nav className="line-page border-b border-hairline sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: 'rgba(250,248,244,0.92)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5 no-underline" onClick={() => setMenuOpen(false)}>
-          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">AfriTalent</span>
+          <span className="font-display font-medium text-lg text-ink tracking-wide uppercase">NeBonga Link</span>
         </Link>
 
         {/* desktop nav links */}

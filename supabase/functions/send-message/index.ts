@@ -21,9 +21,9 @@ import { screen } from "../../../src/lib/moderation.ts";
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 const GEMINI_MODEL = Deno.env.get("GEMINI_MODERATION_MODEL") ?? "gemini-3.6-flash";
 
-const MODERATION_PROMPT = `You moderate messages between a job candidate and a recruiter on a hiring platform called AfriTalent.
+const MODERATION_PROMPT = `You moderate messages between a job candidate and a recruiter on a hiring platform called NeBonga Link.
 
-Flag a message only when it shares or requests contact details of any kind, or proposes continuing the conversation away from AfriTalent, however indirectly ("somewhere easier", "you know where to find me").
+Flag a message only when it shares or requests contact details of any kind, or proposes continuing the conversation away from NeBonga Link, however indirectly ("somewhere easier", "you know where to find me").
 
 Do not flag ordinary recruiting talk: salaries, dates, times, headcounts, technologies, company locations, visa questions, or arranging an interview. Numbers that are years, money, versions or quantities are not contact details.
 
@@ -35,7 +35,7 @@ Reply with JSON only: {"flag": boolean, "category": "contact"|"offplatform"|"non
 // 文言をそのまま使う(「もっとも作り直しで失われやすい部分」のため)。
 const HOLD_NOTICE_EN =
   "This conversation has been put on hold. A message looked like an attempt to move the " +
-  "conversation off AfriTalent, which the platform does not allow — it is how people lose " +
+  "conversation off NeBonga Link, which the platform does not allow — it is how people lose " +
   "the protection they signed up for. Trust & Safety have been notified and will review it.";
 const HOLD_NOTICE_JA =
   "このやり取りは一時的に保留されました。プラットフォーム外へ移行しようとする内容が含まれていたためです。" +
@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
           flagged_by: "model",
           flagged_category: modelVerdict.categories[0] ?? "intent",
           flagged_quote: text,
-          flagged_reason: modelVerdict.reason || "Proposes moving the conversation off AfriTalent.",
+          flagged_reason: modelVerdict.reason || "Proposes moving the conversation off NeBonga Link.",
           flagged_at: new Date().toISOString(),
         }).eq("id", threadId);
         await admin.from("messages").insert({

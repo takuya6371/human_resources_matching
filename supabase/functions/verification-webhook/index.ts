@@ -12,7 +12,7 @@
 // Then register the destination once, which is what mints the secret:
 //   curl -X POST https://verification.didit.me/v3/webhook/destinations/ \
 //     -H "x-api-key: $DIDIT_API_KEY" -H "Content-Type: application/json" \
-//     -d '{"label":"AfriTalent",
+//     -d '{"label":"NeBonga Link",
 //          "url":"https://<ref>.functions.supabase.co/verification-webhook",
 //          "webhook_version":"v3",
 //          "subscribed_events":["status.updated","data.updated"]}'

@@ -3,7 +3,7 @@
 //
 // Opens a Didit KYC session and hands the browser a URL to send the
 // candidate to. The API key stays here; the ID document never touches
-// AfriTalent at all.
+// NeBonga Link at all.
 //
 // Deploy:
 //   supabase secrets set DIDIT_API_KEY=...
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       vendor_data: user.id,
       ...(CALLBACK_URL ? { callback: CALLBACK_URL } : {}),
       ...(body.language ? { language: body.language } : {}),
-      metadata: { surface: "afritalent-profile" },
+      metadata: { surface: "nebonga-link-profile" },
     }),
   });
 

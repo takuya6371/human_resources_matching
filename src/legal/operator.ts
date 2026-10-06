@@ -8,6 +8,8 @@
 // ============================================================
 
 export const OPERATOR = {
+  /** サービス名。事業者名とは別。 */
+  serviceName: 'NeBonga Link',
   /** 登記上の事業者名。例: '株式会社ネボンガ' */
   name: '',
   /** 代表者名 */
@@ -43,5 +45,5 @@ export function fillOperator(text: string): string {
 /** 空欄が残っているか。公開前チェック用に画面上部へ警告を出す。 */
 export function missingOperatorFields(): OperatorKey[] {
   return (Object.keys(OPERATOR) as OperatorKey[])
-    .filter(k => k !== 'privacyOfficer' && !OPERATOR[k])
+    .filter(k => k !== 'privacyOfficer' && k !== 'serviceName' && !OPERATOR[k])
 }

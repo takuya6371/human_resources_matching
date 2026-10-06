@@ -16,7 +16,7 @@ export const terms: LegalDocSet = {
   ja: {
     title: '利用規約',
     intro: [
-      '本利用規約（以下「本規約」といいます）は、{{name}}（以下「当社」といいます）が提供する人材と企業のマッチングサービス（以下「本サービス」といいます）の利用条件を定めるものです。本サービスを利用する方（以下「利用者」といいます）は、本規約に同意したうえで本サービスを利用するものとします。',
+      '本利用規約（以下「本規約」といいます）は、{{name}}（以下「当社」といいます）が提供する人材と企業のマッチングサービス「{{serviceName}}」（以下「本サービス」といいます）の利用条件を定めるものです。本サービスを利用する方（以下「利用者」といいます）は、本規約に同意したうえで本サービスを利用するものとします。',
     ],
     blocks: [
       {
@@ -250,7 +250,7 @@ export const terms: LegalDocSet = {
   en: {
     title: 'Terms of Service',
     intro: [
-      'These Terms of Service ("Terms") set out the conditions for using the talent-matching service ("the Service") operated by {{name}} ("we", "us"). By using the Service, you ("you", "the User") agree to these Terms.',
+      'These Terms of Service ("Terms") set out the conditions for using {{serviceName}} ("the Service"), the talent-matching service operated by {{name}} ("we", "us"). By using the Service, you ("you", "the User") agree to these Terms.',
       'The Japanese text of these Terms is the governing version. This English text is provided for reference only; if the two differ, the Japanese text prevails.',
     ],
     blocks: [

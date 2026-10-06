@@ -16,7 +16,7 @@ export const privacy: LegalDocSet = {
   ja: {
     title: 'プライバシーポリシー',
     intro: [
-      '{{name}}（以下「当社」といいます）は、当社が提供する人材と企業のマッチングサービス（以下「本サービス」といいます）において取得する個人情報を、個人情報の保護に関する法律その他の法令を遵守し、本ポリシーに従って取り扱います。',
+      '{{name}}（以下「当社」といいます）は、当社が提供する人材と企業のマッチングサービス「{{serviceName}}」（以下「本サービス」といいます）において取得する個人情報を、個人情報の保護に関する法律その他の法令を遵守し、本ポリシーに従って取り扱います。',
     ],
     blocks: [
       {
@@ -218,7 +218,7 @@ export const privacy: LegalDocSet = {
   en: {
     title: 'Privacy Policy',
     intro: [
-      '{{name}} ("we", "us") handles personal information obtained through the talent-matching service we operate ("the Service") in accordance with the Act on the Protection of Personal Information and other applicable laws of Japan, and in accordance with this Policy.',
+      '{{name}} ("we", "us") handles personal information obtained through {{serviceName}} ("the Service"), the talent-matching service we operate, in accordance with the Act on the Protection of Personal Information and other applicable laws of Japan, and in accordance with this Policy.',
       'The Japanese text of this Policy is the governing version. This English text is provided for reference only; if the two differ, the Japanese text prevails.',
     ],
     blocks: [
