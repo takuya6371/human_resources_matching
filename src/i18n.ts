@@ -20,6 +20,9 @@ export const translations: TranslationStore = {
       messages: 'Messages',
       board: 'Board',
       howItWorks: 'How it works',
+      dashboard: 'My profile',
+      notifications: 'Notifications',
+      language: 'Language',
     },
     hero: {
       badge: 'Global Talent × Japanese Companies',
@@ -607,6 +610,9 @@ export const translations: TranslationStore = {
       messages: 'メッセージ',
       board: '相談ボード',
       howItWorks: 'ご利用の流れ',
+      dashboard: 'マイページ',
+      notifications: 'お知らせ',
+      language: '表示言語',
     },
     hero: {
       badge: '海外人材 × 日本企業 マッチング',
@@ -1194,6 +1200,9 @@ export const translations: TranslationStore = {
       messages: 'Messages',
       board: 'Entraide',
       howItWorks: 'Comment ça marche',
+      dashboard: 'Mon profil',
+      notifications: 'Notifications',
+      language: 'Langue',
     },
     hero: {
       badge: 'Talents internationaux × Entreprises japonaises',

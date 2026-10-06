@@ -16,6 +16,7 @@ export default function Footer() {
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <Link to="/about" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'nav.about')}</Link>
             <Link to="/how-it-works" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'nav.howItWorks')}</Link>
+            <Link to="/contact" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'nav.contact')}</Link>
             <Link to="/terms" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'legal.terms')}</Link>
             <Link to="/privacy" className="text-ink-soft text-xs hover:text-ink">{t(lang, 'legal.privacy')}</Link>
           </div>
