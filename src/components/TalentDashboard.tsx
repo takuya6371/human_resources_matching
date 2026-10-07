@@ -4,7 +4,7 @@ import Navbar from './Navbar'
 import Footer from './Footer'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
-import { t } from '../i18n'
+import { t, pick, pickList } from '../i18n'
 import { MAX_PROFILE_IMAGE_SIZE, uploadProfileImage } from '../lib/storage'
 import { isSafeHttpUrl } from '../lib/url'
 import { fillMissingJapanese, translateToJa } from '../lib/translate'
@@ -89,9 +89,9 @@ export default function TalentDashboard({ user }: { user: User }) {
 
   useEffect(() => () => { if (avatarPreview) URL.revokeObjectURL(avatarPreview) }, [avatarPreview])
 
-  const name = lang === 'ja' ? user.nameJa : user.nameEn
-  const skills = lang === 'ja' ? user.skillsJa : user.skills
-  const bio = lang === 'ja' ? user.bioJa : user.bioEn
+  const name = pick(lang, user.nameJa, user.nameEn)
+  const skills = pickList(lang, user.skillsJa, user.skills)
+  const bio = pick(lang, user.bioJa, user.bioEn)
 
   function startEdit() {
     setForm({
@@ -165,10 +165,26 @@ export default function TalentDashboard({ user }: { user: User }) {
       }
     }
 
-    const [headlineJa, bioJa] = await fillMissingJapanese([
+    // 日本語が空の項目をまとめて翻訳する。CV取り込み直後は英語しか入らず、
+    // ここを通さないと企業が日本語で見たときに職務経歴や学歴が空欄になる。
+    // 会社名と氏名は固有名詞なので機械翻訳しない（表示側の pick が原文を出す）。
+    const expPairs = form.experience.flatMap(e => [
+      { en: e.role, ja: e.roleJa },
+      { en: e.descriptionEn, ja: e.descriptionJa },
+    ])
+    const filled = await fillMissingJapanese([
       { en: form.headlineEn, ja: form.headlineJa },
       { en: form.bioEn, ja: form.bioJa },
+      { en: form.university, ja: form.universityJa },
+      { en: form.faculty, ja: form.facultyJa },
+      ...expPairs,
     ])
+    const [headlineJa, bioJa, universityJa, facultyJa] = filled
+    const experienceJa = form.experience.map((e, i) => ({
+      ...e,
+      roleJa: filled[4 + i * 2] || e.roleJa,
+      descriptionJa: filled[4 + i * 2 + 1] || e.descriptionJa,
+    }))
 
     const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
     const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
@@ -185,9 +201,9 @@ export default function TalentDashboard({ user }: { user: User }) {
       headlineEn: form.headlineEn,
       headlineJa,
       university: form.university,
-      universityJa: form.universityJa,
+      universityJa,
       faculty: form.faculty,
-      facultyJa: form.facultyJa,
+      facultyJa,
       japaneseLevel: form.japaneseLevel,
       openToWork: form.openToWork,
       skills: skillsEnArr,
@@ -197,7 +213,7 @@ export default function TalentDashboard({ user }: { user: User }) {
       availableFrom: form.availableFrom,
       availableFromJa: form.availableFromJa,
       languages: form.languages,
-      experience: form.experience,
+      experience: experienceJa,
       residenceArea: form.residenceArea || undefined,
       devExperienceYears: form.devExperienceYears ? Number(form.devExperienceYears) : undefined,
       yearsInJapan: form.yearsInJapan ? Number(form.yearsInJapan) : undefined,
@@ -580,16 +596,16 @@ export default function TalentDashboard({ user }: { user: User }) {
                   <div>
                     <h2 className="font-display font-medium text-ink text-xl tracking-wide">{name}</h2>
                     <p className="text-ink-soft text-sm mt-0.5">
-                      {lang === 'ja' ? user.countryJa : user.country} · {lang === 'ja' ? user.fieldJa : user.field}
+                      {pick(lang, user.countryJa, user.country)} · {pick(lang, user.fieldJa, user.field)}
                     </p>
                     {user.email && (
                       <p className="text-ink-faint text-xs mt-0.5">{user.email}</p>
                     )}
                     <div className="flex items-center gap-3 mt-2">
                       <span className="badge-line">{user.japaneseLevel}</span>
-                      {(lang === 'ja' ? user.availableFromJa : user.availableFrom) && (
+                      {(pick(lang, user.availableFromJa, user.availableFrom)) && (
                         <span className="badge-line-ink">
-                          {lang === 'ja' ? user.availableFromJa : user.availableFrom}
+                          {pick(lang, user.availableFromJa, user.availableFrom)}
                         </span>
                       )}
                     </div>
@@ -690,10 +706,10 @@ export default function TalentDashboard({ user }: { user: User }) {
                 </h2>
                 <div>
                   <p className="text-ink text-sm font-medium leading-snug">
-                    {lang === 'ja' ? user.universityJa : user.university}
+                    {pick(lang, user.universityJa, user.university)}
                   </p>
                   <p className="text-ink-soft text-xs mt-1">
-                    {lang === 'ja' ? user.facultyJa : user.faculty}
+                    {pick(lang, user.facultyJa, user.faculty)}
                   </p>
                   <p className="text-ink-faint text-xs mt-0.5">{user.degree} · {user.graduationYear}</p>
                 </div>

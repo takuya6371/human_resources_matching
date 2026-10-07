@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { FIELDS_JA, COMPENSATION_LABEL_KEY } from '../lib/constants'
@@ -139,7 +139,7 @@ export default function JobDetailPage() {
         {(job.descriptionEn || job.descriptionJa) && (
           <div className="line-card p-6 mb-6">
             <p className="text-ink-soft text-sm leading-relaxed whitespace-pre-wrap">
-              {(lang === 'ja' ? job.descriptionJa : job.descriptionEn) || (lang === 'ja' ? job.descriptionEn : job.descriptionJa)}
+              {(pick(lang, job.descriptionJa, job.descriptionEn)) || (pick(lang, job.descriptionEn, job.descriptionJa))}
             </p>
           </div>
         )}

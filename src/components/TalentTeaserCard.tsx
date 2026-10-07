@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../App'
-import { t } from '../i18n'
+import { t, pick, pickList } from '../i18n'
 import type { TalentTeaser } from '../types'
 
 interface Props {
@@ -11,8 +11,8 @@ interface Props {
 // 氏名・写真・自己紹介など個人が特定できる情報だけをぼかして企業ログインへ誘導する。
 export default function TalentTeaserCard({ talent }: Props) {
   const { lang } = useLang()
-  const skills = lang === 'ja' ? talent.skillsJa : talent.skills
-  const field = lang === 'ja' ? talent.fieldJa : talent.field
+  const skills = pickList(lang, talent.skillsJa, talent.skills)
+  const field = pick(lang, talent.fieldJa, talent.field)
 
   return (
     <Link to="/login" className="block no-underline group">
@@ -38,8 +38,8 @@ export default function TalentTeaserCard({ talent }: Props) {
 
         <div className="flex items-center justify-between pt-4 border-t border-hairline">
           <span className="text-xs text-ink-faint">
-            {(lang === 'ja' ? talent.availableFromJa : talent.availableFrom) &&
-              `${t(lang, 'card.available')}: ${lang === 'ja' ? talent.availableFromJa : talent.availableFrom}`}
+            {(pick(lang, talent.availableFromJa, talent.availableFrom)) &&
+              `${t(lang, 'card.available')}: ${pick(lang, talent.availableFromJa, talent.availableFrom)}`}
           </span>
           <span className="text-xs font-medium text-seal group-hover:opacity-70 transition-opacity flex items-center gap-1">
             {t(lang, 'card.locked')}

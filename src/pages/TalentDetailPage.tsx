@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick, pickList } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
 import { isSafeHttpUrl } from '../lib/url'
@@ -90,14 +90,14 @@ export default function TalentDetailPage() {
   }
 
   if (hasFullAccess && talent) {
-    const name = lang === 'ja' ? talent.nameJa : talent.nameEn
-    const country = lang === 'ja' ? talent.countryJa : talent.country
-    const field = lang === 'ja' ? talent.fieldJa : talent.field
-    const university = lang === 'ja' ? talent.universityJa : talent.university
-    const faculty = lang === 'ja' ? talent.facultyJa : talent.faculty
-    const skills = lang === 'ja' ? talent.skillsJa : talent.skills
-    const bio = lang === 'ja' ? talent.bioJa : talent.bioEn
-    const availableFrom = lang === 'ja' ? talent.availableFromJa : talent.availableFrom
+    const name = pick(lang, talent.nameJa, talent.nameEn)
+    const country = pick(lang, talent.countryJa, talent.country)
+    const field = pick(lang, talent.fieldJa, talent.field)
+    const university = pick(lang, talent.universityJa, talent.university)
+    const faculty = pick(lang, talent.facultyJa, talent.faculty)
+    const skills = pickList(lang, talent.skillsJa, talent.skills)
+    const bio = pick(lang, talent.bioJa, talent.bioEn)
+    const availableFrom = pick(lang, talent.availableFromJa, talent.availableFrom)
     const levelLabel = LEVEL_LABELS[talent.japaneseLevel]
 
     return (
@@ -218,14 +218,14 @@ export default function TalentDetailPage() {
                     {talent.experience.map((exp, i) => (
                       <div key={i} className={i > 0 ? 'pt-5 border-t border-hairline' : ''}>
                         <p className="text-ink text-sm font-medium">
-                          {lang === 'ja' ? exp.roleJa : exp.role}
+                          {pick(lang, exp.roleJa, exp.role)}
                         </p>
                         <p className="text-ink-soft text-xs mt-0.5">
-                          {lang === 'ja' ? exp.companyJa : exp.company}
+                          {pick(lang, exp.companyJa, exp.company)}
                         </p>
                         <p className="text-ink-faint text-xs mt-0.5">{exp.period}</p>
                         <p className="text-ink-soft text-sm mt-2 leading-relaxed">
-                          {lang === 'ja' ? exp.descriptionJa : exp.descriptionEn}
+                          {pick(lang, exp.descriptionJa, exp.descriptionEn)}
                         </p>
                       </div>
                     ))}
@@ -295,9 +295,9 @@ export default function TalentDetailPage() {
 
   // ── ゲート表示（未ログイン・人材アカウント）: 個人特定情報のみぼかす ──
   if (!teaser) return null
-  const field = lang === 'ja' ? teaser.fieldJa : teaser.field
-  const skills = lang === 'ja' ? teaser.skillsJa : teaser.skills
-  const availableFrom = lang === 'ja' ? teaser.availableFromJa : teaser.availableFrom
+  const field = pick(lang, teaser.fieldJa, teaser.field)
+  const skills = pickList(lang, teaser.skillsJa, teaser.skills)
+  const availableFrom = pick(lang, teaser.availableFromJa, teaser.availableFrom)
 
   return (
     <div className="min-h-screen line-page">

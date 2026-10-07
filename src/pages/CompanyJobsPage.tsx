@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { fillMissingJapanese } from '../lib/translate'
@@ -302,7 +302,7 @@ export default function CompanyJobsPage() {
                     <p className="text-ink-faint text-xs">
                       {t(lang, `jobs.jobType${job.jobType.charAt(0).toUpperCase()}${job.jobType.slice(1)}`)}
                       {job.remoteOk && ` · ${t(lang, 'jobs.remoteOkLabel')}`}
-                      {' · '}{(lang === 'ja' ? job.fieldJa : job.field) || '—'} · {job.location || '—'}
+                      {' · '}{(pick(lang, job.fieldJa, job.field)) || '—'} · {job.location || '—'}
                     </p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">

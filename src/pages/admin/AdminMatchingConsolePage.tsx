@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { useLang } from '../../App'
-import { t } from '../../i18n'
+import { t, pick } from '../../i18n'
 import { supabase } from '../../lib/supabase'
 import { mapJobRow, jobTitle } from '../../lib/jobMapper'
 import { mapProfileRow, PROFILE_PUBLIC_COLUMNS } from '../../lib/profileMapper'
@@ -118,7 +118,7 @@ export default function AdminMatchingConsolePage() {
                       )}
                       <div className="min-w-0">
                         <p className="text-ink text-sm font-medium truncate">
-                          {lang === 'ja' ? talent.nameJa : talent.nameEn}
+                          {pick(lang, talent.nameJa, talent.nameEn)}
                         </p>
                         <p className="text-ink-faint text-xs truncate">
                           {talent.field} · {talent.japaneseLevel}

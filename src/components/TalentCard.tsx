@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useLang } from '../App'
-import { t } from '../i18n'
+import { t, pick, pickList } from '../i18n'
 import FollowButton from './FollowButton'
 import InterestButton from './InterestButton'
 import type { Talent } from '../types'
@@ -13,11 +13,11 @@ interface Props {
 
 export default function TalentCard({ talent, disableLink = false }: Props) {
   const { lang } = useLang()
-  const name = lang === 'ja' ? talent.nameJa : talent.nameEn
-  const country = lang === 'ja' ? talent.countryJa : talent.country
-  const field = lang === 'ja' ? talent.fieldJa : talent.field
-  const university = lang === 'ja' ? talent.universityJa : talent.university
-  const skills = lang === 'ja' ? talent.skillsJa : talent.skills
+  const name = pick(lang, talent.nameJa, talent.nameEn)
+  const country = pick(lang, talent.countryJa, talent.country)
+  const field = pick(lang, talent.fieldJa, talent.field)
+  const university = pick(lang, talent.universityJa, talent.university)
+  const skills = pickList(lang, talent.skillsJa, talent.skills)
 
   const inner = (
     <>
@@ -35,7 +35,7 @@ export default function TalentCard({ talent, disableLink = false }: Props) {
               <p className="font-display font-medium text-ink text-base">{name}</p>
               <span className="text-base leading-none">{talent.flag}</span>
             </div>
-            <p className="text-ink-soft text-xs mt-1">{lang === 'ja' ? talent.headlineJa : talent.headlineEn}</p>
+            <p className="text-ink-soft text-xs mt-1">{pick(lang, talent.headlineJa, talent.headlineEn)}</p>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
@@ -58,8 +58,8 @@ export default function TalentCard({ talent, disableLink = false }: Props) {
 
       <div className="flex items-center justify-between pt-4 border-t border-hairline">
         <span className="text-xs text-ink-faint">
-          {(lang === 'ja' ? talent.availableFromJa : talent.availableFrom) &&
-            `${t(lang, 'card.available')}: ${lang === 'ja' ? talent.availableFromJa : talent.availableFrom}`}
+          {(pick(lang, talent.availableFromJa, talent.availableFrom)) &&
+            `${t(lang, 'card.available')}: ${pick(lang, talent.availableFromJa, talent.availableFrom)}`}
         </span>
         {!disableLink && (
           <span className="text-xs font-medium text-ink group-hover:text-seal transition-colors">

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { FIELDS, FIELDS_JA, JOB_TYPES } from '../lib/constants'
@@ -128,7 +128,7 @@ export default function JobListPage() {
                     {jobTitle(job, lang)}
                   </p>
                   <p className="text-ink-soft text-xs mb-3">
-                    {(lang === 'ja' ? job.fieldJa : job.field) || '—'}
+                    {(pick(lang, job.fieldJa, job.field)) || '—'}
                     {job.location && ` · ${job.location}`}
                   </p>
                   <div className="flex items-center gap-2 mb-4">

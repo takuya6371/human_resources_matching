@@ -1810,6 +1810,23 @@ export const translations: TranslationStore = {
   },
 }
 
+// 日本語が空なら英語を出す（逆も同じ）。
+// 自動翻訳は保存時にしか走らず、CV取り込み直後・翻訳失敗・古いデータでは
+// 日本語が空のまま残る。素で `lang === 'ja' ? x.ja : x.en` と書くと、
+// 日本語で見たときに職務経歴や学歴がまるごと空欄になる。
+// 表示は必ずこれを通すこと。
+export function pick(lang: Lang, ja?: string | null, en?: string | null): string {
+  const j = (ja ?? '').trim()
+  const e = (en ?? '').trim()
+  return lang === 'ja' ? (j || e) : (e || j)
+}
+
+export function pickList(lang: Lang, ja?: string[] | null, en?: string[] | null): string[] {
+  const j = (ja ?? []).filter(Boolean)
+  const e = (en ?? []).filter(Boolean)
+  return lang === 'ja' ? (j.length ? j : e) : (e.length ? e : j)
+}
+
 export function t(lang: Lang, path: string): string {
   const result = path.split('.').reduce<unknown>((obj, key) => {
     if (obj && typeof obj === 'object') return (obj as Record<string, unknown>)[key]

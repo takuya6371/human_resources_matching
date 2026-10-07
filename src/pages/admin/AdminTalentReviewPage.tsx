@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLang } from '../../App'
-import { t } from '../../i18n'
+import { t, pick } from '../../i18n'
 import { supabase } from '../../lib/supabase'
 
 type TabType = 'pending' | 'all' | 'inquiries'
@@ -159,7 +159,7 @@ export default function AdminTalentReviewPage() {
                       <span className="text-ink-soft text-sm">{p.name_ja}</span>
                       <span className="text-xs font-medium uppercase tracking-wide pb-[2px]"
                             style={{ color: st.color, borderBottom: `1.5px solid ${st.color}` }}>
-                        {lang === 'ja' ? st.label_ja : st.label_en}
+                        {pick(lang, st.label_ja, st.label_en)}
                       </span>
                     </div>
                     <p className="text-ink-faint text-xs">

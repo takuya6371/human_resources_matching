@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Bell, MessageSquare, ChevronDown } from 'lucide-react'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import type { Lang } from '../types'
 
@@ -98,7 +98,7 @@ export default function Navbar() {
   const isAdmin = user?.role === 'admin'
   const loggedIn = Boolean(user || company)
   const companyInitial = company?.name ? company.name.slice(0, 2).toUpperCase() : '??'
-  const accountLabel = isAdmin ? t(lang, 'nav.admin') : user ? (lang === 'ja' ? user.nameJa : user.nameEn) : company?.name
+  const accountLabel = isAdmin ? t(lang, 'nav.admin') : user ? (pick(lang, user.nameJa, user.nameEn)) : company?.name
   const userLink = isAdmin ? '/admin' : '/dashboard'
 
   async function handleLogout() {

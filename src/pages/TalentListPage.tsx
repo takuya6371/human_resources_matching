@@ -6,7 +6,7 @@ import TalentTeaserCard from '../components/TalentTeaserCard'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick, pickList } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapProfileRow, mapTeaserRow, PROFILE_PUBLIC_COLUMNS } from '../lib/profileMapper'
 import { FIELDS, FIELDS_JA, LEVELS } from '../lib/constants'
@@ -80,8 +80,8 @@ export default function TalentListPage() {
     if (!hasFullAccess) return []
     const query = search.trim().toLowerCase()
     return talents.filter(talent => {
-      const name = (lang === 'ja' ? talent.nameJa : talent.nameEn).toLowerCase()
-      const skillsArr = lang === 'ja' ? talent.skillsJa : talent.skills
+      const name = (pick(lang, talent.nameJa, talent.nameEn)).toLowerCase()
+      const skillsArr = pickList(lang, talent.skillsJa, talent.skills)
       const matchSearch = !query ||
         name.includes(query) ||
         skillsArr.some(s => s.toLowerCase().includes(query))
@@ -97,7 +97,7 @@ export default function TalentListPage() {
     if (hasFullAccess) return []
     const query = search.trim().toLowerCase()
     return teasers.filter(talent => {
-      const skillsArr = lang === 'ja' ? talent.skillsJa : talent.skills
+      const skillsArr = pickList(lang, talent.skillsJa, talent.skills)
       const matchSearch = !query || skillsArr.some(s => s.toLowerCase().includes(query))
       const matchField = !activeField || talent.field === activeField
       const matchLevel = !activeLevel || talent.japaneseLevel === activeLevel

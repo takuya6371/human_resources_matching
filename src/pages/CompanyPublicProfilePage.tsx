@@ -8,7 +8,7 @@ import SaveButton from '../components/SaveButton'
 import PostCard from '../components/PostCard'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import { mapJobRow, jobTitle } from '../lib/jobMapper'
 import { isSafeHttpUrl } from '../lib/url'
@@ -147,7 +147,7 @@ export default function CompanyPublicProfilePage() {
                         {jobTitle(job, lang)}
                       </p>
                       <p className="text-ink-faint text-xs mt-0.5">
-                        {(lang === 'ja' ? job.fieldJa : job.field) || '—'}
+                        {(pick(lang, job.fieldJa, job.field)) || '—'}
                         {job.location && ` · ${job.location}`}
                       </p>
                     </Link>

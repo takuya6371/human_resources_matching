@@ -5,7 +5,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
-import { t } from '../i18n'
+import { t, pick } from '../i18n'
 import { supabase } from '../lib/supabase'
 import type { SavedItemType } from '../types'
 
@@ -57,7 +57,7 @@ export default function SavedPage() {
         if (!saved) continue
         resolved.job.push({
           savedId: saved.id,
-          title: (lang === 'ja' ? row.title_ja : row.title_en) || row.title_en || row.title_ja,
+          title: (pick(lang, row.title_ja, row.title_en)) || row.title_en || row.title_ja,
           meta: lang === 'ja' ? (row as any).companies?.name_ja || (row as any).companies?.name : (row as any).companies?.name,
           link: `/jobs/${row.id}`,
         })
@@ -87,8 +87,8 @@ export default function SavedPage() {
         if (!saved) continue
         resolved.talent.push({
           savedId: saved.id,
-          title: (lang === 'ja' ? row.name_ja : row.name_en) || row.name_en,
-          meta: lang === 'ja' ? row.field_ja : row.field,
+          title: (pick(lang, row.name_ja, row.name_en)) || row.name_en,
+          meta: pick(lang, row.field_ja, row.field),
           imageUrl: row.avatar_url ?? undefined,
           link: `/talent/${row.id}`,
         })
@@ -103,7 +103,7 @@ export default function SavedPage() {
         if (!saved) continue
         resolved.company.push({
           savedId: saved.id,
-          title: (lang === 'ja' ? row.name_ja : row.name) || row.name,
+          title: (pick(lang, row.name_ja, row.name)) || row.name,
           meta: row.industry ?? undefined,
           imageUrl: row.logo_url ?? undefined,
           link: `/company/${row.id}`,
