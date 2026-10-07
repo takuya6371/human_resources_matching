@@ -41,11 +41,12 @@ const AuthContext = createContext<AuthContextType>({
 async function fetchProfile(userId: string, email: string): Promise<User | null> {
   // admin_note は profile_private にある（企業から読めないようにするため分離。
   // 20260924000000_protect_private_profile_fields.sql を参照）。
-  const [{ data: profile }, { data: priv }, { data: langs }, { data: exps }] = await Promise.all([
+  const [{ data: profile }, { data: priv }, { data: langs }, { data: exps }, { data: certs }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', userId).single(),
-    supabase.from('profile_private').select('admin_note').eq('id', userId).maybeSingle(),
+    supabase.from('profile_private').select('*').eq('id', userId).maybeSingle(),
     supabase.from('profile_languages').select('*').eq('profile_id', userId).order('sort_order'),
     supabase.from('profile_experiences').select('*').eq('profile_id', userId).order('sort_order'),
+    supabase.from('profile_certifications').select('*').eq('profile_id', userId).order('sort_order'),
   ])
 
   if (!profile) return null
@@ -53,6 +54,22 @@ async function fetchProfile(userId: string, email: string): Promise<User | null>
   return {
     ...mapProfileRow(profile, langs ?? [], exps ?? []),
     adminNote: priv?.admin_note ?? undefined,
+    // 日本式履歴書で使う項目。本人と管理者しか読めない。
+    nameKanaJa: priv?.name_kana_ja ?? undefined,
+    phone: priv?.phone ?? undefined,
+    dateOfBirth: priv?.date_of_birth ?? undefined,
+    gender: priv?.gender ?? undefined,
+    postalCode: priv?.postal_code ?? undefined,
+    addressLine: priv?.address_line ?? undefined,
+    addressKanaJa: priv?.address_kana_ja ?? undefined,
+    commuteMinutes: priv?.commute_minutes ?? undefined,
+    dependentsCount: priv?.dependents_count ?? undefined,
+    hasSpouse: priv?.has_spouse ?? undefined,
+    spouseIsDependent: priv?.spouse_is_dependent ?? undefined,
+    preferredConditions: priv?.preferred_conditions ?? undefined,
+    certifications: (certs ?? []).map(c => ({
+      name: c.name, nameJa: c.name_ja ?? undefined, acquiredOn: c.acquired_on ?? undefined,
+    })),
     email,
     role: (profile.role as 'talent' | 'company' | 'admin') ?? 'talent',
   }
@@ -226,8 +243,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role_en: e.role,
             role_ja: e.roleJa,
             period: e.period,
+            started_on: e.startedOn ?? null,
+            ended_on: e.endedOn ?? null,
+            is_current: e.isCurrent ?? false,
             desc_en: e.descriptionEn,
             desc_ja: e.descriptionJa,
+            sort_order: i,
+          }))
+        )
+        if (insErr) return { error: insErr.message }
+      }
+    }
+
+    // 履歴書用の項目は profile_private。本人と管理者しか読めない。
+    // undefined の項目は送らない（他画面からの部分更新で消さないため）。
+    const privateUpdates: Record<string, unknown> = {}
+    const priv: [string, unknown][] = [
+      ['name_kana_ja', updates.nameKanaJa],
+      ['phone', updates.phone],
+      ['date_of_birth', updates.dateOfBirth || null],
+      ['gender', updates.gender || null],
+      ['postal_code', updates.postalCode],
+      ['address_line', updates.addressLine],
+      ['address_kana_ja', updates.addressKanaJa],
+      ['commute_minutes', updates.commuteMinutes],
+      ['dependents_count', updates.dependentsCount],
+      ['has_spouse', updates.hasSpouse],
+      ['spouse_is_dependent', updates.spouseIsDependent],
+      ['preferred_conditions', updates.preferredConditions],
+    ]
+    for (const [col, v] of priv) if (v !== undefined) privateUpdates[col] = v
+    if (Object.keys(privateUpdates).length > 0) {
+      const { error: privErr } = await supabase
+        .from('profile_private').update(privateUpdates).eq('id', user.id)
+      if (privErr) return { error: privErr.message }
+    }
+
+    if (updates.certifications !== undefined) {
+      const { error: delErr } = await supabase
+        .from('profile_certifications').delete().eq('profile_id', user.id)
+      if (delErr) return { error: delErr.message }
+      if (updates.certifications.length > 0) {
+        const { error: insErr } = await supabase.from('profile_certifications').insert(
+          updates.certifications.map((c, i) => ({
+            profile_id: user.id,
+            name: c.name,
+            name_ja: c.nameJa ?? null,
+            acquired_on: c.acquiredOn ?? null,
             sort_order: i,
           }))
         )

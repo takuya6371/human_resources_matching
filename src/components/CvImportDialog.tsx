@@ -19,6 +19,12 @@ const FIELD_LABEL_KEYS: Record<CvFieldKey, string> = {
   skillsEn: 'dashboard.skillsEn',
   languages: 'dashboard.cvFieldLanguages',
   experience: 'dashboard.cvFieldExperience',
+  phone: 'dashboard.phone',
+  dateOfBirth: 'dashboard.dateOfBirth',
+  gender: 'dashboard.gender',
+  postalCode: 'dashboard.postalCode',
+  addressLine: 'dashboard.addressLine',
+  certifications: 'dashboard.certifications',
 }
 
 // parse-cv が返すエラーコードのうち、利用者が自力で対処できるものは個別の文言を出す。

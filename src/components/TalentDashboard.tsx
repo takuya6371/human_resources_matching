@@ -10,7 +10,7 @@ import { isSafeHttpUrl } from '../lib/url'
 import { fillMissingJapanese, translateToJa } from '../lib/translate'
 import CvImportDialog from './CvImportDialog'
 import type { CvFieldKey, CvFields } from '../lib/cvImport'
-import type { User, JLPTLevel, LanguageLevel, Language, Experience } from '../types'
+import type { User, JLPTLevel, LanguageLevel, Language, Experience, Certification } from '../types'
 
 const LEVELS: JLPTLevel[] = ['N1', 'N2', 'N3', 'N4', 'N5']
 const LANG_LEVELS: LanguageLevel[] = ['Native', 'Fluent', 'Business', 'Conversational', 'Basic']
@@ -43,6 +43,20 @@ interface EditForm {
   videoUrl: string
   pastClients: string
   avatarUrl: string
+  // 日本式履歴書用。企業には見えない（profile_private）。
+  nameKanaJa: string
+  phone: string
+  dateOfBirth: string
+  gender: string
+  postalCode: string
+  addressLine: string
+  addressKanaJa: string
+  commuteMinutes: string
+  dependentsCount: string
+  hasSpouse: boolean
+  spouseIsDependent: boolean
+  preferredConditions: string
+  certifications: Certification[]
 }
 
 const INPUT_CLS = 'input-line'
@@ -63,6 +77,13 @@ function cvCurrentValues(f: EditForm): Record<CvFieldKey, string> {
     skillsEn: f.skillsEn,
     languages: f.languages.map(l => `${l.name} (${l.level})`).join(', '),
     experience: f.experience.map(e => `${e.role} — ${e.company}`).join('\n'),
+    phone: f.phone,
+    dateOfBirth: f.dateOfBirth,
+    gender: f.gender,
+    postalCode: f.postalCode,
+    addressLine: f.addressLine,
+    certifications: f.certifications
+      .map(c => (c.acquiredOn ? `${c.name} (${c.acquiredOn.slice(0, 7)})` : c.name)).join('\n'),
   }
 }
 
@@ -102,6 +123,19 @@ export default function TalentDashboard({ user }: { user: User }) {
 
   function startEdit() {
     setForm({
+      nameKanaJa: user.nameKanaJa ?? '',
+      phone: user.phone ?? '',
+      dateOfBirth: user.dateOfBirth ?? '',
+      gender: user.gender ?? '',
+      postalCode: user.postalCode ?? '',
+      addressLine: user.addressLine ?? '',
+      addressKanaJa: user.addressKanaJa ?? '',
+      commuteMinutes: user.commuteMinutes != null ? String(user.commuteMinutes) : '',
+      dependentsCount: user.dependentsCount != null ? String(user.dependentsCount) : '',
+      hasSpouse: user.hasSpouse ?? false,
+      spouseIsDependent: user.spouseIsDependent ?? false,
+      preferredConditions: user.preferredConditions ?? '',
+      certifications: user.certifications ?? [],
       email: user.email ?? '',
       nameEn: user.nameEn,
       nameJa: user.nameJa,
@@ -255,6 +289,20 @@ export default function TalentDashboard({ user }: { user: User }) {
         videoUrl: form.videoUrl || undefined,
         pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
         avatarUrl: avatarUrl || undefined,
+        // 履歴書用。空文字は「未入力」として null 相当で送る。
+        nameKanaJa: form.nameKanaJa,
+        phone: form.phone,
+        dateOfBirth: form.dateOfBirth,
+        gender: form.gender,
+        postalCode: form.postalCode,
+        addressLine: form.addressLine,
+        addressKanaJa: form.addressKanaJa,
+        commuteMinutes: form.commuteMinutes ? Number(form.commuteMinutes) : undefined,
+        dependentsCount: form.dependentsCount ? Number(form.dependentsCount) : undefined,
+        hasSpouse: form.hasSpouse,
+        spouseIsDependent: form.spouseIsDependent,
+        preferredConditions: form.preferredConditions,
+        certifications: form.certifications,
       }
       const { error } = await updateProfile(updates)
       if (error) {
@@ -297,7 +345,12 @@ export default function TalentDashboard({ user }: { user: User }) {
       // スキルは語単位で、CV側の日本語は取っていないので常に翻訳に任せる
       ...(fields.skillsEn != null && { skillsJa: '' }),
     }
-    setForm(f => f ? { ...f, ...fields, ...ja } : f)
+    // CvFields と EditForm で形が違う項目はここで詰め替える。
+    const { certifications: certs, ...rest } = fields
+    const extra: Partial<EditForm> = certs
+      ? { certifications: certs.map(c => ({ name: c.name, acquiredOn: c.year ? `${c.year}-01-01` : undefined })) }
+      : {}
+    setForm(f => f ? { ...f, ...rest, ...extra, ...ja } : f)
     setCvOpen(false)
   }
 

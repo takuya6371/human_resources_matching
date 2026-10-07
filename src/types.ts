@@ -13,7 +13,12 @@ export interface Experience {
   companyJa: string
   role: string
   roleJa: string
+  /** 表示用の自由文。"2023-02 – Present" など */
   period: string
+  /** 履歴書は「○年○月」で並べるため、period とは別に構造化して持つ */
+  startedOn?: string
+  endedOn?: string
+  isCurrent?: boolean
   descriptionEn: string
   descriptionJa: string
 }
@@ -60,9 +65,31 @@ export interface Talent {
   returnHomeMonth?: string
 }
 
+export interface Certification {
+  name: string
+  nameJa?: string
+  /** 取得年月。'YYYY-MM-DD'（日は月初） */
+  acquiredOn?: string
+}
+
 export interface User extends Talent {
   email?: string
   role: 'talent' | 'company' | 'admin'
+  // 日本式履歴書（JIS様式）用。profile_private にあり企業からは読めない。
+  // 免許・資格だけは企業にも見せるので profile_certifications（別テーブル）。
+  nameKanaJa?: string
+  phone?: string
+  dateOfBirth?: string
+  gender?: string
+  postalCode?: string
+  addressLine?: string
+  addressKanaJa?: string
+  commuteMinutes?: number
+  dependentsCount?: number
+  hasSpouse?: boolean
+  spouseIsDependent?: boolean
+  preferredConditions?: string
+  certifications?: Certification[]
 }
 
 export type AccountType = 'talent' | 'company' | 'admin'

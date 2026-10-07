@@ -21,9 +21,20 @@ export interface CvExtraction {
     summary: string | null
     summary_ja: string | null
     email: string | null
+    phone: string | null
+    date_of_birth: string | null
+    gender: string | null
+    postal_code: string | null
+    address_line: string | null
   }
   languages: { language: string; cefr: string | null; jlpt: string | null; is_native: boolean | null }[]
-  education: { institution: string; degree: string | null; field_of_study: string | null }[]
+  education: {
+    institution: string
+    degree: string | null
+    field_of_study: string | null
+    start_year: number | null
+    end_year: number | null
+  }[]
   experience: {
     employer: string
     employer_ja: string | null
@@ -38,6 +49,7 @@ export interface CvExtraction {
     achievements_ja: string[]
   }[]
   skills: { name: string; canonical: string }[]
+  certifications: { name: string; year: number | null }[]
   derived: {
     total_years_experience: number | null
     japanese_level: string | null
@@ -63,11 +75,21 @@ export interface CvFields {
   skillsEn?: string
   languages?: Language[]
   experience?: Experience[]
+  // 日本式履歴書（JIS様式）用。parse-cv は以前から抽出していたが、
+  // 受け取る側が無く捨てていた。本人の確認を経てから保存する。
+  phone?: string
+  dateOfBirth?: string
+  gender?: string
+  postalCode?: string
+  addressLine?: string
+  certifications?: { name: string; year: number | null }[]
 }
 
 export const CV_FIELD_KEYS = [
   'nameEn', 'email', 'headlineEn', 'bioEn', 'university', 'faculty',
   'japaneseLevel', 'devExperienceYears', 'skillsEn', 'languages', 'experience',
+  // 履歴書用。機微な情報なので、他の項目と同じく本人が確認してから入る。
+  'phone', 'dateOfBirth', 'gender', 'postalCode', 'addressLine', 'certifications',
 ] as const
 
 export type CvFieldKey = typeof CV_FIELD_KEYS[number]
@@ -139,6 +161,13 @@ export function mapCvToProfileFields(cv: CvExtraction, presentLabel = 'Present')
 
   // CV自身が日本語で書いていた分はそのまま使う。空にしておくと保存時に
   // 英語から翻訳され、日本語→英語→日本語の往復になって原文が失われる。
+  if (cv.candidate.phone) fields.phone = cv.candidate.phone
+  if (cv.candidate.date_of_birth) fields.dateOfBirth = cv.candidate.date_of_birth
+  if (cv.candidate.gender) fields.gender = cv.candidate.gender
+  if (cv.candidate.postal_code) fields.postalCode = cv.candidate.postal_code
+  if (cv.candidate.address_line) fields.addressLine = cv.candidate.address_line
+  if (cv.certifications.length > 0) fields.certifications = cv.certifications
+
   if (cv.candidate.full_name_ja) fields.nameJa = cv.candidate.full_name_ja
   if (cv.candidate.headline_ja) fields.headlineJa = cv.candidate.headline_ja
   if (cv.candidate.summary_ja) fields.bioJa = cv.candidate.summary_ja
@@ -169,6 +198,10 @@ export function mapCvToProfileFields(cv: CvExtraction, presentLabel = 'Present')
       role: e.title,
       roleJa: e.title_ja ?? '',
       period: formatPeriod(e, presentLabel),
+      // 履歴書は「○年○月」で並べるので、自由文の period とは別に持つ
+      startedOn: e.start_date ? `${e.start_date}-01` : undefined,
+      endedOn: e.end_date ? `${e.end_date}-01` : undefined,
+      isCurrent: e.is_current ?? false,
       descriptionEn: [e.summary ?? '', ...e.achievements.map(a => `- ${a}`)].filter(Boolean).join('\n'),
       // 日本語は、CVに日本語の記述が実際にあったときだけ入る。
       // achievements_ja は空か、achievements と同数で返る取り決め。
@@ -189,5 +222,10 @@ export function describeCvField(key: CvFieldKey, fields: CvFields): string {
   if (key === 'experience') {
     return (fields.experience ?? []).map(e => `${e.role} — ${e.company}`).join('\n')
   }
-  return fields[key] ?? ''
+  if (key === 'certifications') {
+    return (fields.certifications ?? [])
+      .map(c => (c.year ? `${c.name} (${c.year})` : c.name)).join('\n')
+  }
+  const v = fields[key]
+  return typeof v === 'string' ? v : ''
 }
