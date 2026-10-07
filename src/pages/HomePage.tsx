@@ -66,7 +66,7 @@ export default function HomePage() {
             </button>
           </form>
 
-          <Link to="/login" className="inline-block mt-8 text-sm text-seal hover:opacity-70 no-underline border-b border-seal pb-0.5">
+          <Link to="/start" className="inline-block mt-8 text-sm text-seal hover:opacity-70 no-underline border-b border-seal pb-0.5">
             {t(lang, 'hero.registerCta')} →
           </Link>
         </div>

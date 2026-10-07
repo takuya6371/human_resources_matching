@@ -22,6 +22,7 @@ import SavedPage from './pages/SavedPage'
 import NotificationsPage from './pages/NotificationsPage'
 import MessagesPage from './pages/MessagesPage'
 import AboutPage from './pages/AboutPage'
+import StartPage from './pages/StartPage'
 import ForCompaniesPage from './pages/ForCompaniesPage'
 import HowItWorksPage from './pages/HowItWorksPage'
 import LegalPage from './pages/LegalPage'
@@ -111,6 +112,7 @@ export default function App() {
             <Route path="/saved" element={<SavedPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/start" element={<StartPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/for-companies" element={<ForCompaniesPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />

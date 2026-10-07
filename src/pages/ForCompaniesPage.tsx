@@ -31,7 +31,7 @@ export default function ForCompaniesPage() {
               {t(lang, 'forCompanies.lead')}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/login" className="btn-line no-underline">{t(lang, 'forCompanies.cta')}</Link>
+              <Link to="/login?mode=signup&role=company" className="btn-line no-underline">{t(lang, 'forCompanies.cta')}</Link>
               <Link to="/talents" className="btn-line-ghost no-underline">{t(lang, 'forCompanies.browseCta')}</Link>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function ForCompaniesPage() {
                 {t(lang, 'forCompanies.priceNote')}
               </p>
               <div className="mt-8">
-                <Link to="/login" className="btn-line no-underline">{t(lang, 'forCompanies.cta')}</Link>
+                <Link to="/login?mode=signup&role=company" className="btn-line no-underline">{t(lang, 'forCompanies.cta')}</Link>
               </div>
             </div>
           </div>

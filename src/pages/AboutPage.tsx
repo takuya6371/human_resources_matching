@@ -56,7 +56,7 @@ export default function AboutPage() {
               <p className="mt-4 text-ink-soft text-sm leading-relaxed">{t(lang, 'about.missionP1')}</p>
               <p className="mt-4 text-ink-soft text-sm leading-relaxed">{t(lang, 'about.missionP2')}</p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/login" className="btn-line no-underline">{t(lang, 'about.joinTalent')}</Link>
+                <Link to="/login?mode=signup&role=talent" className="btn-line no-underline">{t(lang, 'about.joinTalent')}</Link>
                 <Link to="/talents" className="btn-line-ghost no-underline">{t(lang, 'about.joinCompany')}</Link>
               </div>
             </div>
@@ -128,7 +128,7 @@ export default function AboutPage() {
               </div>
             </div>
             <div className="mt-10 text-center">
-              <Link to="/login" className="btn-line no-underline">{t(lang, 'about.finalCta')}</Link>
+              <Link to="/start" className="btn-line no-underline">{t(lang, 'about.finalCta')}</Link>
             </div>
           </div>
         </section>

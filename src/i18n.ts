@@ -491,6 +491,17 @@ export const translations: TranslationStore = {
       tagline: 'Better connections, better work.',
       rights: '© 2026 NeBonga Link. All rights reserved.',
     },
+    start: {
+      title: 'Welcome to NeBonga Link',
+      lead: 'Tell us which you are, and we will take you to the right form. It takes about a minute.',
+      talentTitle: 'I am looking for work',
+      talentDesc: 'Build a profile, upload your CV and let companies working with Japan find you. Free.',
+      talentCta: 'Register as talent',
+      companyTitle: 'I am hiring',
+      companyDesc: 'Post roles and reach professionals who already live in Japan. Free at the moment.',
+      companyCta: 'Register as a company',
+      haveAccount: 'Already have an account?',
+    },
     legal: {
       terms: 'Terms of Service',
       privacy: 'Privacy Policy',
@@ -1081,6 +1092,17 @@ export const translations: TranslationStore = {
       tagline: 'Better connections, better work.',
       rights: '© 2026 NeBonga Link. All rights reserved.',
     },
+    start: {
+      title: 'NeBonga Link へようこそ',
+      lead: 'どちらの方かを選んでください。登録は1分ほどで終わります。',
+      talentTitle: '仕事を探している',
+      talentDesc: 'プロフィールを作り、履歴書をアップロードすると、日本と仕事をする企業から見つけてもらえます。無料です。',
+      talentCta: '人材として登録',
+      companyTitle: '採用したい',
+      companyDesc: '求人を掲載し、すでに日本に住む人材に届けられます。現在無料です。',
+      companyCta: '企業として登録',
+      haveAccount: 'すでにアカウントをお持ちですか？',
+    },
     legal: {
       terms: '利用規約',
       privacy: 'プライバシーポリシー',
@@ -1670,6 +1692,17 @@ export const translations: TranslationStore = {
     footer: {
       tagline: 'Better connections, better work.',
       rights: '© 2026 NeBonga Link. Tous droits réservés.',
+    },
+    start: {
+      title: 'Bienvenue sur NeBonga Link',
+      lead: 'Indiquez qui vous êtes et nous vous dirigeons vers le bon formulaire. Cela prend une minute.',
+      talentTitle: 'Je cherche un emploi',
+      talentDesc: 'Créez un profil, déposez votre CV et laissez les entreprises liées au Japon vous trouver. Gratuit.',
+      talentCta: 'S\'inscrire comme talent',
+      companyTitle: 'Je recrute',
+      companyDesc: 'Publiez vos offres et touchez des professionnels qui vivent déjà au Japon. Gratuit actuellement.',
+      companyCta: 'Inscrire mon entreprise',
+      haveAccount: 'Vous avez déjà un compte ?',
     },
     legal: {
       // 本文は英語版を表示する（法務文書の仏訳は用意していない）。

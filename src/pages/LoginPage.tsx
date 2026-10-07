@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
 import { t } from '../i18n'
@@ -12,8 +12,16 @@ export default function LoginPage() {
   const { user, company, accountType, login, signUp } = useAuth()
   const { lang } = useLang()
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'login' | 'signup'>('login')
-  const [signUpType, setSignUpType] = useState<'talent' | 'company'>('talent')
+  const [params] = useSearchParams()
+
+  // /start や QR からの流入は、URL で最初から登録・種別を指定して来る。
+  // 指定が無ければ従来どおりログイン画面。
+  const [mode, setMode] = useState<'login' | 'signup'>(
+    params.get('mode') === 'signup' ? 'signup' : 'login'
+  )
+  const [signUpType, setSignUpType] = useState<'talent' | 'company'>(
+    params.get('role') === 'company' ? 'company' : 'talent'
+  )
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [companyName, setCompanyName] = useState('')

@@ -105,7 +105,7 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="mt-12 text-center">
-              <Link to="/login" className="btn-line no-underline">{t(lang, 'howItWorks.cta')}</Link>
+              <Link to="/start" className="btn-line no-underline">{t(lang, 'howItWorks.cta')}</Link>
             </div>
 
           </div>
