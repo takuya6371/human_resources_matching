@@ -15,20 +15,27 @@ export const CV_FILE_ACCEPT = '.pdf,.docx,.txt,image/png,image/jpeg'
 export interface CvExtraction {
   candidate: {
     full_name: string
+    full_name_ja: string | null
     headline: string | null
+    headline_ja: string | null
     summary: string | null
+    summary_ja: string | null
     email: string | null
   }
   languages: { language: string; cefr: string | null; jlpt: string | null; is_native: boolean | null }[]
   education: { institution: string; degree: string | null; field_of_study: string | null }[]
   experience: {
     employer: string
+    employer_ja: string | null
     title: string
+    title_ja: string | null
     start_date: string | null
     end_date: string | null
     is_current: boolean | null
     summary: string | null
+    summary_ja: string | null
     achievements: string[]
+    achievements_ja: string[]
   }[]
   skills: { name: string; canonical: string }[]
   derived: {
@@ -43,6 +50,12 @@ export interface CvFields {
   email?: string
   headlineEn?: string
   bioEn?: string
+  // CVに日本語の記述が実際にあったときだけ入る。確認画面の項目は増やさず、
+  // 対になる英語の項目を取り込むときに一緒に付いてくる扱いにしている
+  // （CV_FIELD_KEYS には含めない）。
+  nameJa?: string
+  headlineJa?: string
+  bioJa?: string
   university?: string
   faculty?: string
   japaneseLevel?: JLPTLevel
@@ -124,6 +137,12 @@ export function mapCvToProfileFields(cv: CvExtraction, presentLabel = 'Present')
   if (cv.candidate.headline) fields.headlineEn = cv.candidate.headline
   if (cv.candidate.summary) fields.bioEn = cv.candidate.summary
 
+  // CV自身が日本語で書いていた分はそのまま使う。空にしておくと保存時に
+  // 英語から翻訳され、日本語→英語→日本語の往復になって原文が失われる。
+  if (cv.candidate.full_name_ja) fields.nameJa = cv.candidate.full_name_ja
+  if (cv.candidate.headline_ja) fields.headlineJa = cv.candidate.headline_ja
+  if (cv.candidate.summary_ja) fields.bioJa = cv.candidate.summary_ja
+
   // education は新しい順。最新の学歴を大学・学部に充てる。
   const latest = cv.education[0]
   if (latest?.institution) fields.university = latest.institution
@@ -146,12 +165,17 @@ export function mapCvToProfileFields(cv: CvExtraction, presentLabel = 'Present')
   if (cv.experience.length > 0) {
     fields.experience = cv.experience.map(e => ({
       company: e.employer,
-      companyJa: '',
+      companyJa: e.employer_ja ?? '',
       role: e.title,
-      roleJa: '',
+      roleJa: e.title_ja ?? '',
       period: formatPeriod(e, presentLabel),
       descriptionEn: [e.summary ?? '', ...e.achievements.map(a => `- ${a}`)].filter(Boolean).join('\n'),
-      descriptionJa: '',
+      // 日本語は、CVに日本語の記述が実際にあったときだけ入る。
+      // achievements_ja は空か、achievements と同数で返る取り決め。
+      descriptionJa: [
+        e.summary_ja ?? '',
+        ...(e.achievements_ja ?? []).map(a => `- ${a}`),
+      ].filter(Boolean).join('\n'),
     }))
   }
 

@@ -85,8 +85,11 @@ const obj = (properties: Record<string, unknown>) => ({
 const CV_SCHEMA = obj({
   candidate: obj({
     full_name: S("Name exactly as written"),
+    full_name_ja: SN("The name in Japanese script, only if the CV shows it"),
     headline: SN("One-line professional identity. Compose one if absent."),
+    headline_ja: SN("The CV's own Japanese wording. null if the CV has no Japanese."),
     summary: SN("2-3 sentence summary. Compose from the CV if absent."),
+    summary_ja: SN("The CV's own Japanese wording. null if the CV has no Japanese."),
     email: SN(), phone: SN("E.164 if determinable"), links: ARR(S("Full URL")),
     city: SN(), country: SN("Country of residence"), country_code: SN("ISO 3166-1 alpha-2"),
     date_of_birth: SN("YYYY-MM-DD, only if the CV states it"),
@@ -105,10 +108,13 @@ const CV_SCHEMA = obj({
     start_year: IN_(), end_year: IN_("null if ongoing"), is_ongoing: BN(),
   }), "Most recent first"),
   experience: ARR(obj({
-    employer: S(), title: S(),
+    employer: S(), employer_ja: SN("Employer name in Japanese script if the CV shows it"),
+    title: S(), title_ja: SN("The CV's own Japanese wording. null if the CV has no Japanese."),
     employment_type: { type: "string", enum: ["full_time","part_time","contract","freelance","internship","volunteer","other"] },
     start_date: SN("YYYY-MM"), end_date: SN("YYYY-MM or null if current"), is_current: BN(),
-    summary: SN(), achievements: ARR(S("One concrete accomplishment")),
+    summary: SN(), summary_ja: SN("The CV's own Japanese wording. null if the CV has no Japanese."),
+    achievements: ARR(S("One concrete accomplishment")),
+    achievements_ja: ARR(S("The same achievement in the CV's own Japanese wording"), "Empty array if the CV has no Japanese"),
     scale_note: SN("Users, volume, revenue, throughput"),
   }), "Most recent first"),
   skills: ARR(obj({
@@ -142,7 +148,16 @@ const CV_SCHEMA = obj({
 
 const SYSTEM_PROMPT = `You extract structured data from CVs for a platform matching African professionals with Japanese companies.
 
-WRITE THE OUTPUT IN ENGLISH. CVs arrive in French, Japanese and other languages; the profile is always English. Translate every piece of prose you produce — headline, summary, job titles, role summaries, achievements, skill names, field labels, availability. Keep proper nouns as they are written: people, employers, schools, cities, qualifications. Record the document's own language in extraction_meta.source_language.
+THE ENGLISH FIELDS ARE ALWAYS IN ENGLISH. CVs arrive in French, Japanese and other languages. Translate every piece of prose into the plain fields — headline, summary, job titles, role summaries, achievements, skill names, field labels, availability. Keep proper nouns as they are written: people, employers, schools, cities, qualifications. Record the document's own language in extraction_meta.source_language.
+
+THE _ja FIELDS CARRY THE CV'S OWN JAPANESE, COPIED VERBATIM. Never translate into them, never compose them, never romanise them. They exist so that a person who wrote their CV in Japanese is shown to Japanese companies in their own words instead of a translation of a translation.
+
+  - CV written in Japanese: copy its wording into every _ja field, character for character, and put your English translation in the plain field.
+  - CV written in English or French with no Japanese at all: every _ja field is null, and achievements_ja is an empty array.
+  - Bilingual CV, or one with Japanese company names and English prose: fill each _ja field only where that specific piece of text appears in Japanese on the document. Leave the rest null. Mixing is expected and correct.
+  - achievements_ja must either be empty, or line up one-to-one with achievements in the same order. Never return a partial list.
+
+If you are unsure whether a phrase is the CV's own Japanese or your own rendering, it is yours: leave the _ja field null. A missing _ja is filled in later by the platform; a fabricated one is a lie about what the candidate wrote.
 
 GROUNDING
 1. Extract only what the document supports. Never invent an employer, date, qualification or skill.

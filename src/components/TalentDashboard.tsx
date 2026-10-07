@@ -285,12 +285,19 @@ export default function TalentDashboard({ user }: { user: User }) {
   // 英語欄を置き換えたときは、対応する日本語欄が古い内容のまま残ると英日で食い違うため
   // 空にしておく。保存時の自動翻訳が新しい英語から埋め直す。
   function applyCvFields(fields: CvFields) {
-    const clearedJa: Partial<EditForm> = {
-      ...(fields.headlineEn != null && { headlineJa: '' }),
-      ...(fields.bioEn != null && { bioJa: '' }),
+    // 英語を取り込んだら、対になる日本語は原則いったん空にする。
+    // 前のプロフィールの日本語が残ると、英語と食い違ったまま保存される。
+    // ただしCV自身に日本語の記述があった場合はそれを採る。空にして
+    // 保存時の自動翻訳に任せると、日本語→英語→日本語の往復になり
+    // 本人が書いた言葉が失われる。
+    const ja: Partial<EditForm> = {
+      ...(fields.headlineEn != null && { headlineJa: fields.headlineJa ?? '' }),
+      ...(fields.bioEn != null && { bioJa: fields.bioJa ?? '' }),
+      ...(fields.nameEn != null && fields.nameJa ? { nameJa: fields.nameJa } : {}),
+      // スキルは語単位で、CV側の日本語は取っていないので常に翻訳に任せる
       ...(fields.skillsEn != null && { skillsJa: '' }),
     }
-    setForm(f => f ? { ...f, ...fields, ...clearedJa } : f)
+    setForm(f => f ? { ...f, ...fields, ...ja } : f)
     setCvOpen(false)
   }
 
