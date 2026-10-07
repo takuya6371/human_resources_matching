@@ -599,7 +599,12 @@ export default function TalentDashboard({ user }: { user: User }) {
                   + {lang === 'ja' ? '追加' : 'Add'}
                 </button>
               </div>
-              <div className="space-y-6">
+              {/* 1件あたり7入力あり、3件も入れるとフォームが延々と伸びて保存ボタンまで
+                  遠くなる。2件を超えたらこの欄だけ内部スクロールにする。
+                  1〜2件のときに枠を出すとかえって窮屈なので出さない。 */}
+              <div className={`space-y-6 ${form.experience.length > 2
+                ? 'max-h-[30rem] overflow-y-auto border border-hairline p-4'
+                : ''}`}>
                 {form.experience.map((exp, i) => (
                   <div key={i} className={`space-y-3 ${i > 0 ? 'pt-6 border-t border-hairline' : ''}`}>
                     <div className="flex items-center justify-between">

@@ -214,7 +214,10 @@ export default function TalentDetailPage() {
                   <h2 className="text-ink-faint text-xs font-semibold uppercase tracking-widest mb-4">
                     {t(lang, 'detail.experience')}
                   </h2>
-                  <div className="space-y-5">
+                  {/* 職歴が多い人ほどページが伸びて、下にある語学・学歴まで
+                      届かなくなる。3件を超えたらここだけ内部スクロールにする。 */}
+                  <div className={`space-y-5 ${talent.experience.length > 3
+                    ? 'max-h-[32rem] overflow-y-auto pr-2' : ''}`}>
                     {talent.experience.map((exp, i) => (
                       <div key={i} className={i > 0 ? 'pt-5 border-t border-hairline' : ''}>
                         <p className="text-ink text-sm font-medium">
