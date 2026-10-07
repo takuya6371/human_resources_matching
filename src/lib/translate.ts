@@ -8,17 +8,35 @@ import { supabase } from './supabase'
 // CVから取り込んだスキルは20件を簡単に超える。
 const MAX_TEXTS_PER_CALL = 20
 
+// 翻訳が落ちている・遅いときに、保存全体を道連れにしないための上限。
+// Edge Function が無反応だと invoke は長く待つ。実測で保存に約20秒かかり、
+// 会場のスマホでは「固まった」と見なされて離脱する。
+// 打ち切った場合は空で返り、呼び出し側が「英語のまま保存」に倒す。
+const TRANSLATE_TIMEOUT_MS = 8000
+
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    p,
+    new Promise<null>(resolve => setTimeout(() => resolve(null), ms)),
+  ])
+}
+
 export async function translateToJa(texts: string[]): Promise<string[]> {
   if (texts.every(t => !t.trim())) return texts.map(() => '')
 
   const out: string[] = []
   for (let i = 0; i < texts.length; i += MAX_TEXTS_PER_CALL) {
     const chunk = texts.slice(i, i + MAX_TEXTS_PER_CALL)
-    const { data, error } = await supabase.functions.invoke<{ translations?: string[]; error?: string }>(
-      'translate',
-      { body: { texts: chunk, target: 'ja' } }
+    const res = await withTimeout(
+      supabase.functions.invoke<{ translations?: string[]; error?: string }>(
+        'translate',
+        { body: { texts: chunk, target: 'ja' } }
+      ),
+      TRANSLATE_TIMEOUT_MS
     )
-    out.push(...(error || !data?.translations ? chunk.map(() => '') : data.translations))
+    // res が null = 時間切れ。error / translations 無しも同じ扱いで空に倒す。
+    const translations = res && !res.error ? res.data?.translations : undefined
+    out.push(...(translations ?? chunk.map(() => '')))
   }
   return out
 }

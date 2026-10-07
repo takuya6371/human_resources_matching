@@ -13,7 +13,7 @@ interface AuthContextType {
   logout: () => Promise<void>
   resetPasswordRequest: (email: string) => Promise<{ error: string | null }>
   resetPassword: (newPassword: string) => Promise<{ error: string | null }>
-  updateProfile: (updates: Partial<User>) => Promise<void>
+  updateProfile: (updates: Partial<User>) => Promise<{ error: string | null }>
   updateCompany: (updates: Partial<Company>) => Promise<void>
   submitForReview: () => Promise<void>
 }
@@ -33,7 +33,7 @@ const AuthContext = createContext<AuthContextType>({
   logout: async () => {},
   resetPasswordRequest: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
-  updateProfile: async () => {},
+  updateProfile: async () => ({ error: null }),
   updateCompany: async () => {},
   submitForReview: async () => {},
 })
@@ -164,10 +164,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message ?? null }
   }
 
-  const updateProfile = async (updates: Partial<User>) => {
-    if (!user) return
+  // 保存は4つの書き込みに分かれる。どれが失敗しても画面に出せるよう、
+  // error を握り潰さず呼び出し側へ返す。以前は data だけ分割代入しており、
+  // RLS拒否やネットワーク断でも「保存しました」と出ていた。
+  const updateProfile = async (updates: Partial<User>): Promise<{ error: string | null }> => {
+    if (!user) return { error: 'not_signed_in' }
 
-    const { data: saved } = await supabase.from('profiles').update({
+    const { data: saved, error: profileErr } = await supabase.from('profiles').update({
       avatar_url: updates.avatarUrl,
       name_en: updates.nameEn,
       name_ja: updates.nameJa,
@@ -193,11 +196,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       past_clients: updates.pastClients,
       return_home_on: updates.returnHomeMonth ? toReturnHomeDate(updates.returnHomeMonth) : null,
     }).eq('id', user.id).select('status, published_at').single()
+    if (profileErr) return { error: profileErr.message }
 
     if (updates.languages !== undefined) {
-      await supabase.from('profile_languages').delete().eq('profile_id', user.id)
+      const { error: delErr } = await supabase.from('profile_languages').delete().eq('profile_id', user.id)
+      if (delErr) return { error: delErr.message }
       if (updates.languages.length > 0) {
-        await supabase.from('profile_languages').insert(
+        const { error: insErr } = await supabase.from('profile_languages').insert(
           updates.languages.map((l, i) => ({
             profile_id: user.id,
             language: l.name,
@@ -205,13 +210,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             sort_order: i,
           }))
         )
+        if (insErr) return { error: insErr.message }
       }
     }
 
     if (updates.experience !== undefined) {
-      await supabase.from('profile_experiences').delete().eq('profile_id', user.id)
+      const { error: delErr } = await supabase.from('profile_experiences').delete().eq('profile_id', user.id)
+      if (delErr) return { error: delErr.message }
       if (updates.experience.length > 0) {
-        await supabase.from('profile_experiences').insert(
+        const { error: insErr } = await supabase.from('profile_experiences').insert(
           updates.experience.map((e, i) => ({
             profile_id: user.id,
             company_en: e.company,
@@ -224,6 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             sort_order: i,
           }))
         )
+        if (insErr) return { error: insErr.message }
       }
     }
 
@@ -238,6 +246,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status: saved?.status ?? prev.status,
       adminNote: prev.adminNote,
     } : prev)
+
+    return { error: null }
   }
 
   const updateCompany = async (updates: Partial<Company>) => {

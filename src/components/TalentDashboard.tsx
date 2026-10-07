@@ -78,6 +78,10 @@ export default function TalentDashboard({ user }: { user: User }) {
   const { lang } = useLang()
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  // 保存は通るが自動翻訳だけ落ちた場合に出す。保存自体は成功しているので止めない。
+  const [translateWarn, setTranslateWarn] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
   // 写真は選択時点ではアップロードせず、保存時にまとめて送る。
@@ -152,82 +156,109 @@ export default function TalentDashboard({ user }: { user: User }) {
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
+    if (saving) return
+    setSaving(true)
+    setSaveError('')
+    setTranslateWarn(false)
+    try {
 
-    // 写真を選んでいれば、ここで初めてStorageへ送る。失敗したら保存自体を中断して
-    // 編集画面に留まる（黙って写真だけ落として保存すると気づけないため）。
-    let avatarUrl = form.avatarUrl
-    if (avatarFile) {
-      try {
-        avatarUrl = await uploadProfileImage(avatarFile, user.id)
-      } catch {
-        setAvatarError(lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.')
+      // 写真を選んでいれば、ここで初めてStorageへ送る。失敗したら保存自体を中断して
+      // 編集画面に留まる（黙って写真だけ落として保存すると気づけないため）。
+      let avatarUrl = form.avatarUrl
+      if (avatarFile) {
+        try {
+          avatarUrl = await uploadProfileImage(avatarFile, user.id)
+        } catch {
+          setAvatarError(lang === 'ja' ? 'アップロードに失敗しました。' : 'Upload failed.')
+          return
+        }
+      }
+
+      // 日本語が空の項目をまとめて翻訳する。CV取り込み直後は英語しか入らず、
+      // ここを通さないと企業が日本語で見たときに職務経歴や学歴が空欄になる。
+      // 会社名と氏名は固有名詞なので機械翻訳しない（表示側の pick が原文を出す）。
+      const expPairs = form.experience.flatMap(e => [
+        { en: e.role, ja: e.roleJa },
+        { en: e.descriptionEn, ja: e.descriptionJa },
+      ])
+      const jaPairs = [
+        { en: form.headlineEn, ja: form.headlineJa },
+        { en: form.bioEn, ja: form.bioJa },
+        { en: form.university, ja: form.universityJa },
+        { en: form.faculty, ja: form.facultyJa },
+        ...expPairs,
+      ]
+      const needingJa = jaPairs.filter(p => !p.ja.trim() && p.en.trim()).length
+      const filled = await fillMissingJapanese(jaPairs)
+      const [headlineJa, bioJa, universityJa, facultyJa] = filled
+      // 翻訳すべき項目があったのに1つも埋まらなかったら Edge Function 側が
+      // 落ちている。保存は通すが、英語のままである旨を画面に出す。
+      const translatedCount = filled.filter((v, i) => v.trim() && v !== jaPairs[i].ja).length
+      // 保存が成功したときだけ出す。下の updateProfile が失敗した場合は
+      // saveError 側で伝えるので、ここは立てっぱなしにしない。
+      const translationFailed = needingJa > 0 && translatedCount === 0
+      const experienceJa = form.experience.map((e, i) => ({
+        ...e,
+        roleJa: filled[4 + i * 2] || e.roleJa,
+        descriptionJa: filled[4 + i * 2 + 1] || e.descriptionJa,
+      }))
+
+      const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
+      const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
+      // 翻訳できなかった分は空文字で返るので落とす。そのまま保存すると
+      // 日本語表示が「・・・・」だけの空スキルになる。
+      const skillsJaArr = skillsJaArrInput.length > 0
+        ? skillsJaArrInput
+        : (skillsEnArr.length > 0 ? (await translateToJa(skillsEnArr)).filter(Boolean) : [])
+
+      const updates: Partial<User> = {
+        email: form.email,
+        nameEn: form.nameEn,
+        nameJa: form.nameJa,
+        headlineEn: form.headlineEn,
+        headlineJa,
+        university: form.university,
+        universityJa,
+        faculty: form.faculty,
+        facultyJa,
+        japaneseLevel: form.japaneseLevel,
+        openToWork: form.openToWork,
+        skills: skillsEnArr,
+        skillsJa: skillsJaArr,
+        bioEn: form.bioEn,
+        bioJa,
+        availableFrom: form.availableFrom,
+        availableFromJa: form.availableFromJa,
+        languages: form.languages,
+        experience: experienceJa,
+        residenceArea: form.residenceArea || undefined,
+        devExperienceYears: form.devExperienceYears ? Number(form.devExperienceYears) : undefined,
+        yearsInJapan: form.yearsInJapan ? Number(form.yearsInJapan) : undefined,
+        returnHomeMonth: form.returnHomeMonth || undefined,
+        hobbies: form.hobbies || undefined,
+        videoUrl: form.videoUrl || undefined,
+        pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
+        avatarUrl: avatarUrl || undefined,
+      }
+      const { error } = await updateProfile(updates)
+      if (error) {
+        // 画面に出す。以前は error を見ておらず、失敗しても「保存しました」と
+        // 表示して編集内容が消えていた。
+        setSaveError(error)
         return
       }
+      discardAvatarPick()
+      setEditing(false)
+      setSaved(true)
+      if (translationFailed) setTranslateWarn(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      // 翻訳やアップロードで例外が飛ぶと、以前はここで無言で止まっていた。
+      // 利用者からは「押しても何も起きない」ようにしか見えない。
+      setSaveError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSaving(false)
     }
-
-    // 日本語が空の項目をまとめて翻訳する。CV取り込み直後は英語しか入らず、
-    // ここを通さないと企業が日本語で見たときに職務経歴や学歴が空欄になる。
-    // 会社名と氏名は固有名詞なので機械翻訳しない（表示側の pick が原文を出す）。
-    const expPairs = form.experience.flatMap(e => [
-      { en: e.role, ja: e.roleJa },
-      { en: e.descriptionEn, ja: e.descriptionJa },
-    ])
-    const filled = await fillMissingJapanese([
-      { en: form.headlineEn, ja: form.headlineJa },
-      { en: form.bioEn, ja: form.bioJa },
-      { en: form.university, ja: form.universityJa },
-      { en: form.faculty, ja: form.facultyJa },
-      ...expPairs,
-    ])
-    const [headlineJa, bioJa, universityJa, facultyJa] = filled
-    const experienceJa = form.experience.map((e, i) => ({
-      ...e,
-      roleJa: filled[4 + i * 2] || e.roleJa,
-      descriptionJa: filled[4 + i * 2 + 1] || e.descriptionJa,
-    }))
-
-    const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
-    const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
-    // 翻訳できなかった分は空文字で返るので落とす。そのまま保存すると
-    // 日本語表示が「・・・・」だけの空スキルになる。
-    const skillsJaArr = skillsJaArrInput.length > 0
-      ? skillsJaArrInput
-      : (skillsEnArr.length > 0 ? (await translateToJa(skillsEnArr)).filter(Boolean) : [])
-
-    const updates: Partial<User> = {
-      email: form.email,
-      nameEn: form.nameEn,
-      nameJa: form.nameJa,
-      headlineEn: form.headlineEn,
-      headlineJa,
-      university: form.university,
-      universityJa,
-      faculty: form.faculty,
-      facultyJa,
-      japaneseLevel: form.japaneseLevel,
-      openToWork: form.openToWork,
-      skills: skillsEnArr,
-      skillsJa: skillsJaArr,
-      bioEn: form.bioEn,
-      bioJa,
-      availableFrom: form.availableFrom,
-      availableFromJa: form.availableFromJa,
-      languages: form.languages,
-      experience: experienceJa,
-      residenceArea: form.residenceArea || undefined,
-      devExperienceYears: form.devExperienceYears ? Number(form.devExperienceYears) : undefined,
-      yearsInJapan: form.yearsInJapan ? Number(form.yearsInJapan) : undefined,
-      returnHomeMonth: form.returnHomeMonth || undefined,
-      hobbies: form.hobbies || undefined,
-      videoUrl: form.videoUrl || undefined,
-      pastClients: form.pastClients.split(',').map(s => s.trim()).filter(Boolean),
-      avatarUrl: avatarUrl || undefined,
-    }
-    await updateProfile(updates)
-    discardAvatarPick()
-    setEditing(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
   }
 
   function setField<K extends keyof EditForm>(key: K, value: EditForm[K]) {
@@ -280,6 +311,22 @@ export default function TalentDashboard({ user }: { user: User }) {
           <div className="mb-6 px-4 py-3 border text-sm flex items-center gap-2"
                style={{ borderColor: '#1D7E5C', color: '#1D7E5C' }}>
             ✓ {t(lang, 'dashboard.savedMsg')}
+          </div>
+        )}
+
+        {/* 保存できなかったことを必ず画面に出す。黙って止まると、
+            利用者は保存できたと思って編集内容を失う。 */}
+        {saveError && (
+          <div className="mb-6 px-4 py-3 border border-seal text-seal text-sm" role="alert">
+            <p className="font-medium">{t(lang, 'dashboard.saveFailed')}</p>
+            <p className="mt-1 text-xs break-all opacity-80">{saveError}</p>
+          </div>
+        )}
+
+        {/* 保存自体は成功しているので警告どまり */}
+        {translateWarn && (
+          <div className="mb-6 px-4 py-3 border border-hairline text-ink-soft text-sm">
+            {t(lang, 'dashboard.translateFailed')}
           </div>
         )}
 
@@ -576,8 +623,9 @@ export default function TalentDashboard({ user }: { user: User }) {
                       className="px-6 py-2.5 text-sm text-ink-soft hover:text-ink transition-colors cursor-pointer border border-hairline">
                 {t(lang, 'dashboard.cancelBtn')}
               </button>
-              <button type="submit" className="btn-line px-8">
-                {t(lang, 'dashboard.saveBtn')}
+              <button type="submit" disabled={saving}
+                      className="btn-line px-8 disabled:opacity-50 disabled:cursor-not-allowed">
+                {saving ? t(lang, 'dashboard.saving') : t(lang, 'dashboard.saveBtn')}
               </button>
             </div>
           </form>
