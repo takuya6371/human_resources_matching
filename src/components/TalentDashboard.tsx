@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from './Navbar'
 import Footer from './Footer'
@@ -82,6 +82,9 @@ export default function TalentDashboard({ user }: { user: User }) {
   const [saveError, setSaveError] = useState('')
   // 保存は通るが自動翻訳だけ落ちた場合に出す。保存自体は成功しているので止めない。
   const [translateWarn, setTranslateWarn] = useState(false)
+  // 結果メッセージはページ最上部に出る。保存ボタンはフォーム最下部にあるので、
+  // そのままだと押した人の視界に入らない。完了したらここまで引き戻す。
+  const resultRef = useRef<HTMLDivElement>(null)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState<EditForm | null>(null)
   // 写真は選択時点ではアップロードせず、保存時にまとめて送る。
@@ -153,6 +156,10 @@ export default function TalentDashboard({ user }: { user: User }) {
     setAvatarError('')
   }
 
+  useEffect(() => {
+    if (saved || saveError) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [saved, saveError])
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
@@ -189,7 +196,18 @@ export default function TalentDashboard({ user }: { user: User }) {
         ...expPairs,
       ]
       const needingJa = jaPairs.filter(p => !p.ja.trim() && p.en.trim()).length
-      const filled = await fillMissingJapanese(jaPairs)
+
+      const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
+      const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
+
+      // 本文とスキルの翻訳を並列で投げる。直列だと、翻訳が落ちているときに
+      // 打ち切りの8秒が2回積み上がって16秒待たされる。
+      const [filled, skillsTranslated] = await Promise.all([
+        fillMissingJapanese(jaPairs),
+        skillsJaArrInput.length === 0 && skillsEnArr.length > 0
+          ? translateToJa(skillsEnArr)
+          : Promise.resolve<string[]>([]),
+      ])
       const [headlineJa, bioJa, universityJa, facultyJa] = filled
       // 翻訳すべき項目があったのに1つも埋まらなかったら Edge Function 側が
       // 落ちている。保存は通すが、英語のままである旨を画面に出す。
@@ -203,13 +221,11 @@ export default function TalentDashboard({ user }: { user: User }) {
         descriptionJa: filled[4 + i * 2 + 1] || e.descriptionJa,
       }))
 
-      const skillsEnArr = form.skillsEn.split(',').map(s => s.trim()).filter(Boolean)
-      const skillsJaArrInput = form.skillsJa.split(',').map(s => s.trim()).filter(Boolean)
       // 翻訳できなかった分は空文字で返るので落とす。そのまま保存すると
       // 日本語表示が「・・・・」だけの空スキルになる。
       const skillsJaArr = skillsJaArrInput.length > 0
         ? skillsJaArrInput
-        : (skillsEnArr.length > 0 ? (await translateToJa(skillsEnArr)).filter(Boolean) : [])
+        : skillsTranslated.filter(Boolean)
 
       const updates: Partial<User> = {
         email: form.email,
@@ -290,6 +306,22 @@ export default function TalentDashboard({ user }: { user: User }) {
 
   return (
     <div className="min-h-screen line-page">
+      {/* 保存中は画面全体を覆う。フォームが長く、保存ボタンは最下部にあるため、
+          ボタンの文字を変えるだけでは「押しても何も起きない」ようにしか見えない。
+          二重送信も物理的に止まる。 */}
+      {saving && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center"
+             style={{ backgroundColor: 'rgba(250,248,244,0.86)' }}
+             role="status" aria-live="polite">
+          <div className="flex flex-col items-center gap-4">
+            <span className="block h-8 w-8 border-2 border-hairline border-t-ink rounded-full animate-spin" />
+            <p className="text-ink text-sm">{t(lang, 'dashboard.saving')}</p>
+            <p className="text-ink-faint text-xs max-w-xs text-center px-6">
+              {t(lang, 'dashboard.savingNote')}
+            </p>
+          </div>
+        </div>
+      )}
       <Navbar />
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -307,6 +339,7 @@ export default function TalentDashboard({ user }: { user: User }) {
           )}
         </div>
 
+        <div ref={resultRef} className="scroll-mt-24">
         {saved && (
           <div className="mb-6 px-4 py-3 border text-sm flex items-center gap-2"
                style={{ borderColor: '#1D7E5C', color: '#1D7E5C' }}>
@@ -329,6 +362,7 @@ export default function TalentDashboard({ user }: { user: User }) {
             {t(lang, 'dashboard.translateFailed')}
           </div>
         )}
+        </div>
 
         {editing && form ? (
           <form onSubmit={handleSave}>

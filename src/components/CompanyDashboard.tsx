@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
 import { useAuth } from '../context/AuthContext'
@@ -26,6 +26,9 @@ export default function CompanyDashboard({ company }: { company: Company }) {
   const { lang } = useLang()
   const [editing, setEditing] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
+  const resultRef = useRef<HTMLDivElement>(null)
   const [form, setForm] = useState<EditForm | null>(null)
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [logoError, setLogoError] = useState('')
@@ -65,13 +68,27 @@ export default function CompanyDashboard({ company }: { company: Company }) {
     }
   }
 
+  useEffect(() => {
+    if (saved || saveError) resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }, [saved, saveError])
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
     if (!form) return
-    await updateCompany(form)
-    setEditing(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+    if (saving) return
+    setSaving(true)
+    setSaveError('')
+    try {
+      const { error } = await updateCompany(form)
+      if (error) { setSaveError(error); return }
+      setEditing(false)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSaving(false)
+    }
   }
 
   function setField<K extends keyof EditForm>(key: K, value: EditForm[K]) {
@@ -83,6 +100,18 @@ export default function CompanyDashboard({ company }: { company: Company }) {
 
   return (
     <div className="min-h-screen line-page">
+      {/* 人材側と同じ理由: 保存ボタンがフォーム最下部にあり、
+          ボタンの文字だけでは処理中だと分からない。 */}
+      {saving && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center"
+             style={{ backgroundColor: 'rgba(250,248,244,0.86)' }}
+             role="status" aria-live="polite">
+          <div className="flex flex-col items-center gap-4">
+            <span className="block h-8 w-8 border-2 border-hairline border-t-ink rounded-full animate-spin" />
+            <p className="text-ink text-sm">{t(lang, 'dashboard.saving')}</p>
+          </div>
+        </div>
+      )}
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -100,12 +129,20 @@ export default function CompanyDashboard({ company }: { company: Company }) {
           )}
         </div>
 
+        <div ref={resultRef} className="scroll-mt-24">
         {saved && (
           <div className="mb-6 px-4 py-3 border text-sm flex items-center gap-2"
                style={{ borderColor: '#1D7E5C', color: '#1D7E5C' }}>
             ✓ {t(lang, 'dashboard.savedMsg')}
           </div>
         )}
+        {saveError && (
+          <div className="mb-6 px-4 py-3 border border-seal text-seal text-sm" role="alert">
+            <p className="font-medium">{t(lang, 'dashboard.saveFailed')}</p>
+            <p className="mt-1 text-xs break-all opacity-80">{saveError}</p>
+          </div>
+        )}
+        </div>
 
         {editing && form ? (
           <form onSubmit={handleSave}>
@@ -162,8 +199,9 @@ export default function CompanyDashboard({ company }: { company: Company }) {
                       className="px-6 py-2.5 text-sm text-ink-soft hover:text-ink transition-colors cursor-pointer border border-hairline">
                 {t(lang, 'dashboard.cancelBtn')}
               </button>
-              <button type="submit" className="btn-line px-8">
-                {t(lang, 'dashboard.saveBtn')}
+              <button type="submit" disabled={saving}
+                      className="btn-line px-8 disabled:opacity-50 disabled:cursor-not-allowed">
+                {saving ? t(lang, 'dashboard.saving') : t(lang, 'dashboard.saveBtn')}
               </button>
             </div>
           </form>

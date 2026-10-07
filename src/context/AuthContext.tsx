@@ -14,7 +14,7 @@ interface AuthContextType {
   resetPasswordRequest: (email: string) => Promise<{ error: string | null }>
   resetPassword: (newPassword: string) => Promise<{ error: string | null }>
   updateProfile: (updates: Partial<User>) => Promise<{ error: string | null }>
-  updateCompany: (updates: Partial<Company>) => Promise<void>
+  updateCompany: (updates: Partial<Company>) => Promise<{ error: string | null }>
   submitForReview: () => Promise<void>
 }
 
@@ -34,7 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   resetPasswordRequest: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
   updateProfile: async () => ({ error: null }),
-  updateCompany: async () => {},
+  updateCompany: async () => ({ error: null }),
   submitForReview: async () => {},
 })
 
@@ -250,10 +250,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: null }
   }
 
-  const updateCompany = async (updates: Partial<Company>) => {
-    if (!company) return
+  // updateProfile と同じ理由で error を返す。握り潰すと失敗しても
+  // 「保存しました」と出てしまう。
+  const updateCompany = async (updates: Partial<Company>): Promise<{ error: string | null }> => {
+    if (!company) return { error: 'not_signed_in' }
 
-    await supabase.from('companies').update({
+    const { error: companyErr } = await supabase.from('companies').update({
       name: updates.name,
       name_ja: updates.nameJa,
       description: updates.description,
@@ -262,8 +264,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       website: updates.website,
       logo_url: updates.logoUrl,
     }).eq('id', company.id)
+    if (companyErr) return { error: companyErr.message }
 
     setCompany(prev => prev ? { ...prev, ...updates } : prev)
+    return { error: null }
   }
 
   const submitForReview = async () => {
