@@ -92,8 +92,11 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleSubmit} className="line-card p-8">
               {error && (
-                <div className="mb-5 px-4 py-3 border border-seal text-seal text-sm">
-                  {error}
+                <div className="mb-5 px-4 py-3 border border-seal text-seal text-sm" role="alert">
+                  <p>{isLogin ? error : t(lang, 'login.errorSignUpFailed')}</p>
+                  {/* 技術的な内容は補足として小さく。利用者には読めなくても、
+                      問い合わせを受けた側が原因に辿り着ける。 */}
+                  {!isLogin && <p className="mt-1 text-xs break-all opacity-80">{error}</p>}
                 </div>
               )}
 

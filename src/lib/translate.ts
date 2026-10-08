@@ -9,10 +9,11 @@ import { supabase } from './supabase'
 const MAX_TEXTS_PER_CALL = 20
 
 // 翻訳が落ちている・遅いときに、保存全体を道連れにしないための上限。
-// Edge Function が無反応だと invoke は長く待つ。実測で保存に約20秒かかり、
-// 会場のスマホでは「固まった」と見なされて離脱する。
-// 打ち切った場合は空で返り、呼び出し側が「英語のまま保存」に倒す。
-const TRANSLATE_TIMEOUT_MS = 6000
+// 当初6秒にしたが、実際のCV（職歴6件＋見出し＋自己紹介で16件規模）の
+// 翻訳は実測7〜9秒かかり、常に打ち切られて日本語が入らなかった。
+// チャンクは並列なので、何件あっても待つのはこの時間ぶん1回きり。
+// 画面は全面の「保存中」表示で埋まっているので、この長さは許容する。
+const TRANSLATE_TIMEOUT_MS = 20000
 
 function withTimeout<T>(p: Promise<T>, ms: number): Promise<T | null> {
   return Promise.race([

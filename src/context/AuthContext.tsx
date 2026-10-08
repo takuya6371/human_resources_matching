@@ -155,7 +155,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     })
-    return { error: error?.message ?? null }
+    if (!error) return { error: null }
+    // Supabase が500を返したとき message が空や "{}" になることがあり、
+    // 画面に "{}" とだけ出て原因が分からなかった。拾えるものを拾う。
+    const detail = [error.message, (error as { status?: number }).status]
+      .filter(v => v != null && String(v).trim() && String(v) !== '{}')
+      .join(' / ')
+    return { error: detail || error.name || 'signup_failed' }
   }
 
   const logout = async () => {
