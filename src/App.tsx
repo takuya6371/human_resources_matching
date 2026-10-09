@@ -53,14 +53,23 @@ function ScrollToTop() {
 const LANGS: Lang[] = ['en', 'ja', 'fr']
 const LANG_KEY = 'nebonga-link.lang'
 
-// 言語は保存していなかったため、英語や仏語に切り替えても再読み込みで
-// 日本語に戻っていた。日本語を読めない利用者には毎回切り替えが必要になる。
-// プライバシーポリシー第11条もこの保存を前提に書いている。
-function readStoredLang(): Lang {
+// 言語の決め方。優先順は URL → 保存値 → ブラウザの言語 → 日本語。
+//
+// URL を最優先にしているのは、イベントで配るQRやチラシから
+// 「英語で開くリンク」を渡せるようにするため。端末が日本語設定の
+// 海外人材でも、?lang=en のQRを読めば英語で着地する。
+//
+// 保存は localStorage。以前は保存すらしておらず、切り替えても
+// 再読み込みで日本語に戻っていた。
+// プライバシーポリシー第11条はこの保存を前提に書いている。
+function readInitialLang(): Lang {
+  try {
+    const q = new URLSearchParams(window.location.search).get('lang')
+    if (q && LANGS.includes(q as Lang)) return q as Lang
+  } catch { /* URL が壊れていても続行 */ }
   try {
     const saved = localStorage.getItem(LANG_KEY)
     if (saved && LANGS.includes(saved as Lang)) return saved as Lang
-    // 保存が無ければブラウザの言語を見る。該当しなければ日本語。
     const nav = navigator.language.slice(0, 2).toLowerCase()
     if (LANGS.includes(nav as Lang)) return nav as Lang
   } catch {
@@ -69,8 +78,23 @@ function readStoredLang(): Lang {
   return 'ja'
 }
 
+// 読み取ったら ?lang= は URL から外す。残したままだと、利用者が画面で
+// 言語を切り替えたあと再読み込みしたときに URL 側の指定へ戻ってしまい、
+// 操作が効かなくなったように見える。言語は localStorage を正とする。
+function stripLangParam() {
+  try {
+    const url = new URL(window.location.href)
+    if (!url.searchParams.has('lang')) return
+    url.searchParams.delete('lang')
+    const qs = url.searchParams.toString()
+    window.history.replaceState({}, '', url.pathname + (qs ? `?${qs}` : '') + url.hash)
+  } catch { /* 失敗しても表示には影響しない */ }
+}
+
 export default function App() {
-  const [lang, setLang] = useState<Lang>(readStoredLang)
+  const [lang, setLang] = useState<Lang>(readInitialLang)
+
+  useEffect(() => { stripLangParam() }, [])
 
   useEffect(() => {
     try { localStorage.setItem(LANG_KEY, lang) } catch { /* 保存できなくても続行 */ }
