@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, MessageSquare, ChevronDown } from 'lucide-react'
+import { Bell, MessageSquare, ChevronDown, Globe } from 'lucide-react'
 import { useLang } from '../App'
 import { useAuth } from '../context/AuthContext'
 import { t, pick } from '../i18n'
@@ -148,7 +148,8 @@ export default function Navbar() {
     <nav className="line-page border-b border-hairline sticky top-0 z-50 backdrop-blur-sm" style={{ backgroundColor: 'rgba(250,248,244,0.92)' }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-6">
 
-        <Link to="/" className="flex items-center no-underline shrink-0" onClick={closeAll}>
+        <Link to="/" className="flex items-center gap-2.5 no-underline shrink-0" onClick={closeAll}>
+          <img src="/brand/logo.jpg" alt="" className="h-9 w-9 rounded-xl object-cover" />
           <span className="font-display font-medium text-lg text-ink tracking-wide uppercase whitespace-nowrap">
             NeBonga Link
           </span>
@@ -193,11 +194,17 @@ export default function Navbar() {
             ) : (
               <div className="hidden lg:flex items-center gap-3">
                 <button onClick={() => setAccountOpen(o => !o)}
-                        className="flex items-center gap-1 px-2 py-1.5 border border-hairline hover:border-ink transition-colors cursor-pointer text-ink-soft text-xs whitespace-nowrap">
+                        className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full border border-hairline bg-white hover:border-ink transition-colors cursor-pointer text-ink-soft hover:text-ink text-xs whitespace-nowrap">
+                  <Globe className="w-3.5 h-3.5" />
                   {lang.toUpperCase()}
-                  <ChevronDown className="w-3 h-3" />
                 </button>
-                <Link to="/login" className="btn-line no-underline whitespace-nowrap">{t(lang, 'nav.signIn')}</Link>
+                <Link to="/login" className="text-ink-soft text-sm hover:text-ink transition-colors no-underline whitespace-nowrap">
+                  {t(lang, 'nav.signIn')}
+                </Link>
+                <Link to="/start"
+                      className="inline-flex items-center h-9 px-5 rounded-full bg-ink text-paper text-sm font-medium hover:bg-seal transition-colors no-underline whitespace-nowrap">
+                  {t(lang, 'nav.getStarted')}
+                </Link>
               </div>
             )}
 
@@ -285,9 +292,16 @@ export default function Navbar() {
                 {t(lang, 'dashboard.logout')}
               </button>
             ) : (
-              <Link to="/login" className="btn-line no-underline inline-block" onClick={closeAll}>
-                {t(lang, 'nav.signIn')}
-              </Link>
+              <div className="flex items-center gap-4">
+                <Link to="/login" className="text-ink-soft text-sm hover:text-ink no-underline" onClick={closeAll}>
+                  {t(lang, 'nav.signIn')}
+                </Link>
+                <Link to="/start"
+                      className="inline-flex items-center h-9 px-5 rounded-full bg-ink text-paper text-sm font-medium hover:bg-seal transition-colors no-underline"
+                      onClick={closeAll}>
+                  {t(lang, 'nav.getStarted')}
+                </Link>
+              </div>
             )}
           </div>
         </div>

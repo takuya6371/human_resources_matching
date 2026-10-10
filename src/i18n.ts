@@ -23,6 +23,7 @@ export const translations: TranslationStore = {
       dashboard: 'My profile',
       notifications: 'Notifications',
       language: 'Language',
+      getStarted: 'Get Started',
     },
     hero: {
       badge: 'Global Talent × Japanese Companies',
@@ -635,6 +636,7 @@ export const translations: TranslationStore = {
       dashboard: 'マイページ',
       notifications: 'お知らせ',
       language: '表示言語',
+      getStarted: 'はじめる',
     },
     hero: {
       badge: '海外人材 × 日本企業 マッチング',
@@ -1247,6 +1249,7 @@ export const translations: TranslationStore = {
       dashboard: 'Mon profil',
       notifications: 'Notifications',
       language: 'Langue',
+      getStarted: 'Commencer',
     },
     hero: {
       badge: 'Talents internationaux × Entreprises japonaises',
