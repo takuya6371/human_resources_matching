@@ -25,6 +25,7 @@ import MessagesPage from './pages/MessagesPage'
 import AboutPage from './pages/AboutPage'
 import StartPage from './pages/StartPage'
 import ForCompaniesPage from './pages/ForCompaniesPage'
+import ChallengePreviewPage from './pages/ChallengePreviewPage'
 import HowItWorksPage from './pages/HowItWorksPage'
 import LegalPage from './pages/LegalPage'
 import PageNotFound from './components/PageNotFound'
@@ -141,6 +142,8 @@ export default function App() {
             <Route path="/start" element={<StartPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/for-companies" element={<ForCompaniesPage />} />
+            {/* 構想段階の見本。ナビには出さず、/for-companies からの導線と直接URLのみ */}
+            <Route path="/challenges" element={<ChallengePreviewPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/terms" element={<LegalPage doc="terms" />} />
             <Route path="/privacy" element={<LegalPage doc="privacy" />} />

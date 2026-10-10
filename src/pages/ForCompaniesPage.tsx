@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { useLang } from '../App'
 import { t } from '../i18n'
+import { challengeDemo } from '../content/challengeDemo'
 
 const REASONS = ['inJapan', 'reviewed', 'language', 'afterReturn'] as const
 const CAN_DO = ['post', 'search', 'message', 'manage'] as const
@@ -12,6 +13,7 @@ const CAN_DO = ['post', 'search', 'message', 'manage'] as const
 // 在留資格の確認・企業審査・成果報酬はいずれも未実装なので謳わない。
 export default function ForCompaniesPage() {
   const { lang } = useLang()
+  const demo = challengeDemo(lang)
 
   return (
     <div className="min-h-screen line-page flex flex-col">
@@ -68,6 +70,22 @@ export default function ForCompaniesPage() {
                 {t(lang, 'forCompanies.seeFlow')}
               </Link>
             </p>
+          </div>
+        </section>
+
+        {/* まだ作っていない機能の予告。見せたい相手（企業）がいるこのページにだけ置く。
+            文言は src/content/challengeDemo.ts 側に持たせてある（i18n.ts に入れるのは
+            正式に作るときでよく、いまは構想段階のため）。 */}
+        <section className="py-16 sm:py-20 px-4 sm:px-6 border-b border-hairline">
+          <div className="max-w-6xl mx-auto">
+            <div className="line-card p-8 sm:p-10">
+              <span className="badge-line-ink text-[11px]">{demo.teaserBadge}</span>
+              <h2 className="mt-5 font-display text-ink text-xl sm:text-2xl">{demo.teaserTitle}</h2>
+              <p className="mt-3 max-w-2xl text-ink-soft text-sm leading-relaxed">{demo.teaserBody}</p>
+              <p className="mt-6 text-sm">
+                <Link to="/challenges" className="text-seal hover:opacity-70">{demo.teaserLink}</Link>
+              </p>
+            </div>
           </div>
         </section>
 

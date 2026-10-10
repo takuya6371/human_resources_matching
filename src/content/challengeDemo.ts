@@ -1,0 +1,373 @@
+// チャレンジ機能の見本ページで使う文言。
+//
+// まだ構想段階の機能なので、i18n.ts には入れていない。
+// 正式に作るときに i18n へ畳む（そのときキーの形はここに合わせればよい）。
+// 分けてあるもう一つの理由は、i18n.ts が並行で編集されているため。
+//
+// 設計の中身は docs/challenge-design.md を参照。
+//
+// ここに出てくる企業名・人名はすべて架空。画面にもその旨を明記している。
+
+import type { Lang } from '../types'
+
+export interface DemoProposal {
+  /** 架空の提案者 */
+  author: string
+  headline: string
+  /** 'awarded' は採用、'shortlisted' は候補、'submitted' は提出済み */
+  state: 'awarded' | 'shortlisted' | 'submitted'
+  stateLabel: string
+  approach: string
+  result: string
+}
+
+export interface DemoChallenge {
+  company: string
+  industry: string
+  title: string
+  problem: string
+  lookingFor: string
+  areas: string[]
+  deadline: string
+  reward: string
+  proposals: DemoProposal[]
+}
+
+export interface DemoCopy {
+  /** 構想段階であることの告知 */
+  draftBadge: string
+  draftNote: string
+
+  heroTitle: string
+  heroLead: string
+
+  fictionNote: string
+
+  labelProblem: string
+  labelLookingFor: string
+  labelAreas: string
+  labelDeadline: string
+  labelReward: string
+  labelProposals: string
+  labelApproach: string
+  labelResult: string
+
+  /** 設計上の約束。企業にとっても人材にとっても、ここが売り。 */
+  principlesTitle: string
+  principles: { title: string; body: string }[]
+
+  otherTitle: string
+
+  ctaTitle: string
+  ctaBody: string
+  ctaButton: string
+
+  /** 企業向けページに差し込む一節 */
+  teaserBadge: string
+  teaserTitle: string
+  teaserBody: string
+  teaserLink: string
+
+  featured: DemoChallenge
+  others: { company: string; title: string; summary: string; areas: string[] }[]
+}
+
+const ja: DemoCopy = {
+  draftBadge: '構想段階',
+  draftNote: 'この機能はまだ公開していません。考えている形をお見せするための画面です。実際の投稿や提案はできません。',
+
+  heroTitle: '困っていることを書く。\n解き方が集まる。',
+  heroLead: '求人票では書けない「いま困っていること」を出してください。日本で働く外国人材が、それぞれの経験から解き方を提案します。いちばん有用だった提案を出した人に、実際の仕事を出せます。',
+
+  fictionNote: '※ 以下の企業名・人名・内容はすべて架空の例です。',
+
+  labelProblem: '困っていること',
+  labelLookingFor: '求めるもの',
+  labelAreas: '分野',
+  labelDeadline: '締切',
+  labelReward: '報酬',
+  labelProposals: '届いた提案',
+  labelApproach: '解き方',
+  labelResult: '期待できる結果',
+
+  principlesTitle: 'この仕組みで決めていること',
+  principles: [
+    {
+      title: '募集中、提案は非公開',
+      body: '提案を読めるのは出題した企業と本人だけです。他の応募者からは見えません。公開するかどうかは、結果が出たあとに提案者本人が選びます。',
+    },
+    {
+      title: '結果の宣言に期限がある',
+      body: '締切から14日以内に「採用」か「該当なし」を宣言していただきます。宣言がないと無応答として記録され、企業ページに表示されます。',
+    },
+    {
+      title: '提案は15分で書ける量',
+      body: '試作や資料の作成は求めません。解き方と、期待できる結果。それだけです。詳しい話は選考に進んでから、報酬のある場で行います。',
+    },
+  ],
+
+  otherTitle: 'ほかに出ている課題',
+
+  ctaTitle: '最初の課題を一緒に作りませんか',
+  ctaBody: '興味のある企業の方とご一緒に、最初の数件を設計したいと考えています。業種や課題の性質によって、どういう出し方が効くかは変わります。お話を聞かせてください。',
+  ctaButton: 'お問い合わせ',
+
+  teaserBadge: '構想中',
+  teaserTitle: '求人の前に、課題を出すという手',
+  teaserBody: '「どんな人が欲しいか」より「いま何に困っているか」のほうが書きやすい、という声をいただきます。課題を出して、解き方の提案を集め、いちばん有用だった人に仕事を出す。そういう仕組みを考えています。',
+  teaserLink: '考えている形を見る',
+
+  featured: {
+    company: '株式会社サクラ・トレーディング',
+    industry: '食品輸出 / 従業員58名',
+    title: '海外向けECの問い合わせ対応が回らない',
+    problem: '2年前に英語・フランス語での販売を始めましたが、問い合わせ対応が追いついていません。担当は日本人2名で、翻訳ツールを使って返信しています。返信までに平均3日かかっており、その間に注文を取り消されることが月に10件ほどあります。\n\n翻訳ツールの訳が原因で誤解が生じたことも何度かありました。「賞味期限」を期限切れと受け取られて返金対応になった例があります。人を増やす予算は今期はありません。',
+    lookingFor: '返信までの時間を1営業日以内にしたい。人員は増やさない前提でお願いします。完璧な多言語対応でなくてよく、取り消しが減ればまず十分です。',
+    areas: ['カスタマーサポート', '多言語', '業務設計', '生成AI'],
+    deadline: '2026年11月14日',
+    reward: '現金10万円。採用した方には業務委託として継続（月20万円規模・3か月）を想定しています。',
+    proposals: [
+      {
+        author: 'アミナタ D.',
+        headline: 'EC運用 / 仏語・英語・日本語 / 在日5年',
+        state: 'awarded',
+        stateLabel: '採用',
+        approach: '問い合わせを減らす方向から入ることを提案します。\n\n頂いた状況を読む限り、3日かかっていること自体より「なぜ問い合わせが来るか」が問題に見えます。前職の越境ECでは、問い合わせの6割が商品ページに書いていない情報の確認でした。賞味期限の誤解も、おそらく表記の問題です。\n\n手順は、まず直近3か月の問い合わせを分類する。多い順に上位10個を商品ページに書き足す。残ったものにテンプレートを用意する。この順番です。',
+        result: '問い合わせの件数自体が半分程度まで減る見込みです。残りはテンプレートで即答できるので、1営業日以内は人を増やさずに達成できます。賞味期限の表記は "Best before" と日付形式の明示で解消します。',
+      },
+      {
+        author: 'ジョセフ O.',
+        headline: 'バックエンド開発 / Python / 在日3年',
+        state: 'shortlisted',
+        stateLabel: '候補',
+        approach: '過去の問い合わせメールを学習させて、自動で分類と下書き作成を行う仕組みを作ります。\n\n既存のメール環境に組み込む形にすれば、担当者の作業は「下書きを読んで直して送る」だけになります。用語集を作り、賞味期限のような誤訳しやすい語は固定の訳を当てます。',
+        result: '1件あたりの対応時間が短くなり、同じ2名で当日返信が可能になります。構築に3〜4週間を見込みます。',
+      },
+      {
+        author: 'セラマウィット B.',
+        headline: 'カスタマーサクセス / 英語・アムハラ語 / 在日2年',
+        state: 'submitted',
+        stateLabel: '提出済み',
+        approach: '時差を逆に使うことを提案します。日本時間の夜間に対応できる体制を、週10時間程度の業務委託で用意します。欧州・アフリカの顧客にとっては日中にあたるため、体感の返信速度が大きく変わります。',
+        result: '欧州時間での即日返信が可能になります。既存の2名の負荷も下がります。',
+      },
+    ],
+  },
+
+  others: [
+    {
+      company: '北関東精密工業株式会社',
+      title: '安全教育の資料が日本語だけで、伝わっているか確認できない',
+      summary: '外国籍の従業員が12名います。安全教育は日本語の資料と口頭で行っていますが、理解できているかを確認する方法がありません。事故が起きてからでは遅いので、何か手を打ちたい。',
+      areas: ['製造', '教育設計', '多言語', '安全管理'],
+    },
+    {
+      company: '株式会社みのり食品',
+      title: 'アフリカ市場に出たいが、どの国から始めるべきか判断できない',
+      summary: '乾麺と調味料を製造しています。アフリカへの輸出を検討していますが、社内に知見がなく、商社の提案を評価することもできません。まず現地の生活実感から教えてほしい。',
+      areas: ['市場調査', '食品', '輸出', '現地事情'],
+    },
+  ],
+}
+
+const en: DemoCopy = {
+  draftBadge: 'Concept',
+  draftNote: 'This feature is not live yet. This page shows the shape we are considering. Nothing here can be posted or submitted.',
+
+  heroTitle: 'Post what you are stuck on.\nGet ways to solve it.',
+  heroLead: 'Write the thing a job posting cannot express: what is actually going wrong right now. Foreign professionals working in Japan propose how they would solve it, each from their own experience. Whoever gives the most useful answer can be given the actual work.',
+
+  fictionNote: 'All company names, people and content below are fictional examples.',
+
+  labelProblem: 'The problem',
+  labelLookingFor: 'What we want',
+  labelAreas: 'Areas',
+  labelDeadline: 'Deadline',
+  labelReward: 'Reward',
+  labelProposals: 'Proposals received',
+  labelApproach: 'Approach',
+  labelResult: 'Expected result',
+
+  principlesTitle: 'What this system commits to',
+  principles: [
+    {
+      title: 'Proposals stay private while open',
+      body: 'Only the company that posted and the author can read a proposal. Other applicants cannot. After a decision is made, the author chooses whether to make theirs public.',
+    },
+    {
+      title: 'A decision is due on a deadline',
+      body: 'Companies declare either an award or no award within 14 days of closing. If they do not, it is recorded as no response and shown on their company page.',
+    },
+    {
+      title: 'A proposal takes fifteen minutes',
+      body: 'No prototypes, no decks. How you would solve it, and what it would achieve. The detailed work happens after shortlisting, where it is paid.',
+    },
+  ],
+
+  otherTitle: 'Other open problems',
+
+  ctaTitle: 'Help us shape the first ones',
+  ctaBody: 'We want to design the first few problems together with the companies that find this interesting. What works depends a lot on the industry and the kind of problem. Tell us about yours.',
+  ctaButton: 'Get in touch',
+
+  teaserBadge: 'Concept',
+  teaserTitle: 'Post a problem instead of a job',
+  teaserBody: 'Companies tell us it is easier to describe what is going wrong than to describe who they want to hire. Post the problem, collect proposals on how to solve it, and give the actual work to whoever answered best. That is what we are building toward.',
+  teaserLink: 'See the shape of it',
+
+  featured: {
+    company: 'Sakura Trading Co., Ltd.',
+    industry: 'Food export / 58 employees',
+    title: 'We cannot keep up with enquiries from our overseas store',
+    problem: 'We started selling in English and French two years ago, and enquiry handling has not kept up. Two Japanese staff answer them using translation tools. Replies take three days on average, and we lose about ten orders a month to cancellations in the meantime.\n\nThe translations have also caused misunderstandings. One customer read our "best before" date as an expiry and we had to issue a refund. There is no budget to add headcount this year.',
+    lookingFor: 'We want to reply within one business day, without hiring anyone. It does not need to be perfect multilingual support. Fewer cancellations would already be enough.',
+    areas: ['Customer support', 'Multilingual', 'Process design', 'Generative AI'],
+    deadline: '14 November 2026',
+    reward: 'JPY 100,000 in cash. We expect to continue with the selected person on a contract basis (around JPY 200,000 per month, three months).',
+    proposals: [
+      {
+        author: 'Aminata D.',
+        headline: 'E-commerce operations / FR, EN, JA / 5 years in Japan',
+        state: 'awarded',
+        stateLabel: 'Awarded',
+        approach: 'I would start by reducing the number of enquiries rather than answering them faster.\n\nFrom what you describe, the three days is a symptom. At my previous cross-border store, six out of ten enquiries were asking for information that was missing from the product page. The best-before misunderstanding is probably a labelling problem too.\n\nThe order would be: classify three months of past enquiries, add the top ten missing facts to the product pages, then write templates for whatever remains.',
+        result: 'I would expect enquiry volume itself to roughly halve. What is left can be answered from templates immediately, so one business day is reachable without new headcount. The date issue is solved by writing "Best before" with an explicit date format.',
+      },
+      {
+        author: 'Joseph O.',
+        headline: 'Backend development / Python / 3 years in Japan',
+        state: 'shortlisted',
+        stateLabel: 'Shortlisted',
+        approach: 'Train a classifier on your past enquiry emails and have it draft replies automatically.\n\nBuilt into your existing mail setup, your staff would only read, correct and send. A glossary pins the translation of terms that get mistranslated, such as best-before dates.',
+        result: 'Handling time per enquiry drops enough for the same two people to reply same-day. I would estimate three to four weeks to build.',
+      },
+      {
+        author: 'Selamawit B.',
+        headline: 'Customer success / EN, Amharic / 2 years in Japan',
+        state: 'submitted',
+        stateLabel: 'Submitted',
+        approach: 'Use the time difference rather than fighting it. Cover Japanese night hours with about ten hours a week on contract. For European and African customers that is the middle of their day, which changes the perceived speed completely.',
+        result: 'Same-day replies in European time, and less load on your existing two staff.',
+      },
+    ],
+  },
+
+  others: [
+    {
+      company: 'Kita-Kanto Precision Industries',
+      title: 'Our safety training is Japanese-only and we cannot tell if it lands',
+      summary: 'We have twelve foreign employees. Safety training is delivered with Japanese documents and spoken explanation, but we have no way to check whether it was understood. Finding out after an accident is too late.',
+      areas: ['Manufacturing', 'Instructional design', 'Multilingual', 'Safety'],
+    },
+    {
+      company: 'Minori Foods Co., Ltd.',
+      title: 'We want to enter African markets but cannot judge where to start',
+      summary: 'We make dried noodles and seasonings. We are considering exporting to Africa, but nobody here has the background to evaluate what the trading houses propose. Start by telling us what daily life there actually looks like.',
+      areas: ['Market research', 'Food', 'Export', 'Local knowledge'],
+    },
+  ],
+}
+
+const fr: DemoCopy = {
+  draftBadge: 'Concept',
+  draftNote: "Cette fonctionnalité n'est pas encore en ligne. Cette page montre la forme envisagée. Rien ici ne peut être publié ni soumis.",
+
+  heroTitle: 'Publiez ce qui vous bloque.\nRecevez des façons de le résoudre.',
+  heroLead: "Décrivez ce qu'une offre d'emploi ne peut pas dire : ce qui ne va pas en ce moment. Des professionnels étrangers travaillant au Japon proposent leur façon de le résoudre, chacun à partir de son expérience. Celui dont la réponse est la plus utile peut se voir confier le travail.",
+
+  fictionNote: 'Les entreprises, personnes et contenus ci-dessous sont des exemples fictifs.',
+
+  labelProblem: 'Le problème',
+  labelLookingFor: 'Ce que nous cherchons',
+  labelAreas: 'Domaines',
+  labelDeadline: 'Date limite',
+  labelReward: 'Rémunération',
+  labelProposals: 'Propositions reçues',
+  labelApproach: 'Approche',
+  labelResult: 'Résultat attendu',
+
+  principlesTitle: 'Les engagements du système',
+  principles: [
+    {
+      title: 'Les propositions restent privées',
+      body: "Pendant la période ouverte, seuls l'entreprise et l'auteur peuvent lire une proposition. Les autres candidats n'y ont pas accès. Après la décision, l'auteur choisit de la rendre publique ou non.",
+    },
+    {
+      title: 'La décision a une échéance',
+      body: "L'entreprise déclare un lauréat ou une absence de lauréat dans les 14 jours suivant la clôture. À défaut, une absence de réponse est enregistrée et affichée sur sa page.",
+    },
+    {
+      title: 'Une proposition prend quinze minutes',
+      body: 'Ni prototype ni dossier. Comment vous le résoudriez, et ce que cela donnerait. Le travail détaillé vient après la présélection, et il est rémunéré.',
+    },
+  ],
+
+  otherTitle: 'Autres problèmes ouverts',
+
+  ctaTitle: 'Construisons les premiers ensemble',
+  ctaBody: "Nous souhaitons concevoir les premiers cas avec les entreprises que cela intéresse. Ce qui fonctionne dépend beaucoup du secteur et de la nature du problème. Parlez-nous du vôtre.",
+  ctaButton: 'Nous contacter',
+
+  teaserBadge: 'Concept',
+  teaserTitle: "Publier un problème plutôt qu'une offre",
+  teaserBody: "Les entreprises nous disent qu'il est plus facile de décrire ce qui ne va pas que de décrire qui elles veulent recruter. Publiez le problème, recueillez des propositions, confiez le travail à celui qui a le mieux répondu.",
+  teaserLink: 'Voir la forme envisagée',
+
+  featured: {
+    company: 'Sakura Trading Co., Ltd.',
+    industry: 'Export alimentaire / 58 salariés',
+    title: 'Nous ne suivons plus les demandes de notre boutique à l’international',
+    problem: "Nous vendons en anglais et en français depuis deux ans, et le traitement des demandes ne suit plus. Deux collaborateurs japonais y répondent à l'aide d'outils de traduction. Les réponses prennent trois jours en moyenne, et nous perdons une dizaine de commandes par mois annulées entre-temps.\n\nLes traductions ont aussi créé des malentendus : un client a lu notre date de durabilité minimale comme une date de péremption, et nous avons dû le rembourser. Aucun budget de recrutement cette année.",
+    lookingFor: "Répondre sous un jour ouvré, sans recruter. Un support multilingue parfait n'est pas nécessaire ; moins d'annulations suffirait déjà.",
+    areas: ['Support client', 'Multilingue', 'Conception des processus', 'IA générative'],
+    deadline: '14 novembre 2026',
+    reward: "100 000 JPY en espèces. Nous envisageons de poursuivre avec la personne retenue en prestation (environ 200 000 JPY par mois, trois mois).",
+    proposals: [
+      {
+        author: 'Aminata D.',
+        headline: 'Opérations e-commerce / FR, EN, JA / 5 ans au Japon',
+        state: 'awarded',
+        stateLabel: 'Retenue',
+        approach: "Je commencerais par réduire le nombre de demandes plutôt que par y répondre plus vite.\n\nD'après votre description, les trois jours sont un symptôme. Dans ma précédente boutique transfrontalière, six demandes sur dix portaient sur une information absente de la fiche produit. Le malentendu sur la date vient probablement aussi de l'étiquetage.\n\nL'ordre serait : classer trois mois de demandes passées, ajouter les dix informations manquantes les plus fréquentes aux fiches produit, puis rédiger des modèles pour le reste.",
+        result: "Le volume de demandes devrait environ diminuer de moitié. Le reste se traite immédiatement par modèles, donc un jour ouvré est atteignable sans recrutement. La question des dates se règle par la mention « Best before » et un format de date explicite.",
+      },
+      {
+        author: 'Joseph O.',
+        headline: 'Développement backend / Python / 3 ans au Japon',
+        state: 'shortlisted',
+        stateLabel: 'Présélectionné',
+        approach: "Entraîner un classifieur sur vos anciens e-mails et lui faire rédiger automatiquement les brouillons de réponse.\n\nIntégré à votre messagerie actuelle, vos collaborateurs n'auraient plus qu'à lire, corriger et envoyer. Un glossaire fige la traduction des termes souvent mal rendus.",
+        result: "Le temps de traitement par demande baisse suffisamment pour que les deux mêmes personnes répondent le jour même. Trois à quatre semaines de mise en place.",
+      },
+      {
+        author: 'Selamawit B.',
+        headline: 'Customer success / EN, amharique / 2 ans au Japon',
+        state: 'submitted',
+        stateLabel: 'Soumise',
+        approach: "Utiliser le décalage horaire au lieu de le subir. Couvrir les heures de nuit japonaises avec environ dix heures par semaine en prestation. Pour les clients européens et africains, c'est le milieu de leur journée.",
+        result: "Réponses le jour même en heure européenne, et charge allégée pour vos deux collaborateurs.",
+      },
+    ],
+  },
+
+  others: [
+    {
+      company: 'Kita-Kanto Precision Industries',
+      title: "Notre formation sécurité n'existe qu'en japonais",
+      summary: "Nous employons douze personnes étrangères. La formation à la sécurité se fait avec des documents japonais et des explications orales, sans moyen de vérifier la compréhension. L'apprendre après un accident serait trop tard.",
+      areas: ['Industrie', 'Ingénierie pédagogique', 'Multilingue', 'Sécurité'],
+    },
+    {
+      company: 'Minori Foods Co., Ltd.',
+      title: 'Nous voulons aborder les marchés africains sans savoir par où commencer',
+      summary: "Nous fabriquons des nouilles sèches et des condiments. Nous envisageons d'exporter vers l'Afrique, mais personne en interne ne peut évaluer les propositions des maisons de commerce. Commencez par nous dire à quoi ressemble la vie quotidienne là-bas.",
+      areas: ['Étude de marché', 'Alimentaire', 'Export', 'Connaissance du terrain'],
+    },
+  ],
+}
+
+const COPY: Record<Lang, DemoCopy> = { ja, en, fr }
+
+export function challengeDemo(lang: Lang): DemoCopy {
+  return COPY[lang] ?? ja
+}
