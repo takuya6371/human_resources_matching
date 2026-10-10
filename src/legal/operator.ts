@@ -11,21 +11,21 @@ export const OPERATOR = {
   /** サービス名。事業者名とは別。 */
   serviceName: 'NeBonga Link',
   /** 登記上の事業者名。例: '株式会社ネボンガ' */
-  name: '',
+  name: '株式会社NeBonga',
   /** 代表者名 */
-  representative: '',
+  representative: '川崎芳勲',
   /** 所在地（郵便番号から） */
-  address: '',
+  address: '〒150-0043 東京都渋谷区道玄坂１丁目１０番８号 渋谷道玄坂東急ビル２F-C',
   /** 問い合わせ先メールアドレス。開示・削除請求の窓口も兼ねる */
-  contactEmail: '',
+  contactEmail: 'contact@nebonga-link.com',
   /** 個人情報保護管理者の役職・氏名。置かない場合は空でよい */
   privacyOfficer: '',
   /** 施行日。例: '2026年10月5日' */
-  effectiveDate: '',
+  effectiveDate: '2026年10月20日',
   /** 最終改定日。初版なら施行日と同じでよい */
-  revisedDate: '',
+  revisedDate: '2026年10月20日',
   /** 第一審の専属的合意管轄裁判所。例: '東京地方裁判所' */
-  court: '',
+  court: '東京地方裁判所',
 } as const
 
 export type OperatorKey = keyof typeof OPERATOR

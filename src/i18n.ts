@@ -26,10 +26,13 @@ export const translations: TranslationStore = {
       getStarted: 'Get Started',
     },
     hero: {
+      tagline: 'Better Connections,\nBetter Jobs.',
       badge: 'Global Talent × Japanese Companies',
       title: 'Connecting Japan\nand the world',
       subtitle: 'A platform linking professionals from around the world who are in Japan with Japanese companies working across borders. Planning to return home and keep working with Japan? Register your profile.',
       registerCta: 'Register your profile',
+      ctaTalent: "I'm a Talent",
+      ctaCompany: "I'm a Company",
       searchPlaceholder: 'Search by name or skill…',
       searchBtn: 'Search',
     },
@@ -37,6 +40,9 @@ export const translations: TranslationStore = {
       featuredHeading: 'Meet exceptional international talent in Japan',
       featuredSub: 'Handpicked professionals ready to contribute',
       viewAll: 'View all talents',
+      jobsHeading: 'Open roles at Japanese companies',
+      jobsSub: 'No sign-up needed to browse — see what is open right now',
+      viewAllJobs: 'View all jobs',
       trustedHeading: 'Companies working with us',
     },
     list: {
@@ -517,7 +523,7 @@ export const translations: TranslationStore = {
       flaggedBadge: 'On hold',
     },
     footer: {
-      tagline: 'Better connections, better work.',
+      tagline: 'Better Connections, Better Jobs.',
       rights: '© 2026 NeBonga Link. All rights reserved.',
     },
     start: {
@@ -656,10 +662,13 @@ export const translations: TranslationStore = {
       getStarted: 'はじめる',
     },
     hero: {
+      tagline: 'Better Connections,\nBetter Jobs.',
       badge: '海外人材 × 日本企業 マッチング',
       title: '日本と世界を\n仕事でつなぐ',
       subtitle: '日本で働く・学ぶ海外出身の方と、海外とつながる日本企業をつなぐプラットフォームです。帰国後も日本の仕事を続けたい方の登録をお待ちしています。',
       registerCta: 'プロフィールを登録する',
+      ctaTalent: '人材の方はこちら',
+      ctaCompany: '企業の方はこちら',
       searchPlaceholder: '名前またはスキルで検索…',
       searchBtn: '検索',
     },
@@ -667,6 +676,9 @@ export const translations: TranslationStore = {
       featuredHeading: '世界から集まった人材と出会う',
       featuredSub: '世界各国から集まった優秀な人材',
       viewAll: '人材一覧を見る',
+      jobsHeading: '日本企業の求人を見る',
+      jobsSub: '登録不要でそのまま閲覧できます',
+      viewAllJobs: '求人一覧を見る',
       trustedHeading: 'ご一緒している企業',
     },
     list: {
@@ -1147,7 +1159,7 @@ export const translations: TranslationStore = {
       flaggedBadge: '保留中',
     },
     footer: {
-      tagline: 'Better connections, better work.',
+      tagline: 'Better Connections, Better Jobs.',
       rights: '© 2026 NeBonga Link. All rights reserved.',
     },
     start: {
@@ -1286,10 +1298,13 @@ export const translations: TranslationStore = {
       getStarted: 'Commencer',
     },
     hero: {
+      tagline: 'Better Connections,\nBetter Jobs.',
       badge: 'Talents internationaux × Entreprises japonaises',
       title: 'Relier le Japon\net le monde',
       subtitle: 'Une plateforme qui relie les professionnels internationaux au Japon et les entreprises japonaises tournées vers l\'international. Vous comptez rentrer au pays et continuer à travailler avec le Japon ? Créez votre profil.',
       registerCta: 'Créer mon profil',
+      ctaTalent: 'Je suis un talent',
+      ctaCompany: 'Je suis une entreprise',
       searchPlaceholder: 'Rechercher par nom ou compétence…',
       searchBtn: 'Rechercher',
     },
@@ -1297,6 +1312,9 @@ export const translations: TranslationStore = {
       featuredHeading: 'Rencontrez les meilleurs talents internationaux au Japon',
       featuredSub: 'Des professionnels sélectionnés, prêts à contribuer',
       viewAll: 'Voir tous les talents',
+      jobsHeading: 'Offres ouvertes chez des entreprises japonaises',
+      jobsSub: 'Consultez-les sans créer de compte',
+      viewAllJobs: 'Voir toutes les offres',
       trustedHeading: 'Les entreprises avec nous',
     },
     list: {
@@ -1777,7 +1795,7 @@ export const translations: TranslationStore = {
       flaggedBadge: 'En attente',
     },
     footer: {
-      tagline: 'Better connections, better work.',
+      tagline: 'Better Connections, Better Jobs.',
       rights: '© 2026 NeBonga Link. Tous droits réservés.',
     },
     start: {
