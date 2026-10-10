@@ -190,13 +190,15 @@ export default function CvImportDialog({ open, ownerId, currentValues, onApply, 
                   ))}
                 </div>
 
-                <div className="flex gap-3 mt-5">
+                {/* 他の操作列（TalentDashboard / CompanyDashboard / CompanyJobsPage、
+                    ui/dialog.tsx の DialogFooter）と同じく右寄せ、主アクションを右端に置く。 */}
+                <div className="flex items-center justify-end gap-3 mt-5">
+                  <button type="button" onClick={handleClose} className="btn-line-ghost px-6">
+                    {t(lang, 'dashboard.cancelBtn')}
+                  </button>
                   <button type="button" onClick={handleApply} disabled={selected.size === 0}
                           className="btn-line px-6 disabled:opacity-40 disabled:cursor-not-allowed">
                     {t(lang, 'dashboard.cvApply')}
-                  </button>
-                  <button type="button" onClick={handleClose} className="btn-line-ghost px-6">
-                    {t(lang, 'dashboard.cancelBtn')}
                   </button>
                 </div>
               </>
