@@ -118,6 +118,7 @@ export const translations: TranslationStore = {
       emailLabel: 'Email address',
       submitBtn: 'Send reset link',
       sentMsg: "If an account exists with that email, you'll receive a password reset link shortly.",
+      errorMsg: 'We could not send the email right now. This is a problem on our side, not with your address. Please try again later.',
       backToLogin: '← Back to sign in',
     },
     resetPassword: {
@@ -731,6 +732,7 @@ export const translations: TranslationStore = {
       emailLabel: 'メールアドレス',
       submitBtn: 'リセットリンクを送信',
       sentMsg: 'ご入力のメールアドレスのアカウントが存在する場合、パスワード再設定リンクをお送りしました。',
+      errorMsg: 'いまメールを送信できませんでした。入力されたアドレスの問題ではなく、こちら側の障害です。時間をおいてお試しください。',
       backToLogin: '← ログインに戻る',
     },
     resetPassword: {
@@ -1344,6 +1346,7 @@ export const translations: TranslationStore = {
       emailLabel: 'Adresse e-mail',
       submitBtn: 'Envoyer le lien',
       sentMsg: 'Si un compte existe avec cette adresse, vous recevrez un lien de réinitialisation sous peu.',
+      errorMsg: "Impossible d'envoyer l'e-mail pour le moment. Le problème vient de notre côté, pas de votre adresse. Réessayez plus tard.",
       backToLogin: '← Retour à la connexion',
     },
     resetPassword: {

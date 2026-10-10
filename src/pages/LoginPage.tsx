@@ -60,6 +60,7 @@ export default function LoginPage() {
       const { error: authError } = await signUp(email, password, {
         role: signUpType,
         companyName: signUpType === 'company' ? companyName.trim() : undefined,
+        lang,
       })
       if (authError) {
         setError(authError)

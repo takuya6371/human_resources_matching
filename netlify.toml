@@ -1,3 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
+
+[functions]
+  node_bundler = "esbuild"
+  # nodemailer は内部で動的 require を使っており、束ねると壊れることがある。
+  # 束ねずに node_modules ごと同梱させる。
+  external_node_modules = ["nodemailer"]

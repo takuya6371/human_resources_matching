@@ -11,14 +11,18 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim()) return
     setSubmitting(true)
-    await resetPasswordRequest(email.trim())
+    setError(null)
+    const { error } = await resetPasswordRequest(email.trim())
     setSubmitting(false)
-    setSent(true)
+    // errorが返るのはサーバー側の故障のときだけ。アカウントの有無では返らない。
+    if (error) setError(error)
+    else setSent(true)
   }
 
   return (
@@ -28,6 +32,11 @@ export default function ForgotPasswordPage() {
           <p className="text-ink-soft text-sm text-center">{t(lang, 'forgotPassword.sentMsg')}</p>
         ) : (
           <form onSubmit={handleSubmit}>
+            {error && (
+              <p className="mb-5 border border-seal/40 bg-seal/5 px-4 py-3 text-seal text-sm leading-relaxed">
+                {t(lang, 'forgotPassword.errorMsg')}
+              </p>
+            )}
             <div className="mb-6">
               <label className="label-line">{t(lang, 'forgotPassword.emailLabel')}</label>
               <input

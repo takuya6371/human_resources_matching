@@ -21,6 +21,9 @@ interface AuthContextType {
 interface SignUpOptions {
   role: 'talent' | 'company'
   companyName?: string
+  // 認証メールを何語で送るか。Send Email Hook はユーザーのメタデータしか
+  // 見られないので、登録時の表示言語をここに残しておく。
+  lang?: string
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -152,6 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: {
           role: opts?.role ?? 'talent',
           company_name: opts?.companyName,
+          lang: opts?.lang ?? 'ja',
         },
       },
     })
@@ -170,12 +174,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setCompany(null)
   }
 
-  // メールにパスワード再設定リンクを送る。アカウントの有無に関わらず常に成功扱いにする
-  // （送信元がメールアドレスの実在確認に使われないようにするため）。
+  // メールにパスワード再設定リンクを送る。アカウントの有無は伏せる
+  // （送信結果がメールアドレスの実在確認に使われないようにするため）。
+  //
+  // ただし 5xx はサーバー側の故障であって、アカウントの有無とは無関係なので
+  // 握り潰してはいけない。実際、SMTPのTLSネゴシエーションが失敗して500が
+  // 返り続けているのに、画面には「送信しました」と出ていた。
   const resetPasswordRequest = async (email: string): Promise<{ error: string | null }> => {
-    await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     })
+    if (error && (error.status ?? 0) >= 500) {
+      console.error('resetPasswordForEmail failed', error)
+      return { error: error.message }
+    }
     return { error: null }
   }
 
