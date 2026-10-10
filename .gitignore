@@ -2,7 +2,17 @@ node_modules/
 dist/
 .DS_Store
 *.local
-docs/dev-credentials.md
 
 # Local Netlify folder
 .netlify
+
+# 個人的なメモ。本番の認証情報が書かれているので追跡しない
+# （残作業.txt は一度 public リポジトリに上がってしまったため、
+#   書かれていたパスワードは変更が必要）
+残作業.txt
+めも.txt
+docs/dev-credentials.md
+
+# エージェント用の作業ディレクトリ
+docs/.agents/
+docs/.claude/
