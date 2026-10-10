@@ -196,3 +196,41 @@ Supabase Auth ログ: /recover | Hook ran successfully
 
 `AUTH_EMAIL_DRY_RUN=1` を立てると、実際には送らずに
 件名・リンク・本文HTMLを返す。
+
+
+---
+
+# メールアドレスの到達確認
+
+Supabase の「Confirm email」は **OFF** にする。会場のQRから登録した人を
+その場でアプリに入れるため。ONだと確認するまでログインできず、電波の悪い
+会場でメールを開けない人がそのまま離脱する。
+
+かわりに登録直後に確認メールを送り、未確認のあいだは画面上部に警告を出す。
+**送信に失敗しても登録は成立させる**（未確認として扱うだけ）。
+
+```
+登録 → セッション即発行 → /api/verify-email/send → さくら → 本人
+                                                         ↓
+                            /verify-email?token=... → /api/verify-email/confirm
+                                                         ↓
+                                     email_verifications.verified_at
+```
+
+| | |
+|---|---|
+| 正となる状態 | `public.email_verifications.verified_at` |
+| トークン | 32バイト乱数。**sha256 だけを保存**し、平文は持たない |
+| 有効期限 | 24時間 |
+| 再送 | 60秒に1回まで |
+| 画面 | `EmailVerificationNotice`（両ダッシュボードの Navbar 直下）/ `/verify-email` |
+
+`auth.users.email_confirmed_at` は Confirm email を OFF にすると登録時に
+自動で入ってしまい、確認の有無を表さない。**使ってはいけない。**
+
+確認状態の書き込みには service_role が要る（本人に書かせない）。そのため
+Netlify に `SUPABASE_SERVICE_ROLE_KEY` が必要。読み取りは RLS で本人と
+管理者だけに開いている。
+
+状態が読めなかったときは「未確認」ではなく「不明」とし、警告を出さない
+（無関係な人を不安にさせないため）。

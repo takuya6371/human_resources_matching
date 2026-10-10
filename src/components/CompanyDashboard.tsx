@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Navbar from './Navbar'
+import EmailVerificationNotice from './EmailVerificationNotice'
 import Footer from './Footer'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../App'
@@ -113,6 +114,7 @@ export default function CompanyDashboard({ company }: { company: Company }) {
         </div>
       )}
       <Navbar />
+      <EmailVerificationNotice />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">

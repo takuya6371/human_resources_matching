@@ -16,7 +16,12 @@ interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<{ error: string | null }>
   updateCompany: (updates: Partial<Company>) => Promise<{ error: string | null }>
   submitForReview: () => Promise<void>
+  // メールアドレスの到達確認。null は読み込み中・未ログイン。
+  emailVerified: boolean | null
+  sendVerificationEmail: () => Promise<{ status: VerificationStatus }>
 }
+
+export type VerificationStatus = 'sent' | 'already_verified' | 'throttled' | 'failed'
 
 interface SignUpOptions {
   role: 'talent' | 'company'
@@ -39,7 +44,54 @@ const AuthContext = createContext<AuthContextType>({
   updateProfile: async () => ({ error: null }),
   updateCompany: async () => ({ error: null }),
   submitForReview: async () => {},
+  emailVerified: null,
+  sendVerificationEmail: async () => ({ status: 'failed' }),
 })
+
+// Supabase の「Confirm email」は OFF にしてある（会場で登録した人をその場で
+// アプリに入れるため）。そのため auth.users.email_confirmed_at は登録時に
+// 自動で入ってしまい、確認の有無を表さない。email_verifications が正。
+// 読めなかったときは false ではなく null を返す。確認済みかどうか分からない
+// だけで未確認とは限らず、そこで警告を出すと無関係な人を不安にさせる。
+async function fetchEmailVerified(userId: string): Promise<boolean | null> {
+  const { data, error } = await supabase
+    .from('email_verifications')
+    .select('verified_at')
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) {
+    console.error('could not read verification state', error)
+    return null
+  }
+  return Boolean(data?.verified_at)
+}
+
+// 確認メールの送信と、リンクを踏んだときの確認。どちらも service_role が要るので
+// Netlify の関数側でやる（netlify/functions/verify-email.mts）。
+async function postVerification(
+  action: 'send' | 'confirm',
+  accessTokenOrToken: string,
+): Promise<VerificationStatus> {
+  try {
+    const res = await fetch(`/api/verify-email/${action}`, {
+      method: 'POST',
+      headers: action === 'send'
+        ? { authorization: `Bearer ${accessTokenOrToken}` }
+        : { 'content-type': 'application/json' },
+      body: action === 'confirm' ? JSON.stringify({ token: accessTokenOrToken }) : undefined,
+    })
+    const body = await res.json().catch(() => null) as { status?: string } | null
+    if (res.status === 429) return 'throttled'
+    if (!res.ok) {
+      console.error('verification request failed', res.status, body)
+      return 'failed'
+    }
+    return (body?.status === 'already_verified' ? 'already_verified' : 'sent')
+  } catch (e) {
+    console.error('verification request failed', e)
+    return 'failed'
+  }
+}
 
 async function fetchProfile(userId: string, email: string): Promise<User | null> {
   // admin_note は profile_private にある（企業から読めないようにするため分離。
@@ -99,10 +151,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [company, setCompany] = useState<Company | null>(null)
   const [loading, setLoading] = useState(true)
+  const [emailVerified, setEmailVerified] = useState<boolean | null>(null)
 
   const accountType: AccountType | null = user ? user.role : company ? 'company' : null
 
   async function loadAccount(userId: string, email: string) {
+    fetchEmailVerified(userId).then(setEmailVerified)
     const profile = await fetchProfile(userId, email)
     if (profile) {
       setUser(profile)
@@ -132,6 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUser(null)
         setCompany(null)
+        setEmailVerified(null)
       }
     })
 
@@ -148,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, opts?: SignUpOptions): Promise<{ error: string | null }> => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -159,7 +214,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     })
-    if (!error) return { error: null }
+    if (!error) {
+      // Supabase の Confirm email は OFF なので、この時点でセッションが張られる。
+      // 確認メールはこちらから送る。送れなくても登録は成立させ、
+      // 未確認のまま画面に警告を出す（送信可否を登録の成否にしない）。
+      if (data.session) {
+        setEmailVerified(false)
+        void postVerification('send', data.session.access_token)
+      }
+      return { error: null }
+    }
     // Supabase が500を返したとき message が空や "{}" になることがあり、
     // 画面に "{}" とだけ出て原因が分からなかった。拾えるものを拾う。
     const detail = [error.message, (error as { status?: number }).status]
@@ -168,10 +232,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: detail || error.name || 'signup_failed' }
   }
 
+  // Netlify の関数を叩く。送信も確認も service_role が要るのでクライアントからは書けない。
+  const sendVerificationEmail = async (): Promise<{ status: VerificationStatus }> => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return { status: 'failed' }
+    const status = await postVerification('send', session.access_token)
+    if (status === 'already_verified') setEmailVerified(true)
+    return { status }
+  }
+
   const logout = async () => {
     await supabase.auth.signOut()
     setUser(null)
     setCompany(null)
+    setEmailVerified(null)
   }
 
   // メールにパスワード再設定リンクを送る。アカウントの有無は伏せる
@@ -357,7 +431,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, resetPasswordRequest, resetPassword, updateProfile, updateCompany, submitForReview }}>
+    <AuthContext.Provider value={{ user, company, accountType, loading, login, signUp, logout, resetPasswordRequest, resetPassword, updateProfile, updateCompany, submitForReview, emailVerified, sendVerificationEmail }}>
       {children}
     </AuthContext.Provider>
   )
