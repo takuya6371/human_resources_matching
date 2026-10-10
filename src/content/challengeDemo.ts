@@ -77,7 +77,7 @@ const ja: DemoCopy = {
   draftNote: 'この機能はまだ公開していません。考えている形をお見せするための画面です。実際の投稿や提案はできません。',
 
   heroTitle: '困っていることを書く。\n解き方が集まる。',
-  heroLead: '求人票では書けない「いま困っていること」を出してください。日本で働く外国人材が、それぞれの経験から解き方を提案します。いちばん有用だった提案を出した人に、実際の仕事を出せます。',
+  heroLead: '求人票では書けない「いま困っていること」を出してください。日本で学び、働いた人たちが解き方を提案します。いまも日本にいる人も、帰国した人も。いちばん有用だった提案を出した人に、実際の仕事を出せます。',
 
   fictionNote: '※ 以下の企業名・人名・内容はすべて架空の例です。',
 
@@ -114,7 +114,7 @@ const ja: DemoCopy = {
 
   teaserBadge: '構想中',
   teaserTitle: '求人の前に、課題を出すという手',
-  teaserBody: '「どんな人が欲しいか」より「いま何に困っているか」のほうが書きやすい、という声をいただきます。課題を出して、解き方の提案を集め、いちばん有用だった人に仕事を出す。そういう仕組みを考えています。',
+  teaserBody: '「どんな人が欲しいか」より「いま何に困っているか」のほうが書きやすい、という声をいただきます。課題を出して、解き方の提案を集め、いちばん有用だった人に仕事を出す。日本で学び、帰国した人たちにも届きます。採用ではなく、国境をまたいだ業務委託として。',
   teaserLink: '考えている形を見る',
 
   featured: {
@@ -129,15 +129,15 @@ const ja: DemoCopy = {
     proposals: [
       {
         author: 'アミナタ D.',
-        headline: 'EC運用 / 仏語・英語・日本語 / 在日5年',
+        headline: 'EC運用 / 仏語・英語・日本語 / 元在日5年・現ダカール在住',
         state: 'awarded',
         stateLabel: '採用',
-        approach: '問い合わせを減らす方向から入ることを提案します。\n\n頂いた状況を読む限り、3日かかっていること自体より「なぜ問い合わせが来るか」が問題に見えます。前職の越境ECでは、問い合わせの6割が商品ページに書いていない情報の確認でした。賞味期限の誤解も、おそらく表記の問題です。\n\n手順は、まず直近3か月の問い合わせを分類する。多い順に上位10個を商品ページに書き足す。残ったものにテンプレートを用意する。この順番です。',
+        approach: '問い合わせを減らす方向から入ることを提案します。\n\n頂いた状況を読む限り、3日かかっていること自体より「なぜ問い合わせが来るか」が問題に見えます。東京で越境ECの運用を5年やっていましたが、問い合わせの6割は商品ページに書いていない情報の確認でした。\n\nいま私はダカールにいて、まさに御社のような日本の店から買う側です。何が書いていないと不安になるかは、こちら側にいるとよく分かります。賞味期限の誤解も表記の問題で、こちらでは日付の順序自体が違います。\n\n手順は、まず直近3か月の問い合わせを分類する。多い順に上位10個を商品ページに書き足す。残ったものにテンプレートを用意する。この順番です。',
         result: '問い合わせの件数自体が半分程度まで減る見込みです。残りはテンプレートで即答できるので、1営業日以内は人を増やさずに達成できます。賞味期限の表記は "Best before" と日付形式の明示で解消します。',
       },
       {
         author: 'ジョセフ O.',
-        headline: 'バックエンド開発 / Python / 在日3年',
+        headline: 'バックエンド開発 / Python / 東京在住3年',
         state: 'shortlisted',
         stateLabel: '候補',
         approach: '過去の問い合わせメールを学習させて、自動で分類と下書き作成を行う仕組みを作ります。\n\n既存のメール環境に組み込む形にすれば、担当者の作業は「下書きを読んで直して送る」だけになります。用語集を作り、賞味期限のような誤訳しやすい語は固定の訳を当てます。',
@@ -145,10 +145,10 @@ const ja: DemoCopy = {
       },
       {
         author: 'セラマウィット B.',
-        headline: 'カスタマーサクセス / 英語・アムハラ語 / 在日2年',
+        headline: 'カスタマーサクセス / 英語・アムハラ語 / 元在日2年・現アディスアベバ在住',
         state: 'submitted',
         stateLabel: '提出済み',
-        approach: '時差を逆に使うことを提案します。日本時間の夜間に対応できる体制を、週10時間程度の業務委託で用意します。欧州・アフリカの顧客にとっては日中にあたるため、体感の返信速度が大きく変わります。',
+        approach: '時差を逆に使うことを提案します。私のいるアディスアベバは日本より6時間遅く、日本の夜が現地の夕方です。週10時間程度の業務委託で、日本時間の夜間を埋めます。欧州・アフリカの顧客にとっては日中にあたるため、体感の返信速度が大きく変わります。',
         result: '欧州時間での即日返信が可能になります。既存の2名の負荷も下がります。',
       },
     ],
@@ -175,7 +175,7 @@ const en: DemoCopy = {
   draftNote: 'This feature is not live yet. This page shows the shape we are considering. Nothing here can be posted or submitted.',
 
   heroTitle: 'Post what you are stuck on.\nGet ways to solve it.',
-  heroLead: 'Write the thing a job posting cannot express: what is actually going wrong right now. Foreign professionals working in Japan propose how they would solve it, each from their own experience. Whoever gives the most useful answer can be given the actual work.',
+  heroLead: 'Write the thing a job posting cannot express: what is actually going wrong right now. People who studied and worked in Japan propose how they would solve it — some still here, some back in their home country. Whoever gives the most useful answer can be given the actual work.',
 
   fictionNote: 'All company names, people and content below are fictional examples.',
 
@@ -212,7 +212,7 @@ const en: DemoCopy = {
 
   teaserBadge: 'Concept',
   teaserTitle: 'Post a problem instead of a job',
-  teaserBody: 'Companies tell us it is easier to describe what is going wrong than to describe who they want to hire. Post the problem, collect proposals on how to solve it, and give the actual work to whoever answered best. That is what we are building toward.',
+  teaserBody: 'Companies tell us it is easier to describe what is going wrong than to describe who they want to hire. Post the problem, collect proposals, and give the work to whoever answered best. It also reaches the people who studied here and have since gone home — not as a hire, but as cross-border contract work.',
   teaserLink: 'See the shape of it',
 
   featured: {
@@ -227,15 +227,15 @@ const en: DemoCopy = {
     proposals: [
       {
         author: 'Aminata D.',
-        headline: 'E-commerce operations / FR, EN, JA / 5 years in Japan',
+        headline: 'E-commerce operations / FR, EN, JA / 5 years in Japan, now in Dakar',
         state: 'awarded',
         stateLabel: 'Awarded',
-        approach: 'I would start by reducing the number of enquiries rather than answering them faster.\n\nFrom what you describe, the three days is a symptom. At my previous cross-border store, six out of ten enquiries were asking for information that was missing from the product page. The best-before misunderstanding is probably a labelling problem too.\n\nThe order would be: classify three months of past enquiries, add the top ten missing facts to the product pages, then write templates for whatever remains.',
+        approach: 'I would start by reducing the number of enquiries rather than answering them faster.\n\nFrom what you describe, the three days is a symptom. I ran cross-border e-commerce in Tokyo for five years, and six out of ten enquiries were asking for information missing from the product page.\n\nI now live in Dakar, which makes me exactly the customer buying from a Japanese store like yours. From this side it is very clear what is missing. The best-before issue is a labelling problem — here the date order itself is different.\n\nThe order would be: classify three months of past enquiries, add the top ten missing facts to the product pages, then write templates for whatever remains.',
         result: 'I would expect enquiry volume itself to roughly halve. What is left can be answered from templates immediately, so one business day is reachable without new headcount. The date issue is solved by writing "Best before" with an explicit date format.',
       },
       {
         author: 'Joseph O.',
-        headline: 'Backend development / Python / 3 years in Japan',
+        headline: 'Backend development / Python / 3 years in Tokyo',
         state: 'shortlisted',
         stateLabel: 'Shortlisted',
         approach: 'Train a classifier on your past enquiry emails and have it draft replies automatically.\n\nBuilt into your existing mail setup, your staff would only read, correct and send. A glossary pins the translation of terms that get mistranslated, such as best-before dates.',
@@ -243,10 +243,10 @@ const en: DemoCopy = {
       },
       {
         author: 'Selamawit B.',
-        headline: 'Customer success / EN, Amharic / 2 years in Japan',
+        headline: 'Customer success / EN, Amharic / 2 years in Japan, now in Addis Ababa',
         state: 'submitted',
         stateLabel: 'Submitted',
-        approach: 'Use the time difference rather than fighting it. Cover Japanese night hours with about ten hours a week on contract. For European and African customers that is the middle of their day, which changes the perceived speed completely.',
+        approach: 'Use the time difference rather than fighting it. Addis Ababa is six hours behind Tokyo, so your night is my late afternoon. About ten hours a week on contract would cover it. For European and African customers that is the middle of their day, which changes the perceived speed completely.',
         result: 'Same-day replies in European time, and less load on your existing two staff.',
       },
     ],
@@ -273,7 +273,7 @@ const fr: DemoCopy = {
   draftNote: "Cette fonctionnalité n'est pas encore en ligne. Cette page montre la forme envisagée. Rien ici ne peut être publié ni soumis.",
 
   heroTitle: 'Publiez ce qui vous bloque.\nRecevez des façons de le résoudre.',
-  heroLead: "Décrivez ce qu'une offre d'emploi ne peut pas dire : ce qui ne va pas en ce moment. Des professionnels étrangers travaillant au Japon proposent leur façon de le résoudre, chacun à partir de son expérience. Celui dont la réponse est la plus utile peut se voir confier le travail.",
+  heroLead: "Décrivez ce qu'une offre d'emploi ne peut pas dire : ce qui ne va pas en ce moment. Des personnes qui ont étudié et travaillé au Japon proposent leur façon de le résoudre — certaines encore sur place, d'autres rentrées au pays. Celle dont la réponse est la plus utile peut se voir confier le travail.",
 
   fictionNote: 'Les entreprises, personnes et contenus ci-dessous sont des exemples fictifs.',
 
@@ -310,7 +310,7 @@ const fr: DemoCopy = {
 
   teaserBadge: 'Concept',
   teaserTitle: "Publier un problème plutôt qu'une offre",
-  teaserBody: "Les entreprises nous disent qu'il est plus facile de décrire ce qui ne va pas que de décrire qui elles veulent recruter. Publiez le problème, recueillez des propositions, confiez le travail à celui qui a le mieux répondu.",
+  teaserBody: "Les entreprises nous disent qu'il est plus facile de décrire ce qui ne va pas que de décrire qui elles veulent recruter. Publiez le problème, recueillez des propositions, confiez le travail à qui a le mieux répondu. Cela atteint aussi celles et ceux qui ont étudié ici puis sont rentrés — non comme un recrutement, mais comme une prestation transfrontalière.",
   teaserLink: 'Voir la forme envisagée',
 
   featured: {
@@ -325,15 +325,15 @@ const fr: DemoCopy = {
     proposals: [
       {
         author: 'Aminata D.',
-        headline: 'Opérations e-commerce / FR, EN, JA / 5 ans au Japon',
+        headline: 'Opérations e-commerce / FR, EN, JA / 5 ans au Japon, aujourd’hui à Dakar',
         state: 'awarded',
         stateLabel: 'Retenue',
-        approach: "Je commencerais par réduire le nombre de demandes plutôt que par y répondre plus vite.\n\nD'après votre description, les trois jours sont un symptôme. Dans ma précédente boutique transfrontalière, six demandes sur dix portaient sur une information absente de la fiche produit. Le malentendu sur la date vient probablement aussi de l'étiquetage.\n\nL'ordre serait : classer trois mois de demandes passées, ajouter les dix informations manquantes les plus fréquentes aux fiches produit, puis rédiger des modèles pour le reste.",
+        approach: "Je commencerais par réduire le nombre de demandes plutôt que par y répondre plus vite.\n\nD'après votre description, les trois jours sont un symptôme. J'ai géré une boutique transfrontalière à Tokyo pendant cinq ans : six demandes sur dix portaient sur une information absente de la fiche produit.\n\nJe vis aujourd'hui à Dakar, donc je suis exactement la cliente qui achète dans une boutique japonaise comme la vôtre. Vu d'ici, ce qui manque saute aux yeux. La date est un problème d'étiquetage : ici, l'ordre des dates lui-même diffère.\n\nL'ordre serait : classer trois mois de demandes passées, ajouter les dix informations manquantes les plus fréquentes aux fiches produit, puis rédiger des modèles pour le reste.",
         result: "Le volume de demandes devrait environ diminuer de moitié. Le reste se traite immédiatement par modèles, donc un jour ouvré est atteignable sans recrutement. La question des dates se règle par la mention « Best before » et un format de date explicite.",
       },
       {
         author: 'Joseph O.',
-        headline: 'Développement backend / Python / 3 ans au Japon',
+        headline: 'Développement backend / Python / 3 ans à Tokyo',
         state: 'shortlisted',
         stateLabel: 'Présélectionné',
         approach: "Entraîner un classifieur sur vos anciens e-mails et lui faire rédiger automatiquement les brouillons de réponse.\n\nIntégré à votre messagerie actuelle, vos collaborateurs n'auraient plus qu'à lire, corriger et envoyer. Un glossaire fige la traduction des termes souvent mal rendus.",
@@ -341,10 +341,10 @@ const fr: DemoCopy = {
       },
       {
         author: 'Selamawit B.',
-        headline: 'Customer success / EN, amharique / 2 ans au Japon',
+        headline: 'Customer success / EN, amharique / 2 ans au Japon, aujourd’hui à Addis-Abeba',
         state: 'submitted',
         stateLabel: 'Soumise',
-        approach: "Utiliser le décalage horaire au lieu de le subir. Couvrir les heures de nuit japonaises avec environ dix heures par semaine en prestation. Pour les clients européens et africains, c'est le milieu de leur journée.",
+        approach: "Utiliser le décalage horaire au lieu de le subir. Addis-Abeba a six heures de moins que Tokyo : votre nuit est ma fin d'après-midi. Environ dix heures par semaine en prestation suffiraient. Pour les clients européens et africains, c'est le milieu de leur journée.",
         result: "Réponses le jour même en heure européenne, et charge allégée pour vos deux collaborateurs.",
       },
     ],
