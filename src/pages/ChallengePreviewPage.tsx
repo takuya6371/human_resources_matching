@@ -156,7 +156,26 @@ export default function ChallengePreviewPage() {
           </div>
         </section>
 
+        {/* 企業が最初に引っかかるのは、源泉徴収と送金。先回りして答えておく。
+            根拠と論点は docs/payments-and-verification.md を参照。 */}
         <section className="py-14 sm:py-20 px-4 sm:px-6 border-t border-hairline">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="font-display text-ink text-xl sm:text-2xl">{c.faqTitle}</h2>
+            <p className="mt-3 max-w-2xl text-ink-soft text-sm leading-relaxed">{c.faqLead}</p>
+            <dl className="mt-8 border-t border-hairline">
+              {c.faq.map(item => (
+                <div key={item.q} className="border-b border-hairline py-6 sm:grid sm:grid-cols-3 sm:gap-8">
+                  <dt className="text-ink font-medium text-sm leading-snug">{item.q}</dt>
+                  <dd className="mt-2 sm:mt-0 sm:col-span-2 text-ink-soft text-sm leading-relaxed">
+                    {item.a}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        <section className="py-14 sm:py-20 px-4 sm:px-6">
           <div className="max-w-5xl mx-auto">
             <div className="line-card p-8 sm:p-10">
               <h2 className="font-display text-ink text-xl sm:text-2xl">{c.ctaTitle}</h2>

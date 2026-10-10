@@ -58,6 +58,11 @@ export interface DemoCopy {
 
   otherTitle: string
 
+  /** 企業が最初に引っかかるところ。先回りして答えておく。 */
+  faqTitle: string
+  faqLead: string
+  faq: { q: string; a: string }[]
+
   ctaTitle: string
   ctaBody: string
   ctaButton: string
@@ -107,6 +112,35 @@ const ja: DemoCopy = {
   ],
 
   otherTitle: 'ほかに出ている課題',
+
+  faqTitle: 'よくいただく質問',
+  faqLead: '海外にいる方に仕事をお願いする、という点で引っかかりやすいところを先にお答えします。構想段階のため、実際の運用で変わる可能性があります。',
+  faq: [
+    {
+      q: '海外在住の人に、どうやって報酬を支払うのですか',
+      a: '当面は、貴社から提案者へ直接お支払いいただく形を想定しています。当社は資金をお預かりしません。送金は銀行送金のほか、Wiseのような国際送金サービスをお使いいただけます。国によって対応状況と着金手段が異なり、銀行口座ではなくモバイルマネーが主流の国もあります。報酬額を決める前に受取方法を確認しておくと、行き違いがありません。',
+    },
+    {
+      q: '源泉徴収は必要ですか',
+      a: '非居住者への支払いが「国内源泉所得」にあたるかどうかで変わります。役務の提供が国外で行われる場合は原則として該当せず、源泉徴収が不要という整理が一般的です。ただし成果物の著作権譲渡の対価と評価されると「使用料」として扱われる可能性があり、契約書の書き方が影響します。租税条約による軽減・免除もあります。当社は税務の専門家ではありませんので、貴社の顧問税理士にご確認ください。',
+    },
+    {
+      q: '消費税やインボイスはどうなりますか',
+      a: '国外で行われる役務の提供は国外取引となり、消費税の課税対象外（不課税）となるのが基本です。その場合、仕入税額控除の対象ではないため、適格請求書の有無は問題になりません。経理の方が迷いやすいところなので、契約時に整理しておくことをお勧めします。',
+    },
+    {
+      q: '相手が本人かどうか、どう確認するのですか',
+      a: '提案者が企業とつながる前に、身分証による本人確認を必須にしています。氏名と顔写真の照合を行い、確認が済んだ方だけが企業とやりとりできます。お支払い先の口座名義が確認済みの氏名と一致するかも、あわせてご確認ください。',
+    },
+    {
+      q: '課題に自社の内部情報を書いても大丈夫ですか',
+      a: '顧客の個人情報は書かないでください。海外在住の方に見える以上、個人データの国外提供にあたる可能性があります。入力時にも検出して警告します。社内の業務手順や数値については、公開しても差し支えない範囲でお書きください。提案の精度は具体性で決まるので、書ける範囲で具体的に書いていただくほど良い提案が集まります。',
+    },
+    {
+      q: '提案を読むだけ読んで、採用しないことはできますか',
+      a: '「該当なし」の宣言はできます。ただし締切から14日以内に結果を宣言していただく決まりで、宣言がない場合は無応答として記録され、貴社のページに表示されます。また、採用しなかった提案のアイデアの権利は提案者に残ります。評価のために読む権利のみをお渡しする形になります。',
+    },
+  ],
 
   ctaTitle: '最初の課題を一緒に作りませんか',
   ctaBody: '興味のある企業の方とご一緒に、最初の数件を設計したいと考えています。業種や課題の性質によって、どういう出し方が効くかは変わります。お話を聞かせてください。',
@@ -206,6 +240,35 @@ const en: DemoCopy = {
 
   otherTitle: 'Other open problems',
 
+  faqTitle: 'Questions we get',
+  faqLead: 'The parts that usually give companies pause when the person is based overseas. This is still a concept, so details may change.',
+  faq: [
+    {
+      q: 'How do we pay someone living abroad?',
+      a: 'For now, you pay the author directly. We do not hold funds. A bank transfer works, as do services such as Wise. Coverage and the way money arrives differ by country — in several, mobile money is more common than a bank account. Confirming how they will receive payment before agreeing an amount avoids most of the friction.',
+    },
+    {
+      q: 'Do we need to withhold tax?',
+      a: 'It depends on whether the payment counts as Japan-source income. Where the service is performed outside Japan, the usual reading is that it does not, so withholding is not required. However, if the payment is treated as consideration for assigning copyright it may be classed as a royalty, and how the contract is worded matters. Tax treaties can also reduce or remove withholding. We are not tax advisers — please check with yours.',
+    },
+    {
+      q: 'What about consumption tax and qualified invoices?',
+      a: 'A service performed outside Japan is generally an out-of-scope transaction for consumption tax. In that case there is no input tax credit to claim, so the absence of a qualified invoice is not a problem. It is a common source of confusion in accounting, so it is worth settling at contract time.',
+    },
+    {
+      q: 'How do we know the person is who they say they are?',
+      a: 'Identity verification with a government ID is required before anyone can connect with a company. We check the name against a photo, and only verified people can start a conversation. We also suggest checking that the bank account name matches the verified name.',
+    },
+    {
+      q: 'Can we include internal information in the problem?',
+      a: 'Please do not include customers\' personal data. Because people overseas can read it, that may amount to transferring personal data outside Japan. We also detect and warn about it as you type. Internal procedures and figures are fine as long as you are comfortable with them being read. Proposals are only as good as the specifics, so the more concrete you can be, the better the answers.',
+    },
+    {
+      q: 'Can we read the proposals and award nobody?',
+      a: 'You can declare that none fit. You do have to declare an outcome within 14 days of the deadline; if you do not, it is recorded as no response and shown on your company page. Rights in proposals you did not select stay with their authors — what you receive is the right to read them in order to evaluate them.',
+    },
+  ],
+
   ctaTitle: 'Help us shape the first ones',
   ctaBody: 'We want to design the first few problems together with the companies that find this interesting. What works depends a lot on the industry and the kind of problem. Tell us about yours.',
   ctaButton: 'Get in touch',
@@ -303,6 +366,35 @@ const fr: DemoCopy = {
   ],
 
   otherTitle: 'Autres problèmes ouverts',
+
+  faqTitle: 'Questions fréquentes',
+  faqLead: "Ce qui fait généralement hésiter les entreprises lorsque la personne réside à l'étranger. Il s'agit encore d'un concept : les détails peuvent évoluer.",
+  faq: [
+    {
+      q: "Comment payer une personne qui vit à l'étranger ?",
+      a: "Pour l'instant, vous payez directement l'auteur. Nous ne détenons aucun fonds. Un virement bancaire convient, tout comme des services tels que Wise. La couverture et le mode de réception varient selon les pays : dans plusieurs d'entre eux, l'argent mobile est plus courant qu'un compte bancaire. Confirmer le mode de réception avant de convenir d'un montant évite la plupart des frictions.",
+    },
+    {
+      q: 'Faut-il pratiquer une retenue à la source ?',
+      a: "Cela dépend si le paiement constitue un revenu de source japonaise. Lorsque la prestation est réalisée hors du Japon, la lecture habituelle est que ce n'est pas le cas, et la retenue n'est pas requise. En revanche, si le paiement est qualifié de contrepartie d'une cession de droits d'auteur, il peut être traité comme une redevance : la rédaction du contrat compte. Les conventions fiscales peuvent aussi réduire ou supprimer la retenue. Nous ne sommes pas conseillers fiscaux — consultez le vôtre.",
+    },
+    {
+      q: "Et la TVA japonaise et les factures qualifiées ?",
+      a: "Une prestation réalisée hors du Japon est en principe hors champ de la taxe à la consommation. Dans ce cas, il n'y a pas de crédit de taxe à récupérer, et l'absence de facture qualifiée ne pose pas de problème. C'est une source fréquente de confusion en comptabilité : mieux vaut le clarifier à la signature.",
+    },
+    {
+      q: "Comment savoir que la personne est bien celle qu'elle prétend ?",
+      a: "Une vérification d'identité par pièce officielle est obligatoire avant tout contact avec une entreprise. Nous contrôlons le nom et la photo, et seules les personnes vérifiées peuvent engager une conversation. Nous conseillons aussi de vérifier que le titulaire du compte bancaire correspond au nom vérifié.",
+    },
+    {
+      q: 'Peut-on inclure des informations internes dans le problème ?',
+      a: "N'incluez pas de données personnelles de vos clients. Comme des personnes à l'étranger peuvent les lire, cela pourrait constituer un transfert de données personnelles hors du Japon. Nous le détectons et vous alertons à la saisie. Les procédures et chiffres internes conviennent si vous acceptez qu'ils soient lus. La qualité des propositions dépend de la précision : plus vous êtes concret, meilleures sont les réponses.",
+    },
+    {
+      q: 'Peut-on lire les propositions et ne retenir personne ?',
+      a: "Vous pouvez déclarer qu'aucune ne convient. Vous devez toutefois déclarer une issue dans les 14 jours suivant la clôture ; à défaut, une absence de réponse est enregistrée et affichée sur votre page. Les droits sur les propositions non retenues restent à leurs auteurs : vous recevez seulement le droit de les lire pour les évaluer.",
+    },
+  ],
 
   ctaTitle: 'Construisons les premiers ensemble',
   ctaBody: "Nous souhaitons concevoir les premiers cas avec les entreprises que cela intéresse. Ce qui fonctionne dépend beaucoup du secteur et de la nature du problème. Parlez-nous du vôtre.",
